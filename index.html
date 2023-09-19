@@ -396,7 +396,6 @@ form{
                 </div>
 
                 <!-- Coordonnées -->
-                <form action="" method="POST" enctype="multipart/form-data">
                   <div class="mb-3 row">
                     <div class="col-4">
                       <input type="text" name="new_lat" id="lat" size=12 value="" class="form-control">
@@ -405,11 +404,10 @@ form{
                       <input type="text" name="new_lon" id="lon" size=12 value="" class="form-control">
                     </div>
                     <div class="col-4">
-                      <input type="submit" name="update_localisation" value="valider" class="btn btn-success" />
+                      <button type="button" id="updateLoc" class="btn btn-success">Valider</button>
                     </div>
 
                   </div>
-                </form>
               </div>
             </div>
           </div>
@@ -449,7 +447,7 @@ form{
         <script>
 
 var moduleair, token;
-var root1, root2, root3, root4, root5, root6;
+var root1, root2, root3, root4, root5, root6, root7, root8;
 
 var measureType = 'PM';
 var timespanGraph = 2;
@@ -460,6 +458,8 @@ const forms = document.querySelector(".forms"),
 
 document.querySelector("#submit").addEventListener("click", submit);
 document.querySelector("#logout").addEventListener("click", reloadPage);
+document.querySelector("#updateLoc").addEventListener("click", updateLocation);
+
 
 pwShowHide.forEach(eyeIcon => {
     eyeIcon.addEventListener("click", () => {
@@ -637,7 +637,7 @@ document.querySelector("#timestamp").innerText = date_texte;
       }).done(function(data) {
           console.log(data);
 
-    if (root5 != undefined && root6 != undefined  && root8 != undefined){
+    if (root5 != undefined && root6 != undefined  && root7 != undefined && root8 != undefined){
     root5.dispose();
     root6.dispose();
     root7.dispose();
@@ -1465,27 +1465,27 @@ break;
       }, {
         // title: "Moyen",
         color: "#51CCAA",
-        lowScore: 11,
+        lowScore: 10,
         highScore: 20
       }, {
         // title: "Dégradé",
         color: "#EDE663",
-        lowScore: 21,
+        lowScore: 20,
         highScore: 25
       }, {
         // title: "Mauvais",
         color: "#ED5E58",
-        lowScore: 26,
+        lowScore: 25,
         highScore: 50
       }, {
         // title: "Très mauvais",
         color: "#881B33",
-        lowScore: 51,
+        lowScore: 50,
         highScore: 75
       }, {
         // title: "Extr. mauvais",
         color: "#74287D",
-        lowScore: 76,
+        lowScore: 75,
         highScore: 100
       }
     ];
@@ -1501,27 +1501,27 @@ break;
                 }, {
                   // title: "Moyen",
                   color: "#51CCAA",
-                  lowScore: 21,
+                  lowScore: 20,
                   highScore: 40
                 }, {
                   // title: "Dégradé",
                   color: "#EDE663",
-                  lowScore: 41,
+                  lowScore: 40,
                   highScore: 50
                 }, {
                   // title: "Mauvais",
                   color: "#ED5E58",
-                  lowScore: 51,
+                  lowScore: 50,
                   highScore: 100
                 }, {
                   // title: "Très mauvais",
                   color: "#881B33",
-                  lowScore: 101,
+                  lowScore: 100,
                   highScore: 150
                 }, {
                   // title: "Extr. mauvais",
                   color: "#74287D",
-                  lowScore: 151,
+                  lowScore: 150,
                   highScore: 200
                 }
               ];
@@ -1530,16 +1530,16 @@ break;
 
       if (type =="CO2"){
          bandsData = [{
-                  color: "#008000",
+                  color: "#51CCAA",
                   lowScore: 400,
                   highScore: 800
                 }, {
-                  color: "#FFFF00",
-                  lowScore: 801,
+                  color: "#EDE663",
+                  lowScore: 800,
                   highScore: 1500
                 }, {
-                  color: "#FF0000",
-                  lowScore: 1501,
+                  color: "#881B33",
+                  lowScore: 1500,
                   highScore: 3000
                 }
               ];
@@ -1640,31 +1640,31 @@ switch(timespan) {
 
 $.ajax({
         method: "GET",
-        url: "https://aircarto.fr/API_V2/capteurs/dataModuleAir?capteurID="+ moduleair + "&start="+start_string + "&end=" +end_string + "&freq=2m"
+        url: "https://aircarto.fr/API_V2/capteurs/dataModuleAir?capteurID="+ moduleair + "&start="+start_string + "&end=" +end_string + "&freq=2m&token=" + token
     }).done(function(data) {
         console.log(data);
         if (data != null){
 
-  if (root4 != undefined && root5 != undefined && root6 != undefined){
-  root4.dispose();
+  if (root5 != undefined && root6 != undefined && root7 != undefined && root8 != undefined){
   root5.dispose();
   root6.dispose();
   root7.dispose();
+  root8.dispose();
   }
 
   setTimeout( function() {am5.ready(function() {
 
-  root4 = am5.Root.new("chartdiv4");
-  graphCreator(root4,data,'PM',timespanGraph,data[data.length - 1].sensorId);
-
   root5 = am5.Root.new("chartdiv5");
-  graphCreator(root5,data,'THP',timespanGraph,data[data.length - 1].sensorId);
+  graphCreator(root5,data,'PM',timespanGraph,data[data.length - 1].sensorId);
 
   root6 = am5.Root.new("chartdiv6");
-  graphCreator(root6,data,'COV',timespanGraph,data[data.length - 1].sensorId);
+  graphCreator(root6,data,'THP',timespanGraph,data[data.length - 1].sensorId);
 
   root7 = am5.Root.new("chartdiv7");
-  graphCreator(root6,data,'CO2',timespanGraph,data[data.length - 1].sensorId);
+  graphCreator(root7,data,'COV',timespanGraph,data[data.length - 1].sensorId);
+
+  root8 = am5.Root.new("chartdiv8");
+  graphCreator(root8,data,'CO2',timespanGraph,data[data.length - 1].sensorId);
 
 
   })}, 1000);
@@ -1820,6 +1820,62 @@ function reloadPage(){
   location.reload();
 
 }
+
+function addr_search() {
+      var inp = document.getElementById("addr");
+      var xmlhttp = new XMLHttpRequest();
+      var url = "https://nominatim.openstreetmap.org/search?format=json&limit=3&q=" + inp.value;
+      xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          var myArr = JSON.parse(this.responseText);
+          myFunction(myArr);
+        }
+      };
+      xmlhttp.open("GET", url, true);
+      xmlhttp.send();
+    }
+      
+    function myFunction(arr) {
+      var out = "";
+      var i;
+
+      if (arr.length > 0) {
+        for (i = 0; i < arr.length; i++) {
+          out += "<div class='address' title='Show Location and Coordinates' onclick='chooseAddr(" + arr[i].lat + ", " + arr[i].lon + ");return false;'>" + arr[i].display_name + "</div>";
+        }
+        document.getElementById('results').innerHTML = out;
+      } else {
+        document.getElementById('results').innerHTML = "Sorry, no results...";
+      }
+
+    }
+
+    function chooseAddr(lat1, lng1) {
+      myMarker.closePopup();
+      map.setView([lat1, lng1], 18);
+      myMarker.setLatLng([lat1, lng1]);
+      lat = lat1.toFixed(8);
+      lon = lng1.toFixed(8);
+      document.getElementById('lat').value = lat;
+      document.getElementById('lon').value = lon;
+      myMarker.bindPopup("Lat " + lat + "<br />Lon " + lon).openPopup();
+    }
+
+  function updateLocation(){
+
+    let lat = document.querySelector("#lat").value;
+    let lng = document.querySelector("#lon").value;
+
+    console.log("https://aircarto.fr/API_V2/capteurs/changeLoc?capteurID=" + moduleair +"&lat=" + lat + "&long=" + lng + "&token=" + token);
+
+    $.ajax({
+        method: "POST",
+        url: "https://aircarto.fr/API_V2/capteurs/changeLoc?capteurID=" + moduleair +"&lat=" + lat + "&long=" + lng + "&token=" + token
+    }).fail(function() {
+        console.log("Error while posting data to Aircarto API");
+    });
+
+  }    
 
         </script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
