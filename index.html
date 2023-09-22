@@ -378,7 +378,17 @@ form{
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">Connecter un NebuleAir</h5>
-       
+              <span>Lier votre ModuleAir à votre NebuleAir ou à un capteur proche afin de comparer les concentrations de particules fines intérieure et extérieure</span>
+              <br>
+              <div class="mb-3 row">
+                <div class="col-4">
+                  <input type="text" id="linkNebuleAir" placeholder="nebuleair-..." size="14" value="" class="form-control">
+                </div>
+                <div class="col-4">
+                  <button type="button" id="updateLink" class="btn btn-success">Valider</button>
+                </div>
+
+              </div>
               </div>
             </div>
           </div>
@@ -461,6 +471,8 @@ form{
         <script>
 
 var moduleair, token;
+var nebuleair;
+var dataNebuleAir = null;
 var root1, root2, root3, root4, root5, root6, root7, root8;
 
 var measureType = 'PM';
@@ -473,6 +485,7 @@ const forms = document.querySelector(".forms"),
 document.querySelector("#submit").addEventListener("click", submit);
 document.querySelector("#logout").addEventListener("click", reloadPage);
 document.querySelector("#updateLoc").addEventListener("click", updateLocation);
+document.querySelector("#updateLink").addEventListener("click", updateLink);
 
 
 pwShowHide.forEach(eyeIcon => {
@@ -518,9 +531,23 @@ function submit(){
           if (data != null){
 
 const timestamp_UTC = new Date(data[0].time);  
+const timestamp_current = Date.now();
+
+let difference = ((timestamp_current-timestamp_UTC)/1000)/3600;
+
+console.log(difference);
+
+if(difference<=1){timeLengthGraph = 3}
+if(difference >1 && difference <= 3 ){timeLengthGraph = 3}
+if(difference > 3 && difference <= 24 ){timeLengthGraph = 24}
+if(difference > 24 && difference <= 48 ){timeLengthGraph = 48}
+if(difference > 48 && difference <= 168 ){timeLengthGraph = 168}
+if(difference > 168 && difference <= 720 ){timeLengthGraph = 720}
+if(difference > 720 && difference <= 8760 ){timeLengthGraph = 8760}
 
 document.querySelector("#lat").value = data[0].latitude;
 document.querySelector("#lon").value = data[0].longitude;
+document.querySelector("#linkNebuleAir").value = data[0].link;
 
 const offset = -(new Date().getTimezoneOffset())/60;
 //const  timestamp_local = new Date(timestamp_UTC.setHours(timestamp_UTC.getHours() + offset));
@@ -637,13 +664,36 @@ document.querySelector("#timestamp").innerText = date_texte;
 
     const end = new Date();
   const end_string = end.toISOString();
-  const get_start = end.setHours(end.getHours() - 3);
+  const get_start = end.setHours(end.getHours() - timeLengthGraph);
   const start = new Date(get_start);
   const start_string = start.toISOString()
   console.log(start_string);
   console.log(end_string);
 
+  if (data[0].link != null){
+
+    nebuleair = data[0].link;
+
+    console.log("https://aircarto.fr/API_V2/capteurs/dataNebuleAir?capteurID="+ data[0].link + "&start="+start_string + "&end=" +end_string + "&freq=2m");
+
+    $.ajax({
+          method: "GET",
+          url: "https://aircarto.fr/API_V2/capteurs/dataNebuleAir?capteurID="+ data[0].link + "&start="+start_string + "&end=" +end_string + "&freq=2m"
+      }).done(function(data) {
+        console.log(data);
+        dataNebuleAir = data;
+        if(data == null){
+        openToast("Pas de donnée NebuleAir sur cet intervalle.");
+      }
+        })
+      .fail(function() {
+          console.log("Error while geting data from Aircarto API");
+      }); 
+
+  }
+
   console.log("https://aircarto.fr/API_V2/capteurs/dataModuleAir?capteurID="+ moduleair + "&start="+start_string + "&end=" +end_string + "&freq=2m&token=" + token);
+
 
   $.ajax({
           method: "GET",
@@ -661,19 +711,19 @@ document.querySelector("#timestamp").innerText = date_texte;
     setTimeout( function() {am5.ready(function() {
       if(data != null){
     root5 = am5.Root.new("chartdiv5");
-    graphCreator(root5,data,'PM',timespanGraph,data[0].sensorId);
+    graphCreator(root5,data,dataNebuleAir,'PM',timespanGraph,data[0].sensorId);
 
     root6 = am5.Root.new("chartdiv6");
-    graphCreator(root6,data,'THP',timespanGraph,data[0].sensorId);
+    graphCreator(root6,data,dataNebuleAir,'THP',timespanGraph,data[0].sensorId);
 
     root7 = am5.Root.new("chartdiv7");
-    graphCreator(root7,data,'COV',timespanGraph,data[0].sensorId);
+    graphCreator(root7,data,dataNebuleAir,'COV',timespanGraph,data[0].sensorId);
 
     root8 = am5.Root.new("chartdiv8");
-    graphCreator(root8,data,'CO2',timespanGraph,data[0].sensorId);
+    graphCreator(root8,data,dataNebuleAir,'CO2',timespanGraph,data[0].sensorId);
     }else{
 
-      openToast("Pas de donnée sur les 3 dernières heures. Veuillez choisir une période plus longue.");
+      openToast("Pas de donnée sur cet intervalle. Veuillez choisir une période plus longue.");
 
 
     }
@@ -706,33 +756,79 @@ document.querySelector("#timestamp").innerText = date_texte;
 
 
 
-function graphCreator(root,data,type,timespan,id){
+function graphCreator(root,data1,data2,type,timespan,id){
 
-  let data_PM1 = data.map(function(e){
+  console.log(data2);
+
+  let dataMerged = data1.concat(data2);
+
+  let data_PM1_moduleair = data1.map(function(e){
               return {value:e.PM1, date:new Date(e.time).getTime()}
           } );
-    let data_PM25 = data.map(function(e){
+    let data_PM25_moduleair = data1.map(function(e){
               return {value:e.PM25, date:new Date(e.time).getTime()}
           } );
-    let data_PM10 = data.map(function(e){
+    let data_PM10_moduleair = data1.map(function(e){
               return {value:e.PM10, date:new Date(e.time).getTime()}
     } );
 
-    let data_T = data.map(function(e){
+    let data_T_moduleair = data1.map(function(e){
               return {value:e.TEMP, date:new Date(e.time).getTime()}
     } );
 
-    let data_H = data.map(function(e){
+    let data_H_moduleair = data1.map(function(e){
               return {value:e.HUM, date:new Date(e.time).getTime()}
     } );
 
-    let data_P = data.map(function(e){
+    let data_P_moduleair = data1.map(function(e){
               return {value:e.PRESS, date:new Date(e.time).getTime()}
     } );
 
-    let data_COV = data.map(function(e){
+    let data_COV_moduleair = data1.map(function(e){
               return {value:e.COV, date:new Date(e.time).getTime()}
     } );
+
+    let data_CO2_moduleair = data1.map(function(e){
+              return {value:e.CO2, date:new Date(e.time).getTime()}
+    } );
+
+    let data_PM1_nebuleair = null;
+    let data_PM25_nebuleair = null;
+    let data_PM10_nebuleair = null;
+    let data_T_nebuleair = null;
+    let data_H_nebuleair = null;
+    let data_P_nebuleair = null;
+    let data_COV_nebuleair = null;
+
+    if(data2 != null){
+
+    data_PM1_nebuleair = data2.map(function(e){
+              return {value:e.PM1, date:new Date(e.time).getTime()}
+          } );
+    data_PM25_nebuleair = data2.map(function(e){
+              return {value:e.PM25, date:new Date(e.time).getTime()}
+          } );
+    data_PM10_nebuleair = data2.map(function(e){
+              return {value:e.PM10, date:new Date(e.time).getTime()}
+    } );
+
+    data_T_nebuleair = data2.map(function(e){
+              return {value:e.TEMP, date:new Date(e.time).getTime()}
+    } );
+
+    data_H_nebuleair = data2.map(function(e){
+              return {value:e.HUM, date:new Date(e.time).getTime()}
+    } );
+
+   data_P_nebuleair = data2.map(function(e){
+              return {value:e.PRESS, date:new Date(e.time).getTime()}
+    } );
+
+    data_COV_nebuleair = data2.map(function(e){
+              return {value:e.COV, date:new Date(e.time).getTime()}
+    } );
+
+    }
 
     let idTitre = id;
 
@@ -795,8 +891,8 @@ function graphCreator(root,data,type,timespan,id){
                       renderer: am5xy.AxisRendererY.new(root, {})
                   }));
 
-                  let series_PM1 = chart.series.push(am5xy.LineSeries.new(root, {
-                          name: "PM1 ModuleAir",
+                  let series_PM1_moduleair = chart.series.push(am5xy.LineSeries.new(root, {
+                          name: "PM1 int.",
                           xAxis: xAxis,
                           yAxis: yAxis,
                           valueYField: "value",
@@ -808,11 +904,30 @@ function graphCreator(root,data,type,timespan,id){
                           })
                       }));
 
-                  series_PM1.data.setAll(data_PM1);
-                  series_PM1.appear();
+                  series_PM1_moduleair.data.setAll(data_PM1_moduleair);
+                  series_PM1_moduleair.appear();
 
-                  let series_PM25 = chart.series.push(am5xy.LineSeries.new(root, {
-                          name: "PM2.5 ModuleAir",
+                  if(data_PM1_nebuleair != null){
+
+                  let series_PM1_nebuleair = chart.series.push(am5xy.LineSeries.new(root, {
+                        name: "PM1 ext.",
+                        xAxis: xAxis,
+                        yAxis: yAxis,
+                        valueYField: "value",
+                        valueXField: "date",
+                        legendValueText: "{valueY}",
+                        tooltip: am5.Tooltip.new(root, {
+                            pointerOrientation: "horizontal",
+                            labelText: "{valueY}"
+                        })
+                    }));
+
+                  series_PM1_nebuleair.data.setAll(data_PM1_nebuleair);
+                  series_PM1_nebuleair.appear();
+                  }
+
+                  let series_PM25_moduleair = chart.series.push(am5xy.LineSeries.new(root, {
+                          name: "PM2.5 int.",
                           xAxis: xAxis,
                           yAxis: yAxis,
                           valueYField: "value",
@@ -824,12 +939,13 @@ function graphCreator(root,data,type,timespan,id){
                           })
                       }));
 
-                  series_PM25.data.setAll(data_PM25);
-                  series_PM25.appear();
+                  series_PM25_moduleair.data.setAll(data_PM25_moduleair);
+                  series_PM25_moduleair.appear();
 
+                  if(data_PM25_nebuleair != null){
 
-                  let series_PM10 = chart.series.push(am5xy.LineSeries.new(root, {
-                          name: "PM10 ModuleAir",
+                    let series_PM25_nebuleair = chart.series.push(am5xy.LineSeries.new(root, {
+                          name: "PM2.5 ext.",
                           xAxis: xAxis,
                           yAxis: yAxis,
                           valueYField: "value",
@@ -841,8 +957,49 @@ function graphCreator(root,data,type,timespan,id){
                           })
                       }));
 
-                  series_PM10.data.setAll(data_PM10);
-                  series_PM10.appear();
+                    series_PM25_nebuleair.data.setAll(data_PM10_nebuleair);
+                    series_PM25_nebuleair.appear();
+                    }
+
+
+                  let series_PM10_moduleair = chart.series.push(am5xy.LineSeries.new(root, {
+                          name: "PM10 int.",
+                          xAxis: xAxis,
+                          yAxis: yAxis,
+                          valueYField: "value",
+                          valueXField: "date",
+                          legendValueText: "{valueY}",
+                          tooltip: am5.Tooltip.new(root, {
+                              pointerOrientation: "horizontal",
+                              labelText: "{valueY}"
+                          })
+                      }));
+
+                  series_PM10_moduleair.data.setAll(data_PM10_moduleair);
+                  series_PM10_moduleair.appear();
+
+
+                  if(data_PM10_nebuleair != null){
+
+                    let series_PM10_nebuleair = chart.series.push(am5xy.LineSeries.new(root, {
+                          name: "PM10 ext.",
+                          xAxis: xAxis,
+                          yAxis: yAxis,
+                          valueYField: "value",
+                          valueXField: "date",
+                          legendValueText: "{valueY}",
+                          tooltip: am5.Tooltip.new(root, {
+                              pointerOrientation: "horizontal",
+                              labelText: "{valueY}"
+                          })
+                      }));
+
+                  series_PM10_nebuleair.data.setAll(data_PM10_nebuleair);
+                  series_PM10_nebuleair.appear();
+                  }
+
+
+
 
                   // Add cursor
                   // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
@@ -852,7 +1009,7 @@ function graphCreator(root,data,type,timespan,id){
                   cursor.lineY.set("visible", false);
 
                   var legend = chart.bottomAxesContainer.children.push(am5.Legend.new(root, {
-                    width: 400,
+                    width: 800,
                     height: am5.percent(20),
                     layout: root.horizontalLayout,
                 }));
@@ -912,7 +1069,7 @@ function graphCreator(root,data,type,timespan,id){
 
                   var exporting = am5plugins_exporting.Exporting.new(root, {
 menu: am5plugins_exporting.ExportingMenu.new(root, {}),
-dataSource: data
+dataSource: dataMerged
 });
 
                   // Make stuff animate on load
@@ -967,8 +1124,8 @@ dataSource: data
                       renderer: am5xy.AxisRendererY.new(root, {})
                   }));
 
-                  let series_T = chart.series.push(am5xy.LineSeries.new(root, {
-                          name: "Temp. ModuleAir",
+                  let series_T_moduleair = chart.series.push(am5xy.LineSeries.new(root, {
+                          name: "Temp. int.",
                           xAxis: xAxis,
                           yAxis: yAxisT,
                           valueYField: "value",
@@ -980,11 +1137,30 @@ dataSource: data
                           })
                       }));
 
-                      series_T.data.setAll(data_T);
-                      series_T.appear();
+                      series_T_moduleair.data.setAll(data_T_moduleair);
+                      series_T_moduleair.appear();
 
-                  let series_H = chart.series.push(am5xy.LineSeries.new(root, {
-                          name: "Hum. rel. ModuleAir",
+                      if(data_T_nebuleair != null){
+
+                      let series_T_nebuleair = chart.series.push(am5xy.LineSeries.new(root, {
+                            name: "Temp. ext.",
+                            xAxis: xAxis,
+                            yAxis: yAxisT,
+                            valueYField: "value",
+                            valueXField: "date",
+                            legendValueText: "{valueY}",
+                            tooltip: am5.Tooltip.new(root, {
+                                pointerOrientation: "horizontal",
+                                labelText: "{valueY}"
+                            })
+                        }));
+
+                      series_T_nebuleair.data.setAll(data_T_nebuleair);
+                      series_T_nebuleair.appear();
+                      }
+
+                  let series_H_moduleair = chart.series.push(am5xy.LineSeries.new(root, {
+                          name: "Hum. rel. int.",
                           xAxis: xAxis,
                           yAxis: yAxisH,
                           valueYField: "value",
@@ -996,12 +1172,31 @@ dataSource: data
                           })
                       }));
 
-                      series_H.data.setAll(data_H);
-                      series_H.appear();
+                      series_H_moduleair.data.setAll(data_H_moduleair);
+                      series_H_moduleair.appear();
+
+                      if(data_H_nebuleair != null){
+
+                        let series_H_nebuleair = chart.series.push(am5xy.LineSeries.new(root, {
+                              name: "Hum. rel. ext.",
+                              xAxis: xAxis,
+                              yAxis: yAxisH,
+                              valueYField: "value",
+                              valueXField: "date",
+                              legendValueText: "{valueY}",
+                              tooltip: am5.Tooltip.new(root, {
+                                  pointerOrientation: "horizontal",
+                                  labelText: "{valueY}"
+                              })
+                          }));
+
+                        series_H_nebuleair.data.setAll(data_H_nebuleair);
+                        series_H_nebuleair.appear();
+                        }
 
 
-                  let series_P = chart.series.push(am5xy.LineSeries.new(root, {
-                          name: "Press. ModuleAir",
+                  let series_P_moduleair = chart.series.push(am5xy.LineSeries.new(root, {
+                          name: "Press. int.",
                           xAxis: xAxis,
                           yAxis: yAxisP,
                           valueYField: "value",
@@ -1013,8 +1208,28 @@ dataSource: data
                           })
                       }));
 
-                  series_P.data.setAll(data_P);
-                  series_P.appear();
+                  series_P_moduleair.data.setAll(data_P_moduleair);
+                  series_P_moduleair.appear();
+
+                  if(data_P_nebuleair != null){
+
+                  let series_P_nebuleair = chart.series.push(am5xy.LineSeries.new(root, {
+                        name: "Press. ext.",
+                        xAxis: xAxis,
+                        yAxis: yAxisP,
+                        valueYField: "value",
+                        valueXField: "date",
+                        legendValueText: "{valueY}",
+                        tooltip: am5.Tooltip.new(root, {
+                            pointerOrientation: "horizontal",
+                            labelText: "{valueY}"
+                        })
+                    }));
+
+                  series_P_nebuleair.data.setAll(data_P_nebuleair);
+                  series_P_nebuleair.appear();
+                  }
+
 
                   // Add cursor
                   // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
@@ -1024,7 +1239,7 @@ dataSource: data
                   cursor.lineY.set("visible", false);
 
                   var legend = chart.bottomAxesContainer.children.push(am5.Legend.new(root, {
-                    width: 400,
+                    width: 800,
                     height: am5.percent(20),
                     layout: root.horizontalLayout,
                 }));
@@ -1084,16 +1299,12 @@ dataSource: data
 
                   var exporting = am5plugins_exporting.Exporting.new(root, {
 menu: am5plugins_exporting.ExportingMenu.new(root, {}),
-dataSource: data
+dataSource: dataMerged
 });
 
                   // Make stuff animate on load
                   // https://www.amcharts.com/docs/v5/concepts/animations/
                   chart.appear(1000, 100);
-
-
-
-
 
 }
 
@@ -1134,8 +1345,8 @@ if (type == 'COV'){
                       renderer: am5xy.AxisRendererY.new(root, {})
                   }));
 
-                  let series_COV = chart.series.push(am5xy.LineSeries.new(root, {
-                          name: "COV ModuleAir",
+                  let series_COV_moduleair = chart.series.push(am5xy.LineSeries.new(root, {
+                          name: "COV int.",
                           xAxis: xAxis,
                           yAxis: yAxis,
                           valueYField: "value",
@@ -1147,8 +1358,29 @@ if (type == 'COV'){
                           })
                       }));
 
-                      series_COV.data.setAll(data_COV);
-                      series_COV.appear();
+                      series_COV_moduleair.data.setAll(data_COV_moduleair);
+                      series_COV_moduleair.appear();
+
+                      if(data_COV_nebuleair != null){
+
+                      let series_COV_nebuleair = chart.series.push(am5xy.LineSeries.new(root, {
+                            name: "COV ext.",
+                            xAxis: xAxis,
+                            yAxis: yAxis,
+                            valueYField: "value",
+                            valueXField: "date",
+                            legendValueText: "{valueY}",
+                            tooltip: am5.Tooltip.new(root, {
+                                pointerOrientation: "horizontal",
+                                labelText: "{valueY}"
+                            })
+                        }));
+
+                      series_COV_nebuleair.data.setAll(data_COV_nebuleair);
+                      series_COV_nebuleair.appear();
+                      }
+
+
 
                   // Add cursor
                   // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
@@ -1158,7 +1390,7 @@ if (type == 'COV'){
                   cursor.lineY.set("visible", false);
 
                   var legend = chart.bottomAxesContainer.children.push(am5.Legend.new(root, {
-                    width: 400,
+                    width: 800,
                     height: am5.percent(20),
                     layout: root.horizontalLayout,
                 }));
@@ -1218,7 +1450,7 @@ if (type == 'COV'){
 
                   var exporting = am5plugins_exporting.Exporting.new(root, {
 menu: am5plugins_exporting.ExportingMenu.new(root, {}),
-dataSource: data
+dataSource: dataMerged
 });
 
                   // Make stuff animate on load
@@ -1265,8 +1497,8 @@ chartTitleText += "ppm";
                     renderer: am5xy.AxisRendererY.new(root, {})
                 }));
 
-                let series_COV = chart.series.push(am5xy.LineSeries.new(root, {
-                        name: "CO₂",
+                let series_CO2 = chart.series.push(am5xy.LineSeries.new(root, {
+                        name: "CO₂ int.",
                         xAxis: xAxis,
                         yAxis: yAxis,
                         valueYField: "value",
@@ -1278,8 +1510,8 @@ chartTitleText += "ppm";
                         })
                     }));
 
-                    series_COV.data.setAll(data_COV);
-                    series_COV.appear();
+                    series_CO2.data.setAll(data_CO2_moduleair);
+                    series_CO2.appear();
 
                 // Add cursor
                 // https://www.amcharts.com/docs/v5/charts/xy-chart/cursor/
@@ -1289,7 +1521,7 @@ chartTitleText += "ppm";
                 cursor.lineY.set("visible", false);
 
                 var legend = chart.bottomAxesContainer.children.push(am5.Legend.new(root, {
-                  width: 400,
+                  width: 800,
                   height: am5.percent(20),
                   layout: root.horizontalLayout,
               }));
@@ -1349,7 +1581,7 @@ chartTitleText += "ppm";
 
                 var exporting = am5plugins_exporting.Exporting.new(root, {
 menu: am5plugins_exporting.ExportingMenu.new(root, {}),
-dataSource: data
+dataSource: dataMerged
 });
 
                 // Make stuff animate on load
@@ -1625,11 +1857,10 @@ break;
 
     }
 
-function reloadDataSensor(id,hours,timespan){
+function reloadDataSensor(hours,timespan){
 
 console.log("%ModuleAir 1 sensor", "color: yellow; font-style: bold; background-color: blue;padding: 2px", );
 
-console.log(id);
 console.log(hours);
 console.log(timespan);
 
@@ -1656,6 +1887,29 @@ switch(timespan) {
       break;
   } 
 
+
+if (nebuleair != null){
+
+  console.log("https://aircarto.fr/API_V2/capteurs/dataNebuleAir?capteurID="+ nebuleair + "&start="+start_string + "&end=" +end_string + "&freq="+ timespan);
+
+  $.ajax({
+        method: "GET",
+        url: "https://aircarto.fr/API_V2/capteurs/dataNebuleAir?capteurID="+ nebuleair + "&start="+start_string + "&end=" +end_string + "&freq=" + timespan
+    }).done(function(data) {
+      console.log(data);
+      dataNebuleAir = data;
+
+      if(data == null){
+        openToast("Pas de donnée NebuleAir sur cet intervalle.");
+      }
+
+      })
+    .fail(function() {
+        console.log("Error while geting data from Aircarto API");
+    }); 
+
+}
+
   console.log("https://aircarto.fr/API_V2/capteurs/dataModuleAir?capteurID="+ moduleair + "&start="+start_string + "&end=" +end_string + "&freq="+ timespan);
 
 $.ajax({
@@ -1675,23 +1929,22 @@ $.ajax({
   setTimeout( function() {am5.ready(function() {
 
   root5 = am5.Root.new("chartdiv5");
-  graphCreator(root5,data,'PM',timespanGraph,data[data.length - 1].sensorId);
+  graphCreator(root5,data,dataNebuleAir,'PM',timespanGraph,data[data.length - 1].sensorId);
 
   root6 = am5.Root.new("chartdiv6");
-  graphCreator(root6,data,'THP',timespanGraph,data[data.length - 1].sensorId);
+  graphCreator(root6,data,dataNebuleAir,'THP',timespanGraph,data[data.length - 1].sensorId);
 
   root7 = am5.Root.new("chartdiv7");
-  graphCreator(root7,data,'COV',timespanGraph,data[data.length - 1].sensorId);
+  graphCreator(root7,data,dataNebuleAir,'COV',timespanGraph,data[data.length - 1].sensorId);
 
   root8 = am5.Root.new("chartdiv8");
-  graphCreator(root8,data,'CO2',timespanGraph,data[data.length - 1].sensorId);
+  graphCreator(root8,data,dataNebuleAir,'CO2',timespanGraph,data[data.length - 1].sensorId);
 
 
   })}, 1000);
 
 }else{
-
-         // alert
+        openToast("Pas de donnée sur cet intervalle. Veuillez choisir une période plus longue.");
         }
 
     })
@@ -1710,7 +1963,7 @@ function refresh_data() {
 function chooseTimeModuleAir(id, hours, timespan) {
             timeLengthGraph = hours;
             timespanGraph = timespan;
-            reloadDataSensor(id,hours,timespan);
+            reloadDataSensor(hours,timespan);
             document.getElementById("button1h").innerHTML = '<button type="button" onclick="chooseTimeModuleAir(\'' + id + '\',1,' + timespanGraph + ')" class="btn btn-outline-secondary btn-sm">1h</button>';
             document.getElementById("button3h").innerHTML = '<button type="button" onclick="chooseTimeModuleAir(\'' + id + '\',3,' + timespanGraph + ')" class="btn btn-outline-secondary btn-sm">3h</button>';
             document.getElementById("button24h").innerHTML = '<button type="button" onclick="chooseTimeModuleAir(\'' + id + '\',24,' + timespanGraph + ')" class="btn btn-outline-secondary btn-sm">24h</button>';
@@ -1897,6 +2150,26 @@ function addr_search() {
 
   }    
 
+  function updateLink(){
+
+let nebuleair = document.querySelector("#linkNebuleAir").value;
+
+console.log("https://aircarto.fr/API_V2/capteurs/link?capteurID_ModuleAir="+ moduleair +"&capteurID_NebuleAir=" + nebuleair + "&token=" + token);
+
+$.ajax({
+    method: "GET",
+    url: "https://aircarto.fr/API_V2/capteurs/link?capteurID_ModuleAir="+ moduleair +"&capteurID_NebuleAir=" + nebuleair + "&token=" + token
+}).done(function(data) {
+
+console.log(data);
+//location.reload(); //RELOAD THE PAGE
+
+})
+.fail(function() {
+    console.log("Error while posting data to Aircarto API");
+});
+
+} 
 
   function openToast(message) {
             let toastDiv= document.getElementById('messageToast');
