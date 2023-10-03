@@ -928,6 +928,7 @@ function graphCreator(root,data1,data2,type,timespan,id){
 
                   let series_PM25_moduleair = chart.series.push(am5xy.LineSeries.new(root, {
                           name: "PM2.5 int.",
+                          connect : false,
                           xAxis: xAxis,
                           yAxis: yAxis,
                           valueYField: "value",
@@ -964,6 +965,7 @@ function graphCreator(root,data1,data2,type,timespan,id){
 
                   let series_PM10_moduleair = chart.series.push(am5xy.LineSeries.new(root, {
                           name: "PM10 int.",
+                          connect : false,
                           xAxis: xAxis,
                           yAxis: yAxis,
                           valueYField: "value",
@@ -1910,11 +1912,11 @@ if (nebuleair != null){
 
 }
 
-  console.log("https://aircarto.fr/API_V2/capteurs/dataModuleAir?capteurID="+ moduleair + "&start="+start_string + "&end=" +end_string + "&freq="+ timespan);
+  console.log("https://aircarto.fr/API_V2/capteurs/dataModuleAir?capteurID="+ moduleair + "&start="+start_string + "&end=" +end_string + "&freq="+ timespan +"&token=" + token);
 
 $.ajax({
         method: "GET",
-        url: "https://aircarto.fr/API_V2/capteurs/dataModuleAir?capteurID="+ moduleair + "&start="+start_string + "&end=" +end_string + "&freq=2m&token=" + token
+        url: "https://aircarto.fr/API_V2/capteurs/dataModuleAir?capteurID="+ moduleair + "&start="+start_string + "&end=" +end_string + "&freq="+ timespan +"&token=" + token
     }).done(function(data) {
         console.log(data);
         if (data != null){
