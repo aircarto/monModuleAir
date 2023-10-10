@@ -53,7 +53,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #4070f4;
+    background-color: white;
     column-gap: 30px;
 }
 
@@ -230,6 +230,7 @@ form{
     </head>
     <body>
 
+     
 
       <div class="toast-container position-fixed end-0 p-3" style="bottom:10px;">
         <div class="toast align-items-center" id="messageToast" role="alert" aria-live="assertive" aria-atomic="true">
@@ -241,7 +242,7 @@ form{
         </div>
     </div>
 
-
+    <div class="container">
 
         <section id="container_form">
             <div class="form login">
@@ -272,17 +273,17 @@ form{
                 <div class="row" style="margin-top:20px;">
                   <div class="col-sm-8">
                     <a>
-                      <img src="/monmoduleair/img/LogoModuleAirColor_long.png" height="50" alt="">
+                      <img src="./img/logoModuleAirColor_long.png" height="50" alt="">
                     </a>
                   </div>
           
                   <div class="col-sm-4" >
                     <a style="display: none;">
-                      <img src="/monmoduleair/img/LogoAtmoSud.png" class="float-left" height="50" alt="">
+                      <img src="./img/LogoAtmoSud.png" class="float-left" height="50" alt="">
                     </a>
           
                     <a>
-                      <img src="/monmoduleair/img/LogoAirCarto.png" class="float-right" height="50" alt="">
+                      <img src="./img/LogoAirCarto.png" class="float-right" height="50" alt="">
                     </a>
                   </div>
                 </div>
@@ -292,9 +293,10 @@ form{
                       <div class="card">
                         <div class="card-body">
             
-                          <h3 class="card-title">Mes données</h3>
+                          <h3 class="card-title">ModuleAir <span id="idm"></span></h3>
+                          <h4>Mes données</h4>
             
-                            <p>Dernières mesures effectuées par le capteur <span id="idm"></span>:  <span id="timestamp"></span> <br><button type="button" onclick="refresh_data()" class="btn btn-outline-secondary btn-sm">Recharger les données</button></p>
+                            <p>Dernières mesures effectuées par le capteur:  <span id="timestamp"></span> <br><button type="button" onclick="refresh_data()" class="btn btn-outline-secondary btn-sm">Recharger les données</button></p>
                             
                             <div class="row">
             
@@ -466,6 +468,7 @@ form{
     </div>
 
         </section>
+      </div>
 
         <!-- JavaScript -->
         <script>
