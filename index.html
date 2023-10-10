@@ -516,6 +516,8 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     maxZoom: 21
 }).addTo(map); 
 
+var myMarker;
+
 function submit(){
 
     moduleair = document.querySelector("#moduleair").value;
@@ -623,7 +625,7 @@ document.querySelector("#timestamp").innerText = date_texte;
 
     map.setView(coordsCenter, zoomLevel); 
 
-    var myMarker = L.marker([data[0].latitude, data[0].longitude], {
+    myMarker = new L.marker([data[0].latitude, data[0].longitude], {
       title: "Coordinates",
       alt: "Coordinates",
       draggable: true
@@ -2123,7 +2125,6 @@ function adressResult(arr) {
 }
 
 function chooseAddr(lat1, lng1) {
-      console.log('TEST');
       myMarker.closePopup();
       map.setView([lat1, lng1], 18);
       myMarker.setLatLng([lat1, lng1]);
