@@ -463,6 +463,33 @@
         </div>
       </div>
 
+        <!-- CONNEXION NEBULEAIR-->
+
+              <div class="row" style="margin-top: 20px">
+                <div class="col-sm-12">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">Position dans la maison</h5>
+                      <span
+                        >Indiquez la pièces dans laquelle se trouve le ModuleAir
+                        </span>
+                      <br/>
+                      <select id="room" class="form-select form-select-sm" aria-label="Small select example">
+                        <option value=null>Choix de la pièce</option>
+                        <option value="cuisine">Cuisine</option>
+                        <option value="salle_a_manger">Salle à manger</option>
+                        <option value="salon">Salon</option>
+                        <option value="chambre_parents">Chambre parents</option>
+                        <option value="chambre_enfants">Chambre enfants</option>
+                        <option value="toilettes">Toilettes</option>
+                        <option value="salle_de_bain">Salle de bain</option>
+                        <option value="entree">Entrée</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
       <!-- MAP CONTROL-->
 
       <div class="row" style="margin-top: 20px">
@@ -591,6 +618,8 @@
         .querySelector("#updateLink")
         .addEventListener("click", updateLink);
 
+      document.querySelector("#room").addEventListener("change", changeRoom);
+
       pwShowHide.forEach((eyeIcon) => {
         eyeIcon.addEventListener("click", () => {
           let pwFields =
@@ -646,6 +675,15 @@
           .done(function (data) {
             console.log(data);
             if (data != null) {
+
+              // if (data[0].displayMap){
+              //   document.querySelector("#show").checked = true;
+              // }else{
+              //   document.querySelector("#show").checked = false;
+              // }
+
+              document.querySelector("option[value="+ data[0].room +"]").selected = true;
+
               const timestamp_UTC = new Date(data[0].time);
               const timestamp_current = Date.now();
 
@@ -834,7 +872,7 @@
               console.log(start_string);
               console.log(end_string);
 
-              if (data[0].link != null) {
+              if (data[0].link != null && data[0].link != "" && data[0].link.contains("nebuleair-")) {
                 nebuleair = data[0].link;
 
                 console.log(
@@ -976,7 +1014,6 @@
 
       function graphCreator(root, data1, data2, type, timespan, id) {
         console.log(data2);
-
         let dataMerged = data1.concat(data2);
 
         let data_PM1_moduleair = data1.map(function (e) {
@@ -2954,6 +2991,31 @@
           .fail(function () {
             console.log("Error while posting data to Aircarto API");
           });
+      }
+
+
+      function changeRoom(event){
+
+        let room;
+
+        console.log(event.target.value);
+
+        $.ajax({
+          method: "POST",
+          url:
+            "https://aircarto.fr/API_V2/capteurs/changeRoom?capteurID=" +
+            moduleair +
+            "&room=" +
+            event.target.value +
+            "&token=" +
+            token,
+          success: function (result) {
+              openToast("Pièce changée.");
+          },
+        }).fail(function () {
+          console.log("Error while posting data to Aircarto API");
+          openToast("Erreur pour le changement de la pièce.");
+        });
       }
 
       function openToast(message) {
