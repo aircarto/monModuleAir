@@ -676,7 +676,7 @@
             console.log(data);
             if (data != null) {
 
-              document.querySelector("option[value="+ data[0].room +"]").selected = true;
+              document.querySelector("#room").value = data[0].room;
 
               const timestamp_UTC = new Date(data[0].time);
               const timestamp_current = Date.now();
