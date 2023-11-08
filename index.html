@@ -441,7 +441,6 @@
                     <input
                       type="text"
                       id="linkNebuleAir"
-                      placeholder="nebuleair-..."
                       size="14"
                       value=""
                       class="form-control"
@@ -653,6 +652,12 @@
 
       var myMarker;
 
+      // setTimeout(() => {
+      //   console.log("reload");
+      //   submit();
+      //   // reloadDataSensor(timeLengthGraph, timespanGraph);
+      // }, 120000);
+
       function submit() {
         moduleair = document.querySelector("#moduleair").value;
         token = document.querySelector("#token").value;
@@ -710,7 +715,7 @@
 
               document.querySelector("#lat").value = data[0].latitude;
               document.querySelector("#lon").value = data[0].longitude;
-              document.querySelector("#linkNebuleAir").value = data[0].link;
+              document.querySelector("#linkNebuleAir").value = data[0].link.split("-")[1];
 
               // const offset = -new Date().getTimezoneOffset() / 60;
               //const  timestamp_local = new Date(timestamp_UTC.setHours(timestamp_UTC.getHours() + offset));
@@ -1007,9 +1012,14 @@
       }
 
       function graphCreator(root, data1, data2, type, timespan, id) {
-        console.log(data2);
-        let dataMerged = data1.concat(data2);
+        let dataMerged;
 
+        if (data2 != null && data2 != undefined){
+           dataMerged = data1.concat(data2);
+        }else{
+          dataMerged = data1;
+        }
+        
         let data_PM1_moduleair = data1.map(function (e) {
           return { value: e.PM1, date: new Date(e.time).getTime() };
         });
@@ -1048,7 +1058,7 @@
         let data_P_nebuleair = null;
         let data_COV_nebuleair = null;
 
-        if (data2 != null) {
+        if (data2 != null && data2 != undefined) {
           data_PM1_nebuleair = data2.map(function (e) {
             return { value: e.PM1, date: new Date(e.time).getTime() };
           });
@@ -1118,6 +1128,19 @@
             })
           );
 
+
+          chart.get("colors").set("colors", [
+  am5.color(0x095256),
+  am5.color(0x087f8c),
+  am5.color(0x5aaa95),
+  am5.color(0x86a873),
+  am5.color(0xbb9f06)
+]);
+
+
+
+
+
           // Create axes
           // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
           let xAxis = chart.xAxes.push(
@@ -1156,6 +1179,7 @@
           series_PM1_moduleair.data.setAll(data_PM1_moduleair);
           series_PM1_moduleair.appear();
 
+          console.log(data_PM1_nebuleair);
           if (data_PM1_nebuleair != null) {
             let series_PM1_nebuleair = chart.series.push(
               am5xy.LineSeries.new(root, {
@@ -1175,6 +1199,8 @@
             series_PM1_nebuleair.data.setAll(data_PM1_nebuleair);
             series_PM1_nebuleair.appear();
           }
+
+
 
           let series_PM25_moduleair = chart.series.push(
             am5xy.LineSeries.new(root, {
@@ -1211,7 +1237,7 @@
               })
             );
 
-            series_PM25_nebuleair.data.setAll(data_PM10_nebuleair);
+            series_PM25_nebuleair.data.setAll(data_PM25_nebuleair);
             series_PM25_nebuleair.appear();
           }
 
@@ -1259,9 +1285,12 @@
           var cursor = chart.set(
             "cursor",
             am5xy.XYCursor.new(root, {
-              behavior: "none",
+              behavior: "zoomX",
+              xAxis: xAxis,
+              snapToSeriesBy: "!x"
             })
           );
+          cursor.lineX.set("visible", true);
           cursor.lineY.set("visible", false);
 
           var legend = chart.bottomAxesContainer.children.push(
@@ -1313,6 +1342,7 @@
             textAlign: "right",
           });
 
+          legend.valueLabels.template.set("forceHidden", true);
           // It's is important to set legend data after all the events are set on template, otherwise events won't be copied
           legend.data.setAll(chart.series.values);
 
@@ -1355,6 +1385,15 @@
               pinchZoomX: true,
             })
           );
+
+
+          chart.get("colors").set("colors", [
+  am5.color(0x095256),
+  am5.color(0x087f8c),
+  am5.color(0x5aaa95),
+  am5.color(0x86a873),
+  am5.color(0xbb9f06)
+]);
 
           // Create axes
           // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
@@ -1507,9 +1546,12 @@
           var cursor = chart.set(
             "cursor",
             am5xy.XYCursor.new(root, {
-              behavior: "none",
+              behavior: "zoomX",
+              xAxis: xAxis,
+              snapToSeriesBy: "!x"
             })
           );
+          cursor.lineX.set("visible", true);
           cursor.lineY.set("visible", false);
 
           var legend = chart.bottomAxesContainer.children.push(
@@ -1561,6 +1603,8 @@
             textAlign: "right",
           });
 
+          legend.valueLabels.template.set("forceHidden", true);
+
           // It's is important to set legend data after all the events are set on template, otherwise events won't be copied
           legend.data.setAll(chart.series.values);
 
@@ -1603,6 +1647,14 @@
               pinchZoomX: true,
             })
           );
+
+          chart.get("colors").set("colors", [
+  am5.color(0x095256),
+  am5.color(0x087f8c),
+  am5.color(0x5aaa95),
+  am5.color(0x86a873),
+  am5.color(0xbb9f06)
+]);
 
           // Create axes
           // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
@@ -1667,9 +1719,12 @@
           var cursor = chart.set(
             "cursor",
             am5xy.XYCursor.new(root, {
-              behavior: "none",
+              behavior: "zoomX",
+              xAxis: xAxis,
+              snapToSeriesBy: "!x"
             })
           );
+          cursor.lineX.set("visible", true);
           cursor.lineY.set("visible", false);
 
           var legend = chart.bottomAxesContainer.children.push(
@@ -1721,6 +1776,7 @@
             textAlign: "right",
           });
 
+          legend.valueLabels.template.set("forceHidden", true);
           // It's is important to set legend data after all the events are set on template, otherwise events won't be copied
           legend.data.setAll(chart.series.values);
 
@@ -1763,6 +1819,14 @@
               pinchZoomX: true,
             })
           );
+
+          chart.get("colors").set("colors", [
+  am5.color(0x095256),
+  am5.color(0x087f8c),
+  am5.color(0x5aaa95),
+  am5.color(0x86a873),
+  am5.color(0xbb9f06)
+]);
 
           // Create axes
           // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
@@ -1807,9 +1871,12 @@
           var cursor = chart.set(
             "cursor",
             am5xy.XYCursor.new(root, {
-              behavior: "none",
+              behavior: "zoomX",
+              xAxis: xAxis,
+              snapToSeriesBy: "!x"
             })
           );
+          cursor.lineX.set("visible", true);
           cursor.lineY.set("visible", false);
 
           var legend = chart.bottomAxesContainer.children.push(
@@ -1861,6 +1928,7 @@
             textAlign: "right",
           });
 
+          legend.valueLabels.template.set("forceHidden", true);
           // It's is important to set legend data after all the events are set on template, otherwise events won't be copied
           legend.data.setAll(chart.series.values);
 
@@ -2957,7 +3025,7 @@
       }
 
       function updateLink() {
-        let nebuleair = document.querySelector("#linkNebuleAir").value;
+        let nebuleair = "nebuleair-" + document.querySelector("#linkNebuleAir").value;
 
         console.log(
           "https://aircarto.fr/API_V2/capteurs/link?capteurID_ModuleAir=" +
@@ -2981,12 +3049,80 @@
           .done(function (data) {
             console.log(data);
             //location.reload(); //RELOAD THE PAGE
+            //document.querySelector("#linkNebuleAir").value = 
+
+
+            // if (data != null) {
+            //   if (
+            //     root5 != undefined &&
+            //     root6 != undefined &&
+            //     root7 != undefined &&
+            //     root8 != undefined
+            //   ) {
+            //     root5.dispose();
+            //     root6.dispose();
+            //     root7.dispose();
+            //     root8.dispose();
+            //   }
+
+            //   setTimeout(function () {
+            //     am5.ready(function () {
+            //       root5 = am5.Root.new("chartdiv5");
+            //       graphCreator(
+            //         root5,
+            //         data,
+            //         dataNebuleAir,
+            //         "PM",
+            //         timespanGraph,
+            //         data[data.length - 1].sensorId
+            //       );
+
+            //       root6 = am5.Root.new("chartdiv6");
+            //       graphCreator(
+            //         root6,
+            //         data,
+            //         dataNebuleAir,
+            //         "THP",
+            //         timespanGraph,
+            //         data[data.length - 1].sensorId
+            //       );
+
+            //       root7 = am5.Root.new("chartdiv7");
+            //       graphCreator(
+            //         root7,
+            //         data,
+            //         dataNebuleAir,
+            //         "COV",
+            //         timespanGraph,
+            //         data[data.length - 1].sensorId
+            //       );
+
+            //       root8 = am5.Root.new("chartdiv8");
+            //       graphCreator(
+            //         root8,
+            //         data,
+            //         dataNebuleAir,
+            //         "CO2",
+            //         timespanGraph,
+            //         data[data.length - 1].sensorId
+            //       );
+            //     });
+            //   }, 1000);
+            // } else {
+            //   openToast(
+            //     "Pas de donnée sur cet intervalle. Veuillez choisir une période plus longue."
+            //   );
+            // }
+
+
+
+
+            
           })
           .fail(function () {
             console.log("Error while posting data to Aircarto API");
           });
       }
-
 
       function changeRoom(event){
 
