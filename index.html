@@ -715,7 +715,11 @@
 
               document.querySelector("#lat").value = data[0].latitude;
               document.querySelector("#lon").value = data[0].longitude;
+              if(data[0].link != null){
               document.querySelector("#linkNebuleAir").value = data[0].link.split("-")[1];
+              }else{
+                document.querySelector("#linkNebuleAir").value = "";
+              }
 
               // const offset = -new Date().getTimezoneOffset() / 60;
               //const  timestamp_local = new Date(timestamp_UTC.setHours(timestamp_UTC.getHours() + offset));
@@ -1130,16 +1134,13 @@
 
 
           chart.get("colors").set("colors", [
-  am5.color(0x095256),
-  am5.color(0x087f8c),
-  am5.color(0x5aaa95),
-  am5.color(0x86a873),
-  am5.color(0xbb9f06)
-]);
-
-
-
-
+            am5.color(0xf44336),
+            am5.color(0x8fce00),
+            am5.color(0x2986cc),
+            am5.color(0xffd966),
+            am5.color(0x814c9e),
+            am5.color(0xf48686)
+          ]);
 
           // Create axes
           // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
@@ -1388,12 +1389,13 @@
 
 
           chart.get("colors").set("colors", [
-  am5.color(0x095256),
-  am5.color(0x087f8c),
-  am5.color(0x5aaa95),
-  am5.color(0x86a873),
-  am5.color(0xbb9f06)
-]);
+            am5.color(0xf44336),
+            am5.color(0x8fce00),
+            am5.color(0x2986cc),
+            am5.color(0xffd966),
+            am5.color(0x814c9e),
+            am5.color(0xf48686)
+          ]);
 
           // Create axes
           // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
@@ -1649,12 +1651,13 @@
           );
 
           chart.get("colors").set("colors", [
-  am5.color(0x095256),
-  am5.color(0x087f8c),
-  am5.color(0x5aaa95),
-  am5.color(0x86a873),
-  am5.color(0xbb9f06)
-]);
+            am5.color(0xf44336),
+            am5.color(0x8fce00),
+            am5.color(0x2986cc),
+            am5.color(0xffd966),
+            am5.color(0x814c9e),
+            am5.color(0xf48686)
+          ]);
 
           // Create axes
           // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
@@ -1821,12 +1824,13 @@
           );
 
           chart.get("colors").set("colors", [
-  am5.color(0x095256),
-  am5.color(0x087f8c),
-  am5.color(0x5aaa95),
-  am5.color(0x86a873),
-  am5.color(0xbb9f06)
-]);
+            am5.color(0xf44336),
+            am5.color(0x8fce00),
+            am5.color(0x2986cc),
+            am5.color(0xffd966),
+            am5.color(0x814c9e),
+            am5.color(0xf48686)
+          ]);
 
           // Create axes
           // https://www.amcharts.com/docs/v5/charts/xy-chart/axes/
