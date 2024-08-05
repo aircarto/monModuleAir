@@ -663,7 +663,7 @@
         token = document.querySelector("#token").value;
 
         console.log(
-          "https://aircarto.fr/API_V2/capteurs/metadata?capteurType=ModuleAir&capteurID=" +
+          "https://api.aircarto.fr/capteurs/metadata?capteurType=ModuleAir&capteurID=" +
             moduleair +
             "&token=" +
             token
@@ -672,7 +672,7 @@
         $.ajax({
           method: "GET",
           url:
-            "https://aircarto.fr/API_V2/capteurs/metadata?capteurType=ModuleAir&capteurID=" +
+            "https://api.aircarto.fr/capteurs/metadata?capteurType=ModuleAir&capteurID=" +
             moduleair +
             "&token=" +
             token,
@@ -879,7 +879,7 @@
                 nebuleair = data[0].link;
 
                 console.log(
-                  "https://aircarto.fr/API_V2/capteurs/dataNebuleAir?capteurID=" +
+                  "https://api.aircarto.fr/capteurs/dataNebuleAir?capteurID=" +
                     data[0].link +
                     "&start=" +
                     start_string +
@@ -891,7 +891,7 @@
                 $.ajax({
                   method: "GET",
                   url:
-                    "https://aircarto.fr/API_V2/capteurs/dataNebuleAir?capteurID=" +
+                    "https://api.aircarto.fr/capteurs/dataNebuleAir?capteurID=" +
                     data[0].link +
                     "&start=" +
                     start_string +
@@ -912,7 +912,7 @@
               }
 
               console.log(
-                "https://aircarto.fr/API_V2/capteurs/dataModuleAir?capteurID=" +
+                "https://api.aircarto.fr/capteurs/dataModuleAir?capteurID=" +
                   moduleair +
                   "&start=" +
                   start_string +
@@ -925,7 +925,7 @@
               $.ajax({
                 method: "GET",
                 url:
-                  "https://aircarto.fr/API_V2/capteurs/dataModuleAir?capteurID=" +
+                  "https://api.aircarto.fr/capteurs/dataModuleAir?capteurID=" +
                   moduleair +
                   "&start=" +
                   start_string +
@@ -2285,7 +2285,7 @@
 
         if (nebuleair != null) {
           console.log(
-            "https://aircarto.fr/API_V2/capteurs/dataNebuleAir?capteurID=" +
+            "https://api.aircarto.fr/capteurs/dataNebuleAir?capteurID=" +
               nebuleair +
               "&start=" +
               start_string +
@@ -2298,7 +2298,7 @@
           $.ajax({
             method: "GET",
             url:
-              "https://aircarto.fr/API_V2/capteurs/dataNebuleAir?capteurID=" +
+              "https://api.aircarto.fr/capteurs/dataNebuleAir?capteurID=" +
               nebuleair +
               "&start=" +
               start_string +
@@ -2321,7 +2321,7 @@
         }
 
         console.log(
-          "https://aircarto.fr/API_V2/capteurs/dataModuleAir?capteurID=" +
+          "https://api.aircarto.fr/capteurs/dataModuleAir?capteurID=" +
             moduleair +
             "&start=" +
             start_string +
@@ -2336,7 +2336,7 @@
         $.ajax({
           method: "GET",
           url:
-            "https://aircarto.fr/API_V2/capteurs/dataModuleAir?capteurID=" +
+            "https://api.aircarto.fr/capteurs/dataModuleAir?capteurID=" +
             moduleair +
             "&start=" +
             start_string +
@@ -2998,7 +2998,7 @@
         let lng = document.querySelector("#lon").value;
 
         console.log(
-          "https://aircarto.fr/API_V2/capteurs/changeLoc?capteurID=" +
+          "https://api.aircarto.fr/capteurs/changeLoc?capteurID=" +
             moduleair +
             "&lat=" +
             lat +
@@ -3011,7 +3011,7 @@
         $.ajax({
           method: "POST",
           url:
-            "https://aircarto.fr/API_V2/capteurs/changeLoc?capteurID=" +
+            "https://api.aircarto.fr/capteurs/changeLoc?capteurID=" +
             moduleair +
             "&lat=" +
             lat +
@@ -3032,7 +3032,7 @@
         let nebuleair = "nebuleair-" + document.querySelector("#linkNebuleAir").value;
 
         console.log(
-          "https://aircarto.fr/API_V2/capteurs/link?capteurID_ModuleAir=" +
+          "https://api.aircarto.fr/capteurs/link?capteurID_ModuleAir=" +
             moduleair +
             "&capteurID_NebuleAir=" +
             nebuleair +
@@ -3043,7 +3043,7 @@
         $.ajax({
           method: "GET",
           url:
-            "https://aircarto.fr/API_V2/capteurs/link?capteurID_ModuleAir=" +
+            "https://api.aircarto.fr/capteurs/link?capteurID_ModuleAir=" +
             moduleair +
             "&capteurID_NebuleAir=" +
             nebuleair +
@@ -3137,7 +3137,7 @@
         $.ajax({
           method: "POST",
           url:
-            "https://aircarto.fr/API_V2/capteurs/changeRoom?capteurID=" +
+            "https://api.aircarto.fr/capteurs/changeRoom?capteurID=" +
             moduleair +
             "&room=" +
             event.target.value +
