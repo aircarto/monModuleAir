@@ -15,9 +15,9 @@
       href="https://moduleair.fr/img/favicon.png"
     />
 
-    <!-- Boxicons CSS -->
+    <!-- Font Awesome -->
     <link
-      href="https://cdn.jsdelivr.net/npm/boxicons@2.1.4/css/boxicons.min.css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
       rel="stylesheet"
     />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
@@ -579,7 +579,7 @@
               class="password"
               id="token"
             />
-            <i class="bx bx-hide eye-icon"></i>
+            <i class="fa-solid fa-eye-slash eye-icon"></i>
           </div>
 
           <div class="field button-field">
@@ -598,7 +598,7 @@
             <img src="./img/LogoAirCarto.png" alt="AirCarto" />
           </div>
           <button class="btn-logout" id="logout">
-            <i class="bx bx-log-out"></i> Déconnexion
+            <i class="fa-solid fa-right-from-bracket"></i> Déconnexion
           </button>
         </div>
       </div>
@@ -614,13 +614,13 @@
                     <h3 class="card-title mb-2">ModuleAir <span id="idm"></span></h3>
                     <div class="sensor-info">
                       <span class="sensor-status">
-                        <i class="bx bx-time"></i>
+                        <i class="fa-regular fa-clock"></i>
                         <span id="timestamp"></span>
                       </span>
                     </div>
                   </div>
                   <button type="button" onclick="refresh_data()" class="btn btn-outline-secondary">
-                    <i class="bx bx-refresh"></i> Actualiser
+                    <i class="fa-solid fa-rotate"></i> Actualiser
                   </button>
                 </div>
 
@@ -706,7 +706,7 @@
             <div class="card h-100">
               <div class="card-body">
                 <h5 class="card-title">
-                  <i class="bx bx-link"></i> Connecter un NebuleAir
+                  <i class="fa-solid fa-link"></i> Connecter un NebuleAir
                 </h5>
                 <p class="text-muted mb-3">
                   Liez votre ModuleAir à un NebuleAir pour comparer les mesures intérieures et extérieures.
@@ -720,7 +720,7 @@
                     style="max-width: 200px;"
                   />
                   <button type="button" id="updateLink" class="btn btn-success">
-                    <i class="bx bx-check"></i> Valider
+                    <i class="fa-solid fa-check"></i> Valider
                   </button>
                 </div>
               </div>
@@ -732,7 +732,7 @@
             <div class="card h-100">
               <div class="card-body">
                 <h5 class="card-title">
-                  <i class="bx bx-home"></i> Position dans la maison
+                  <i class="fa-solid fa-house"></i> Position dans la maison
                 </h5>
                 <p class="text-muted mb-3">
                   Indiquez la pièce dans laquelle se trouve le ModuleAir.
@@ -759,7 +759,7 @@
             <div class="card">
               <div class="card-body">
                 <h5 class="card-title">
-                  <i class="bx bx-map"></i> Géolocaliser mon capteur
+                  <i class="fa-solid fa-location-dot"></i> Géolocaliser mon capteur
                 </h5>
 
                 <div id="search">
@@ -777,7 +777,7 @@
                       class="btn btn-outline-secondary"
                       onclick="addr_search();"
                     >
-                      <i class="bx bx-search"></i> Rechercher
+                      <i class="fa-solid fa-magnifying-glass"></i> Rechercher
                     </button>
                   </div>
 
@@ -801,7 +801,7 @@
                       style="max-width: 150px;"
                     />
                     <button type="button" id="updateLoc" class="btn btn-success">
-                      <i class="bx bx-check"></i> Valider
+                      <i class="fa-solid fa-check"></i> Valider
                     </button>
                   </div>
                 </div>
