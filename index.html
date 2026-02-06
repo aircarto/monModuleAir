@@ -377,10 +377,10 @@
         border-radius: 50%;
       }
 
-      /* Color dots for pollutants */
-      .toggle-btn[data-series="PM1"] .color-dot { background: #f44336; }
-      .toggle-btn[data-series="PM25"] .color-dot { background: #8fce00; }
-      .toggle-btn[data-series="PM10"] .color-dot { background: #2986cc; }
+      /* Color dots for pollutants - PM in green gradient */
+      .toggle-btn[data-series="PM1"] .color-dot { background: #2d6a4f; }
+      .toggle-btn[data-series="PM25"] .color-dot { background: #40916c; }
+      .toggle-btn[data-series="PM10"] .color-dot { background: #74c69d; }
       .toggle-btn[data-series="TEMP"] .color-dot { background: #ff6b6b; }
       .toggle-btn[data-series="HUM"] .color-dot { background: #4ecdc4; }
       .toggle-btn[data-series="COV"] .color-dot { background: #f39c12; }
@@ -2201,11 +2201,11 @@
           })
         );
 
-        // Colors for each pollutant
+        // Colors for each pollutant - PM in green gradient
         const colors = {
-          PM1: am5.color(0xf44336),
-          PM25: am5.color(0x8fce00),
-          PM10: am5.color(0x2986cc),
+          PM1: am5.color(0x2d6a4f),
+          PM25: am5.color(0x40916c),
+          PM10: am5.color(0x74c69d),
           TEMP: am5.color(0xff6b6b),
           HUM: am5.color(0x4ecdc4),
           COV: am5.color(0xf39c12),
