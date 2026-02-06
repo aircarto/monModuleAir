@@ -54,7 +54,28 @@
 
     <style>
       /* Google Fonts - Poppins */
-      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+      :root {
+        --primary-color: #2563eb;
+        --primary-hover: #1d4ed8;
+        --secondary-color: #64748b;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --background-color: #f8fafc;
+        --card-background: #ffffff;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --border-color: #e2e8f0;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        --radius-sm: 8px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
+        --transition: all 0.2s ease;
+      }
 
       * {
         margin: 0;
@@ -62,63 +83,110 @@
         box-sizing: border-box;
         font-family: "Poppins", sans-serif;
       }
+
+      body {
+        background-color: var(--background-color);
+        color: var(--text-primary);
+      }
+
       #container_form {
-        height: 100vh;
+        min-height: 100vh;
         width: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        background-color: white;
-        column-gap: 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
       }
 
       #container_graphs {
-        height: 100vh;
+        min-height: 100vh;
         width: 100%;
-        /* display: flex; */
-        align-items: center;
-        justify-content: center;
-        background-color: white;
-        column-gap: 30px;
+        background-color: var(--background-color);
         display: none;
+        padding-bottom: 40px;
+      }
+
+      /* Header sticky */
+      .app-header {
+        background: var(--card-background);
+        box-shadow: var(--shadow-md);
+        padding: 16px 0;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        margin-bottom: 24px;
+      }
+
+      .app-header .container-fluid {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .app-header img {
+        height: 45px;
+      }
+
+      .btn-logout {
+        background: transparent;
+        border: 2px solid var(--danger-color);
+        color: var(--danger-color);
+        padding: 8px 20px;
+        border-radius: var(--radius-sm);
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+      }
+
+      .btn-logout:hover {
+        background: var(--danger-color);
+        color: white;
       }
 
       .form {
-        position: absolute;
         max-width: 430px;
         width: 100%;
-        padding: 30px;
-        border-radius: 6px;
-        background: #fff;
+        padding: 40px;
+        border-radius: var(--radius-lg);
+        background: var(--card-background);
+        box-shadow: var(--shadow-lg);
       }
+
       .form.signup {
         opacity: 0;
         pointer-events: none;
       }
+
       .forms.show-signup .form.signup {
         opacity: 1;
         pointer-events: auto;
       }
+
       .forms.show-signup .form.login {
         opacity: 0;
         pointer-events: none;
       }
+
       header {
         font-size: 28px;
-        font-weight: 600;
-        color: #232836;
+        font-weight: 700;
+        color: var(--text-primary);
         text-align: center;
       }
+
       form {
         margin-top: 30px;
       }
+
       .form .field {
         position: relative;
         height: 50px;
         width: 100%;
         margin-top: 20px;
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
       }
+
       .field input,
       .field button {
         height: 100%;
@@ -126,117 +194,332 @@
         border: none;
         font-size: 16px;
         font-weight: 400;
-        border-radius: 6px;
+        border-radius: var(--radius-sm);
       }
+
       .field input {
         outline: none;
         padding: 0 15px;
-        border: 1px solid#CACACA;
+        border: 2px solid var(--border-color);
+        transition: var(--transition);
       }
+
       .field input:focus {
-        border-bottom-width: 2px;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
       }
+
       .eye-icon {
         position: absolute;
         top: 50%;
         right: 10px;
         transform: translateY(-50%);
         font-size: 18px;
-        color: #8b8b8b;
+        color: var(--text-secondary);
         cursor: pointer;
         padding: 5px;
+        transition: var(--transition);
       }
+
+      .eye-icon:hover {
+        color: var(--primary-color);
+      }
+
       .field button {
         color: #fff;
-        background-color: #0171d3;
-        transition: all 0.3s ease;
+        background: linear-gradient(135deg, var(--primary-color) 0%, #4f46e5 100%);
+        transition: var(--transition);
         cursor: pointer;
+        font-weight: 600;
       }
+
       .field button:hover {
-        background-color: #016dcb;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
       }
 
       .form a {
-        color: #0171d3;
+        color: var(--primary-color);
         text-decoration: none;
       }
+
       .form-content a:hover {
         text-decoration: underline;
       }
 
-      @media screen and (max-width: 400px) {
-        .form {
-          padding: 20px 10px;
-        }
+      /* Cards modernes */
+      .card {
+        background: var(--card-background);
+        border: none;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-sm);
+        transition: var(--transition);
       }
 
+      .card:hover {
+        box-shadow: var(--shadow-md);
+      }
+
+      .card-body {
+        padding: 24px;
+      }
+
+      .card-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 16px;
+      }
+
+      /* Time buttons - Pills style */
+      .time-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .time-controls-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .time-controls-label {
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-size: 14px;
+        min-width: 100px;
+      }
+
+      .time-btn {
+        padding: 8px 16px;
+        border-radius: 20px;
+        border: 2px solid var(--border-color);
+        background: var(--card-background);
+        color: var(--text-secondary);
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
+        transition: var(--transition);
+      }
+
+      .time-btn:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+      }
+
+      .time-btn.active, .time-btn.btn-secondary {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+      }
+
+      .time-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* Pollutant toggle buttons */
+      .pollutant-toggles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding: 16px;
+        background: var(--background-color);
+        border-radius: var(--radius-md);
+      }
+
+      .toggle-btn {
+        padding: 10px 18px;
+        border-radius: var(--radius-sm);
+        border: 2px solid var(--border-color);
+        background: var(--card-background);
+        color: var(--text-secondary);
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .toggle-btn:hover {
+        border-color: var(--primary-color);
+      }
+
+      .toggle-btn.active {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+      }
+
+      .toggle-btn .color-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+
+      /* Color dots for pollutants */
+      .toggle-btn[data-series="PM1"] .color-dot { background: #f44336; }
+      .toggle-btn[data-series="PM25"] .color-dot { background: #8fce00; }
+      .toggle-btn[data-series="PM10"] .color-dot { background: #2986cc; }
+      .toggle-btn[data-series="TEMP"] .color-dot { background: #ff6b6b; }
+      .toggle-btn[data-series="HUM"] .color-dot { background: #4ecdc4; }
+      .toggle-btn[data-series="COV"] .color-dot { background: #f39c12; }
+      .toggle-btn[data-series="CO2"] .color-dot { background: #e74c3c; }
+
+      /* Gauge charts */
+      .gauges-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px;
+      }
+
+      #chartdiv1, #chartdiv2, #chartdiv3, #chartdiv4 {
+        width: 220px;
+        height: 220px;
+      }
+
+      /* Unified chart */
+      #unifiedChart {
+        width: 100%;
+        height: 550px;
+        max-width: 100%;
+      }
+
+      /* Map */
       #map {
-        /* width: 100vW; */
-        height: 500px;
-        padding: 0;
-        margin: 0;
-        /* margin-top: 20px; */
+        height: 450px;
+        border-radius: var(--radius-md);
+        overflow: hidden;
       }
 
       .address {
         cursor: pointer;
-        border: 3px solid #1c6ea4;
-        border-radius: 9px;
-        padding: 5px;
-        margin: 4px;
-        margin-bottom: 8px;
+        border: 2px solid var(--primary-color);
+        border-radius: var(--radius-sm);
+        padding: 12px;
+        margin: 8px 0;
+        transition: var(--transition);
       }
 
       .address:hover {
-        background-color: #92a4a2;
+        background-color: rgba(37, 99, 235, 0.1);
       }
 
-      #chartdiv1 {
-        width: 250px;
-        height: 250px;
+      /* Form controls */
+      .form-control, .form-select {
+        border: 2px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        padding: 10px 14px;
+        transition: var(--transition);
+      }
+
+      .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      }
+
+      .btn-success {
+        background: var(--success-color);
+        border: none;
+        border-radius: var(--radius-sm);
+        padding: 10px 24px;
+        font-weight: 500;
+        transition: var(--transition);
+      }
+
+      .btn-success:hover {
+        background: #059669;
+        transform: translateY(-1px);
+      }
+
+      .btn-outline-secondary {
+        border: 2px solid var(--border-color);
+        color: var(--text-secondary);
+        border-radius: var(--radius-sm);
+        transition: var(--transition);
+      }
+
+      .btn-outline-secondary:hover {
+        background: var(--background-color);
+        border-color: var(--secondary-color);
+      }
+
+      /* Spacing utilities */
+      .section-gap {
+        margin-top: 24px;
+      }
+
+      /* Responsive */
+      @media screen and (max-width: 768px) {
+        .form {
+          padding: 24px 16px;
+        }
+
+        .app-header .container-fluid {
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        #chartdiv1, #chartdiv2, #chartdiv3, #chartdiv4 {
+          width: 160px;
+          height: 160px;
+        }
+
+        .pollutant-toggles {
+          justify-content: center;
+        }
+
+        .time-controls-group {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .time-controls-label {
+          width: 100%;
+          text-align: center;
+        }
+      }
+
+      @media screen and (max-width: 400px) {
+        .form {
+          padding: 20px 12px;
+        }
+
+        #chartdiv1, #chartdiv2, #chartdiv3, #chartdiv4 {
+          width: 140px;
+          height: 140px;
+        }
+      }
+
+      /* Sensor info styling */
+      .sensor-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .sensor-status {
         display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 20px;
+        color: var(--success-color);
+        font-weight: 500;
+        font-size: 14px;
       }
 
-      #chartdiv2 {
-        width: 250px;
-        height: 250px;
-        display: inline-flex;
-      }
-
-      #chartdiv3 {
-        width: 250px;
-        height: 250px;
-        display: inline-flex;
-      }
-
-      #chartdiv4 {
-        width: 250px;
-        height: 250px;
-        display: inline-flex;
-      }
-
-      #chartdiv5 {
-        width: 100%;
-        height: 500px;
-        max-width: 100%;
-      }
-
-      #chartdiv6 {
-        width: 100%;
-        height: 500px;
-        max-width: 100%;
-      }
-
-      #chartdiv7 {
-        width: 100%;
-        height: 500px;
-        max-width: 100%;
-      }
-
-      #chartdiv8 {
-        width: 100%;
-        height: 500px;
-        max-width: 100%;
+      /* Hide old chart divs */
+      #chartdiv5, #chartdiv6, #chartdiv7, #chartdiv8 {
+        display: none;
       }
     </style>
   </head>
@@ -292,128 +575,107 @@
     </section>
 
     <section id="container_graphs">
-      <div class="container-fluid">
-        <!-- LOGOS TOP -->
-        <div class="row" style="margin-top: 20px">
-          <div class="col-sm-8">
-            <a>
-              <img src="./img/LogoModuleAirColor_long.png" height="50" alt="" />
-            </a>
+      <!-- Sticky Header -->
+      <div class="app-header">
+        <div class="container-fluid">
+          <div class="d-flex align-items-center gap-3">
+            <img src="/img/logoModuleAirColor_long.png" alt="ModuleAir" />
+            <img src="./img/LogoAirCarto.png" alt="AirCarto" />
           </div>
-
-          <div class="col-sm-4">
-            <a style="display: none">
-              <img
-                src="./img/LogoAtmoSud.png"
-                class="float-left"
-                height="50"
-                alt=""
-              />
-            </a>
-
-            <a>
-              <img
-                src="./img/LogoAirCarto.png"
-                class="float-right"
-                height="50"
-                alt=""
-              />
-            </a>
-          </div>
+          <button class="btn-logout" id="logout">
+            <i class="bx bx-log-out"></i> Déconnexion
+          </button>
         </div>
+      </div>
 
-        <div class="row" style="margin-top: 20px">
+      <div class="container-fluid">
+
+        <div class="row section-gap">
           <div class="col-sm-12">
             <div class="card">
               <div class="card-body">
-                <h3 class="card-title">ModuleAir <span id="idm"></span></h3>
-                <h4>Mes données</h4>
-
-                <p>
-                  Dernières mesures du capteur :
-                  <span id="timestamp"></span> 
-                </p>
-                <p>Niveau de connexion Wifi: <span id="wifilevel"></span></p>
-                <button
-                    type="button"
-                    onclick="refresh_data()"
-                    class="btn btn-outline-secondary btn-sm"
-                  >
-                    Recharger les données
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+                  <div>
+                    <h3 class="card-title mb-2">ModuleAir <span id="idm"></span></h3>
+                    <div class="sensor-info">
+                      <span class="sensor-status">
+                        <i class="bx bx-time"></i>
+                        <span id="timestamp"></span>
+                      </span>
+                    </div>
+                  </div>
+                  <button type="button" onclick="refresh_data()" class="btn btn-outline-secondary">
+                    <i class="bx bx-refresh"></i> Actualiser
                   </button>
-                </p>
-
-                <div class="row">
-                  <div class="col-sm">
-                    <!-- PM1 -->
-                    <div
-                      class="embed-responsive embed-responsive-4by3"
-                      id="chartdiv1"
-                    ></div>
-                  </div>
-
-                  <div class="col-sm">
-                    <!-- PM2.5 -->
-                    <div
-                      class="embed-responsive embed-responsive-4by3"
-                      id="chartdiv2"
-                    ></div>
-                  </div>
-
-                  <div class="col-sm">
-                    <div
-                      class="embed-responsive embed-responsive-4by3"
-                      id="chartdiv3"
-                    >
-                      <!-- PM10 -->
-                    </div>
-                  </div>
-
-                  <div class="col-sm">
-                    <div
-                      class="embed-responsive embed-responsive-4by3"
-                      id="chartdiv4"
-                    >
-                      <!-- PM10 -->
-                    </div>
-                  </div>
                 </div>
 
-                <!-- <br></br> -->
+                <div class="gauges-container">
+                  <div id="chartdiv1"></div>
+                  <div id="chartdiv2"></div>
+                  <div id="chartdiv3"></div>
+                  <div id="chartdiv4"></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- HISTORIQUE -->
-        <div class="row" style="margin-top: 20px">
+        <div class="row section-gap">
           <div class="col-sm-12">
             <div class="card">
               <div class="card-body">
-                <div id="historique">Historique</div>
-                <span id="button1h"></span>
-                <span id="button3h"></span>
-                <span id="button24h"></span>
-                <span id="button48h"></span>
-                <span id="button1s"></span>
-                <span id="button1m"></span>
-                <span id="button1a"></span>
-                <div id="pdt">Pas de temps</div>
-                <span id="button2m"></span>
-                <span id="button15m"></span>
-                <span id="button60m"></span>
-                <span id="button1440m"></span>
-              </div>
-            </div>
-          </div>
-        </div>
+                <h5 class="card-title mb-3">Historique des mesures</h5>
 
-        <!-- GRAPH -->
+                <div class="time-controls">
+                  <div class="time-controls-group">
+                    <span class="time-controls-label">Période :</span>
+                    <span id="button1h"></span>
+                    <span id="button3h"></span>
+                    <span id="button24h"></span>
+                    <span id="button48h"></span>
+                    <span id="button1s"></span>
+                    <span id="button1m"></span>
+                    <span id="button1a"></span>
+                  </div>
+                  <div class="time-controls-group">
+                    <span class="time-controls-label">Résolution :</span>
+                    <span id="button2m"></span>
+                    <span id="button15m"></span>
+                    <span id="button60m"></span>
+                    <span id="button1440m"></span>
+                  </div>
+                </div>
 
-        <div class="row" style="margin-top: 20px">
-          <div class="col-sm-12">
-            <div class="card">
-              <div class="card-body">
+                <!-- Pollutant Toggle Buttons -->
+                <div class="pollutant-toggles">
+                  <button class="toggle-btn active" data-series="CO2" onclick="toggleSeries('CO2')">
+                    <span class="color-dot"></span> CO₂ <small>(ppm)</small>
+                  </button>
+                  <button class="toggle-btn" data-series="PM1" onclick="toggleSeries('PM1')">
+                    <span class="color-dot"></span> PM1 <small>(µg/m³)</small>
+                  </button>
+                  <button class="toggle-btn active" data-series="PM25" onclick="toggleSeries('PM25')">
+                    <span class="color-dot"></span> PM2.5 <small>(µg/m³)</small>
+                  </button>
+                  <button class="toggle-btn" data-series="PM10" onclick="toggleSeries('PM10')">
+                    <span class="color-dot"></span> PM10 <small>(µg/m³)</small>
+                  </button>
+                  <button class="toggle-btn" data-series="TEMP" onclick="toggleSeries('TEMP')">
+                    <span class="color-dot"></span> Temp <small>(°C)</small>
+                  </button>
+                  <button class="toggle-btn" data-series="HUM" onclick="toggleSeries('HUM')">
+                    <span class="color-dot"></span> Humidité <small>(%)</small>
+                  </button>
+                  <button class="toggle-btn" data-series="COV" onclick="toggleSeries('COV')">
+                    <span class="color-dot"></span> COV <small>(ppb)</small>
+                  </button>
+                </div>
+
+                <!-- Unified Chart -->
+                <div id="unifiedChart"></div>
+
+                <!-- Hidden old charts for compatibility -->
                 <div id="chartdiv5"></div>
                 <div id="chartdiv6"></div>
                 <div id="chartdiv7"></div>
@@ -424,135 +686,107 @@
         </div>
 
         <!-- CONNEXION NEBULEAIR-->
-
-        <div class="row" style="margin-top: 20px">
-          <div class="col-sm-12">
-            <div class="card">
+        <div class="row section-gap">
+          <div class="col-md-6">
+            <div class="card h-100">
               <div class="card-body">
-                <h5 class="card-title">Connecter un NebuleAir</h5>
-                <span
-                  >Lier votre ModuleAir à votre NebuleAir ou à un capteur proche
-                  afin de comparer les concentrations de particules fines
-                  intérieure et extérieure</span
-                >
-                <br />
-                <div class="mb-3 row">
-                  <div class="col-4">
-                    <input
-                      type="text"
-                      id="linkNebuleAir"
-                      size="14"
-                      value=""
-                      class="form-control"
-                    />
-                  </div>
-                  <div class="col-4">
-                    <button
-                      type="button"
-                      id="updateLink"
-                      class="btn btn-success"
-                    >
-                      Valider
-                    </button>
-                  </div>
+                <h5 class="card-title">
+                  <i class="bx bx-link"></i> Connecter un NebuleAir
+                </h5>
+                <p class="text-muted mb-3">
+                  Liez votre ModuleAir à un NebuleAir pour comparer les mesures intérieures et extérieures.
+                </p>
+                <div class="d-flex gap-2 align-items-center">
+                  <input
+                    type="text"
+                    id="linkNebuleAir"
+                    placeholder="ID du NebuleAir"
+                    class="form-control"
+                    style="max-width: 200px;"
+                  />
+                  <button type="button" id="updateLink" class="btn btn-success">
+                    <i class="bx bx-check"></i> Valider
+                  </button>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-        <!-- EMPLACEMENT-->
-
-              <div class="row" style="margin-top: 20px">
-                <div class="col-sm-12">
-                  <div class="card">
-                    <div class="card-body">
-                      <h5 class="card-title">Position dans la maison</h5>
-                      <span
-                        >Indiquez la pièces dans laquelle se trouve le ModuleAir
-                        </span>
-                      <br/>
-                      <select id="room" class="form-select form-select-sm" aria-label="Small select example">
-                        <option value=null>Choix de la pièce</option>
-                        <option value="cuisine">Cuisine</option>
-                        <option value="salle_a_manger">Salle à manger</option>
-                        <option value="salon">Salon</option>
-                        <option value="chambre_parents">Chambre parents</option>
-                        <option value="chambre_enfants">Chambre enfants</option>
-                        <option value="toilettes">Toilettes</option>
-                        <option value="salle_de_bain">Salle de bain</option>
-                        <option value="entree">Entrée</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
+          <!-- EMPLACEMENT-->
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-body">
+                <h5 class="card-title">
+                  <i class="bx bx-home"></i> Position dans la maison
+                </h5>
+                <p class="text-muted mb-3">
+                  Indiquez la pièce dans laquelle se trouve le ModuleAir.
+                </p>
+                <select id="room" class="form-select" style="max-width: 250px;">
+                  <option value="null">Choix de la pièce</option>
+                  <option value="cuisine">Cuisine</option>
+                  <option value="salle_a_manger">Salle à manger</option>
+                  <option value="salon">Salon</option>
+                  <option value="chambre_parents">Chambre parents</option>
+                  <option value="chambre_enfants">Chambre enfants</option>
+                  <option value="toilettes">Toilettes</option>
+                  <option value="salle_de_bain">Salle de bain</option>
+                  <option value="entree">Entrée</option>
+                </select>
               </div>
+            </div>
+          </div>
+        </div>
 
-      <!-- MAP CONTROL-->
+        <!-- MAP CONTROL-->
+        <div class="row section-gap">
+          <div class="col-sm-12">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">
+                  <i class="bx bx-map"></i> Géolocaliser mon capteur
+                </h5>
 
-      <div class="row" style="margin-top: 20px">
-        <div class="col-sm-12">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Géolocaliser mon capteur</h5>
-
-              <div id="search">
-                <div class="mb-3 row">
-                  <div class="col-8">
+                <div id="search">
+                  <div class="d-flex gap-2 mb-3 flex-wrap">
                     <input
                       type="text"
                       name="addr"
-                      value=""
                       id="addr"
                       class="form-control"
-                      placeholder="Entrez ici l'adresse ou se situe le ModuleAir ou déplacez le curseur sur la carte"
+                      placeholder="Entrez l'adresse du ModuleAir..."
+                      style="flex: 1; min-width: 250px;"
                     />
-                  </div>
-                  <div class="col-4">
                     <button
                       type="button"
-                      class="btn btn-outline-secondary btn-sm"
+                      class="btn btn-outline-secondary"
                       onclick="addr_search();"
                     >
-                      Rechercher
+                      <i class="bx bx-search"></i> Rechercher
                     </button>
                   </div>
-                </div>
 
-                <div id="results">
-                  <!-- Affichage des résultats de la recherche -->
-                </div>
+                  <div id="results"></div>
 
-                <!-- Coordonnées -->
-                <div class="mb-3 row">
-                  <div class="col-4">
+                  <div class="d-flex gap-2 align-items-center flex-wrap mt-3">
                     <input
                       type="text"
                       name="new_lat"
                       id="lat"
-                      size="12"
-                      value=""
+                      placeholder="Latitude"
                       class="form-control"
+                      style="max-width: 150px;"
                     />
-                  </div>
-                  <div class="col-4">
                     <input
                       type="text"
                       name="new_lon"
                       id="lon"
-                      size="12"
-                      value=""
+                      placeholder="Longitude"
                       class="form-control"
+                      style="max-width: 150px;"
                     />
-                  </div>
-                  <div class="col-4">
-                    <button
-                      type="button"
-                      id="updateLoc"
-                      class="btn btn-success"
-                    >
-                      Valider
+                    <button type="button" id="updateLoc" class="btn btn-success">
+                      <i class="bx bx-check"></i> Valider
                     </button>
                   </div>
                 </div>
@@ -560,33 +794,14 @@
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- MAP -->
-
-      <div class="row" style="margin-top: 20px">
-        <div class="col-sm-12">
-          <div class="card">
-            <div class="card-body">
-              <div id="map"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- LOGOUT BUTTON -->
-
-      <div class="row" style="margin-top: 20px">
-        <div class="col-sm-12">
-          <div class="card">
-            <div class="card-body">
-              <button
-                type="button"
-                class="btn btn-outline-secondary btn-sm"
-                id="logout"
-              >
-                Déconnexion
-              </button>
+        <!-- MAP -->
+        <div class="row section-gap">
+          <div class="col-sm-12">
+            <div class="card">
+              <div class="card-body p-0" style="overflow: hidden; border-radius: var(--radius-md);">
+                <div id="map"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -599,17 +814,41 @@
       var moduleair, token;
       var nebuleair;
       var dataNebuleAir = null;
-      var root1, root2, root3, root4, root5, root6, root7, root8;
+      var root1, root2, root3, root4, rootUnified;
+      var unifiedChart, allSeries = {};
+      var allAxes = {}; // Store Y-axes references
 
       var measureType = "PM";
-      var timespanGraph = 2;
-      var timeLengthGraph = 3;
+      var timespanGraph = 2;   // pas de temps en minutes
+      var timeLengthGraph = 3;  //historique en heures
+
+      // Toggle states for series visibility
+      var seriesVisibility = {
+        PM1: false, PM25: true, PM10: false,
+        TEMP: false, HUM: false,
+        COV: false, CO2: true
+      };
 
       const forms = document.querySelector(".forms"),
         pwShowHide = document.querySelectorAll(".eye-icon");
 
       document.querySelector("#submit").addEventListener("click", submit);
-      document.querySelector("#logout").addEventListener("click", reloadPage);
+      document.querySelector("#logout").addEventListener("click", logout);
+
+      // Auto-login from localStorage
+      window.addEventListener("DOMContentLoaded", function() {
+        const savedModuleair = localStorage.getItem("moduleair_id");
+        const savedToken = localStorage.getItem("moduleair_token");
+
+        if (savedModuleair && savedToken) {
+          document.querySelector("#moduleair").value = savedModuleair;
+          document.querySelector("#token").value = savedToken;
+          // Auto-submit after a short delay
+          setTimeout(function() {
+            submit();
+          }, 300);
+        }
+      });
       document
         .querySelector("#updateLoc")
         .addEventListener("click", updateLocation);
@@ -652,22 +891,20 @@
 
       var myMarker;
 
-      // setTimeout(() => {
-      //   console.log("reload");
-      //   submit();
-      //   // reloadDataSensor(timeLengthGraph, timespanGraph);
-      // }, 120000);
+      setInterval(() => {
+       console.log("***RELOAD****");
+         //submit();
+         reloadDataSensor(timeLengthGraph, timespanGraph);
+       }, timespanGraph * 60000);
 
       function submit() {
+        console.log("---------");
+        console.log("---------");
+        console.log("SUBMIT");
+
         moduleair = document.querySelector("#moduleair").value;
         token = document.querySelector("#token").value;
 
-        console.log(
-          "https://api.aircarto.fr/capteurs/metadata?capteurType=ModuleAir&capteurID=" +
-            moduleair +
-            "&token=" +
-            token
-        );
 
         $.ajax({
           method: "GET",
@@ -678,8 +915,13 @@
             token,
         })
           .done(function (data) {
+            console.log("Getting data from aircarto API (metadata)");
+
             console.log(data);
             if (data != null) {
+              // Save credentials to localStorage on successful login
+              localStorage.setItem("moduleair_id", moduleair);
+              localStorage.setItem("moduleair_token", token);
 
               document.querySelector("#room").value = data[0].room;
 
@@ -727,8 +969,8 @@
               document.querySelector("#idm").innerText = data[0].sensorId;
               document.querySelector("#timestamp").innerText = timeDateCounter(data[0].time);
 
-              let wifiLevel = 2 * (parseInt(data[0].wifi_signal) + 100);
-              document.querySelector("#wifilevel").innerText = wifiLevel + " %";
+              //let wifiLevel = 2 * (parseInt(data[0].wifi_signal) + 100);
+              //document.querySelector("#wifilevel").innerText = wifiLevel + " %";
 
               document.querySelector("#container_form").style.display = "none";
               document.querySelector("#container_graphs").style.display = "block";
@@ -800,71 +1042,27 @@
               let id = moduleair;
 
               document.getElementById("button1h").innerHTML =
-                '<button type="button" onclick="chooseTimeModuleAir(\'' +
-                id +
-                "',1," +
-                timespanGraph +
-                ')" class="btn btn-outline-secondary btn-sm">1h</button>';
+                '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',1," + timespanGraph + ')" class="time-btn">1h</button>';
               document.getElementById("button3h").innerHTML =
-                '<button type="button" onclick="chooseTimeModuleAir(\'' +
-                id +
-                "',3," +
-                timespanGraph +
-                ')" class="btn btn-outline-secondary btn-sm">3h</button>';
+                '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',3," + timespanGraph + ')" class="time-btn">3h</button>';
               document.getElementById("button24h").innerHTML =
-                '<button type="button" onclick="chooseTimeModuleAir(\'' +
-                id +
-                "',24," +
-                timespanGraph +
-                ')" class="btn btn-outline-secondary btn-sm">24h</button>';
+                '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',24," + timespanGraph + ')" class="time-btn">24h</button>';
               document.getElementById("button48h").innerHTML =
-                '<button type="button" onclick="chooseTimeModuleAir(\'' +
-                id +
-                "',48," +
-                timespanGraph +
-                ')" class="btn btn-outline-secondary btn-sm">48h</button>';
+                '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',48," + timespanGraph + ')" class="time-btn">48h</button>';
               document.getElementById("button1s").innerHTML =
-                '<button type="button" onclick="chooseTimeModuleAir(\'' +
-                id +
-                "',168," +
-                timespanGraph +
-                ')" class="btn btn-outline-secondary btn-sm">1 semaine</button>';
+                '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',168," + timespanGraph + ')" class="time-btn">1 sem</button>';
               document.getElementById("button1m").innerHTML =
-                '<button type="button" onclick="chooseTimeModuleAir(\'' +
-                id +
-                "',720," +
-                timespanGraph +
-                ')" class="btn btn-outline-secondary btn-sm">1 mois</button>';
+                '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',720," + timespanGraph + ')" class="time-btn">1 mois</button>';
               document.getElementById("button1a").innerHTML =
-                '<button type="button" onclick="chooseTimeModuleAir(\'' +
-                id +
-                "',8760," +
-                timespanGraph +
-                ')" class="btn btn-outline-secondary btn-sm" disabled>1 an</button>';
+                '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',8760," + timespanGraph + ')" class="time-btn" disabled>1 an</button>';
               document.getElementById("button2m").innerHTML =
-                '<button type="button" onclick="chooseTimeModuleAir(\'' +
-                id +
-                "'," +
-                timeLengthGraph +
-                ',2)" class="btn btn-outline-secondary btn-sm">2m</button>';
+                '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',2)" class="time-btn">2m</button>';
               document.getElementById("button15m").innerHTML =
-                '<button type="button" onclick="chooseTimeModuleAir(\'' +
-                id +
-                "'," +
-                timeLengthGraph +
-                ',15)" class="btn btn-outline-secondary btn-sm">15m</button>';
+                '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',15)" class="time-btn">15m</button>';
               document.getElementById("button60m").innerHTML =
-                '<button type="button" onclick="chooseTimeModuleAir(\'' +
-                id +
-                "'," +
-                timeLengthGraph +
-                ',60)" class="btn btn-outline-secondary btn-sm">1h</button>';
+                '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',60)" class="time-btn">1h</button>';
               document.getElementById("button1440m").innerHTML =
-                '<button type="button" onclick="chooseTimeModuleAir(\'' +
-                id +
-                "'," +
-                timeLengthGraph +
-                ',1440)" class="btn btn-outline-secondary btn-sm">24h</button>';
+                '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',1440)" class="time-btn">24h</button>';
               buttonsSwitcher(timeLengthGraph, timespanGraph);
 
               const end = new Date();
@@ -900,6 +1098,7 @@
                     "&freq=2m",
                 })
                   .done(function (data) {
+                    console.log("Getting NebuleAir data from aircarto API (data) :");
                     console.log(data);
                     dataNebuleAir = data;
                     if (data == null) {
@@ -936,59 +1135,23 @@
                   token,
               })
                 .done(function (data) {
+                  console.log("Getting ModuleAir data from aircarto API (data) :");
                   console.log(data);
 
-                  if (
-                    root5 != undefined &&
-                    root6 != undefined &&
-                    root7 != undefined &&
-                    root8 != undefined
-                  ) {
-                    root5.dispose();
-                    root6.dispose();
-                    root7.dispose();
-                    root8.dispose();
+                  // Dispose old unified chart if exists
+                  if (rootUnified != undefined) {
+                    rootUnified.dispose();
                   }
 
                   setTimeout(function () {
                     am5.ready(function () {
                       if (data != null) {
-                        root5 = am5.Root.new("chartdiv5");
-                        graphCreator(
-                          root5,
+                        // Create unified chart
+                        rootUnified = am5.Root.new("unifiedChart");
+                        unifiedGraphCreator(
+                          rootUnified,
                           data,
                           dataNebuleAir,
-                          "PM",
-                          timespanGraph,
-                          data[0].sensorId
-                        );
-
-                        root6 = am5.Root.new("chartdiv6");
-                        graphCreator(
-                          root6,
-                          data,
-                          dataNebuleAir,
-                          "THP",
-                          timespanGraph,
-                          data[0].sensorId
-                        );
-
-                        root7 = am5.Root.new("chartdiv7");
-                        graphCreator(
-                          root7,
-                          data,
-                          dataNebuleAir,
-                          "COV",
-                          timespanGraph,
-                          data[0].sensorId
-                        );
-
-                        root8 = am5.Root.new("chartdiv8");
-                        graphCreator(
-                          root8,
-                          data,
-                          dataNebuleAir,
-                          "CO2",
                           timespanGraph,
                           data[0].sensorId
                         );
@@ -1957,8 +2120,432 @@
         }
       }
 
+      // Unified chart creator - single chart with all series
+      function unifiedGraphCreator(root, data1, data2, timespan, id) {
+        let dataMerged;
+        if (data2 != null && data2 != undefined) {
+          dataMerged = data1.concat(data2);
+        } else {
+          dataMerged = data1;
+        }
+
+        // Prepare data for each pollutant (no pressure)
+        let data_PM1_int = data1.map(e => ({ value: e.PM1, date: new Date(e.time).getTime() }));
+        let data_PM25_int = data1.map(e => ({ value: e.PM25, date: new Date(e.time).getTime() }));
+        let data_PM10_int = data1.map(e => ({ value: e.PM10, date: new Date(e.time).getTime() }));
+        let data_TEMP_int = data1.map(e => ({ value: e.TEMP, date: new Date(e.time).getTime() }));
+        let data_HUM_int = data1.map(e => ({ value: e.HUM, date: new Date(e.time).getTime() }));
+        let data_COV_int = data1.map(e => ({ value: e.COV, date: new Date(e.time).getTime() }));
+        let data_CO2_int = data1.map(e => ({ value: e.CO2, date: new Date(e.time).getTime() }));
+
+        let data_PM1_ext = null, data_PM25_ext = null, data_PM10_ext = null;
+        let data_TEMP_ext = null, data_HUM_ext = null;
+        let data_COV_ext = null;
+
+        if (data2 != null && data2 != undefined) {
+          data_PM1_ext = data2.map(e => ({ value: e.PM1, date: new Date(e.time).getTime() }));
+          data_PM25_ext = data2.map(e => ({ value: e.PM25, date: new Date(e.time).getTime() }));
+          data_PM10_ext = data2.map(e => ({ value: e.PM10, date: new Date(e.time).getTime() }));
+          data_TEMP_ext = data2.map(e => ({ value: e.TEMP, date: new Date(e.time).getTime() }));
+          data_HUM_ext = data2.map(e => ({ value: e.HUM, date: new Date(e.time).getTime() }));
+          data_COV_ext = data2.map(e => ({ value: e.COV, date: new Date(e.time).getTime() }));
+        }
+
+        // Build chart title
+        let chartTitleText = "ModuleAir-" + id + ", ";
+        switch (timespan) {
+          case 2: chartTitleText += "mesures à 2 minutes"; break;
+          case 15: chartTitleText += "moyennes quart-horaires"; break;
+          case 60: chartTitleText += "moyennes horaires"; break;
+          case 1440: chartTitleText += "moyennes journalières"; break;
+        }
+
+        root.numberFormatter.set("numberFormat", "#.#");
+        root.setThemes([am5themes_Animated.new(root)]);
+
+        // Create chart
+        unifiedChart = root.container.children.push(
+          am5xy.XYChart.new(root, {
+            panX: true,
+            panY: true,
+            wheelX: "panX",
+            wheelY: "zoomX",
+            maxTooltipDistance: 0,
+            pinchZoomX: true,
+            layout: root.verticalLayout
+          })
+        );
+
+        // Create X axis (time)
+        let xAxis = unifiedChart.xAxes.push(
+          am5xy.DateAxis.new(root, {
+            maxDeviation: 0.2,
+            baseInterval: { timeUnit: "minute", count: 1 },
+            renderer: am5xy.AxisRendererX.new(root, {}),
+            tooltip: am5.Tooltip.new(root, {}),
+          })
+        );
+
+        // Colors for each pollutant
+        const colors = {
+          PM1: am5.color(0xf44336),
+          PM25: am5.color(0x8fce00),
+          PM10: am5.color(0x2986cc),
+          TEMP: am5.color(0xff6b6b),
+          HUM: am5.color(0x4ecdc4),
+          COV: am5.color(0xf39c12),
+          CO2: am5.color(0xe74c3c)
+        };
+
+        // ========== CREATE MULTIPLE Y-AXES ==========
+
+        // LEFT SIDE AXES
+        // Y-Axis for PM (µg/m³) - Left, first
+        let yAxisPM = unifiedChart.yAxes.push(
+          am5xy.ValueAxis.new(root, {
+            renderer: am5xy.AxisRendererY.new(root, {}),
+            min: 0,
+          })
+        );
+        yAxisPM.children.unshift(am5.Label.new(root, {
+          text: "PM (µg/m³)",
+          rotation: -90,
+          y: am5.p50,
+          centerX: am5.p50,
+          fill: colors.PM25,
+          fontSize: 12,
+          fontWeight: "500"
+        }));
+
+        // Y-Axis for Temperature (°C) - Left, second
+        let yAxisTemp = unifiedChart.yAxes.push(
+          am5xy.ValueAxis.new(root, {
+            renderer: am5xy.AxisRendererY.new(root, {
+              opposite: false
+            }),
+          })
+        );
+        yAxisTemp.children.unshift(am5.Label.new(root, {
+          text: "Temp (°C)",
+          rotation: -90,
+          y: am5.p50,
+          centerX: am5.p50,
+          fill: colors.TEMP,
+          fontSize: 12,
+          fontWeight: "500"
+        }));
+        yAxisTemp.get("renderer").grid.template.set("forceHidden", true);
+
+        // RIGHT SIDE AXES
+        // Y-Axis for CO2 (ppm) - Right, first
+        let yAxisCO2 = unifiedChart.yAxes.push(
+          am5xy.ValueAxis.new(root, {
+            renderer: am5xy.AxisRendererY.new(root, {
+              opposite: true
+            }),
+            min: 400,
+          })
+        );
+        yAxisCO2.children.push(am5.Label.new(root, {
+          text: "CO₂ (ppm)",
+          rotation: 90,
+          y: am5.p50,
+          centerX: am5.p50,
+          fill: colors.CO2,
+          fontSize: 12,
+          fontWeight: "500"
+        }));
+        yAxisCO2.get("renderer").grid.template.set("forceHidden", true);
+
+        // Y-Axis for Humidity (%) - Right, second
+        let yAxisHum = unifiedChart.yAxes.push(
+          am5xy.ValueAxis.new(root, {
+            renderer: am5xy.AxisRendererY.new(root, {
+              opposite: true
+            }),
+            min: 0,
+            max: 100,
+          })
+        );
+        yAxisHum.children.push(am5.Label.new(root, {
+          text: "Hum (%)",
+          rotation: 90,
+          y: am5.p50,
+          centerX: am5.p50,
+          fill: colors.HUM,
+          fontSize: 12,
+          fontWeight: "500"
+        }));
+        yAxisHum.get("renderer").grid.template.set("forceHidden", true);
+
+        // Y-Axis for COV (ppb) - Right, third
+        let yAxisCOV = unifiedChart.yAxes.push(
+          am5xy.ValueAxis.new(root, {
+            renderer: am5xy.AxisRendererY.new(root, {
+              opposite: true
+            }),
+            min: 0,
+          })
+        );
+        yAxisCOV.children.push(am5.Label.new(root, {
+          text: "COV (ppb)",
+          rotation: 90,
+          y: am5.p50,
+          centerX: am5.p50,
+          fill: colors.COV,
+          fontSize: 12,
+          fontWeight: "500"
+        }));
+        yAxisCOV.get("renderer").grid.template.set("forceHidden", true);
+
+        // ========== HELPER FUNCTION TO CREATE SERIES ==========
+        function createSeries(name, data, color, yAxis, isDashed, unit, pollutantKey) {
+          // Check if this series should be visible initially
+          const shouldBeVisible = seriesVisibility[pollutantKey];
+
+          let series = unifiedChart.series.push(
+            am5xy.LineSeries.new(root, {
+              name: name,
+              xAxis: xAxis,
+              yAxis: yAxis,
+              valueYField: "value",
+              valueXField: "date",
+              stroke: color,
+              fill: color,
+              legendValueText: "{valueY}",
+              visible: shouldBeVisible,
+              tooltip: am5.Tooltip.new(root, {
+                pointerOrientation: "horizontal",
+                labelText: "{name}: {valueY} " + unit,
+              }),
+            })
+          );
+
+          if (isDashed) {
+            series.strokes.template.setAll({
+              strokeDasharray: [5, 3],
+              strokeOpacity: 0.7
+            });
+          }
+
+          series.data.setAll(data);
+
+          // Only animate if visible
+          if (shouldBeVisible) {
+            series.appear();
+          } else {
+            series.hide(0); // Hide immediately without animation
+          }
+
+          return series;
+        }
+
+        // ========== CREATE ALL SERIES ==========
+        allSeries = {};
+
+        // PM series (on yAxisPM) - µg/m³
+        allSeries.PM1_int = createSeries("PM1 int.", data_PM1_int, colors.PM1, yAxisPM, false, "µg/m³", "PM1");
+        allSeries.PM25_int = createSeries("PM2.5 int.", data_PM25_int, colors.PM25, yAxisPM, false, "µg/m³", "PM25");
+        allSeries.PM10_int = createSeries("PM10 int.", data_PM10_int, colors.PM10, yAxisPM, false, "µg/m³", "PM10");
+
+        // Temperature series (on yAxisTemp) - °C
+        allSeries.TEMP_int = createSeries("Temp. int.", data_TEMP_int, colors.TEMP, yAxisTemp, false, "°C", "TEMP");
+
+        // Humidity series (on yAxisHum) - %
+        allSeries.HUM_int = createSeries("Hum. int.", data_HUM_int, colors.HUM, yAxisHum, false, "%", "HUM");
+
+        // COV series (on yAxisCOV) - ppb
+        allSeries.COV_int = createSeries("COV int.", data_COV_int, colors.COV, yAxisCOV, false, "ppb", "COV");
+
+        // CO2 series (on yAxisCO2) - ppm
+        allSeries.CO2_int = createSeries("CO₂ int.", data_CO2_int, colors.CO2, yAxisCO2, false, "ppm", "CO2");
+
+        // Exterior series (dashed lines) - only if NebuleAir data exists
+        if (data2 != null && data2 != undefined) {
+          allSeries.PM1_ext = createSeries("PM1 ext.", data_PM1_ext, colors.PM1, yAxisPM, true, "µg/m³", "PM1");
+          allSeries.PM25_ext = createSeries("PM2.5 ext.", data_PM25_ext, colors.PM25, yAxisPM, true, "µg/m³", "PM25");
+          allSeries.PM10_ext = createSeries("PM10 ext.", data_PM10_ext, colors.PM10, yAxisPM, true, "µg/m³", "PM10");
+          allSeries.TEMP_ext = createSeries("Temp. ext.", data_TEMP_ext, colors.TEMP, yAxisTemp, true, "°C", "TEMP");
+          allSeries.HUM_ext = createSeries("Hum. ext.", data_HUM_ext, colors.HUM, yAxisHum, true, "%", "HUM");
+          allSeries.COV_ext = createSeries("COV ext.", data_COV_ext, colors.COV, yAxisCOV, true, "ppb", "COV");
+        }
+
+        // Store axes references globally for visibility toggle
+        allAxes = {
+          PM: yAxisPM,
+          TEMP: yAxisTemp,
+          HUM: yAxisHum,
+          COV: yAxisCOV,
+          CO2: yAxisCO2
+        };
+
+        // Hide axes that shouldn't be visible initially
+        const pmVisible = seriesVisibility.PM1 || seriesVisibility.PM25 || seriesVisibility.PM10;
+        if (!pmVisible) yAxisPM.hide(0);
+        if (!seriesVisibility.TEMP) yAxisTemp.hide(0);
+        if (!seriesVisibility.HUM) yAxisHum.hide(0);
+        if (!seriesVisibility.COV) yAxisCOV.hide(0);
+        if (!seriesVisibility.CO2) yAxisCO2.hide(0);
+
+        // Apply initial visibility based on toggle states
+        applySeriesVisibility();
+
+        // Add cursor
+        var cursor = unifiedChart.set(
+          "cursor",
+          am5xy.XYCursor.new(root, {
+            behavior: "zoomX",
+            xAxis: xAxis,
+            snapToSeriesBy: "!x"
+          })
+        );
+        cursor.lineX.set("visible", true);
+        cursor.lineY.set("visible", false);
+
+        // Add legend
+        var legend = unifiedChart.children.push(
+          am5.Legend.new(root, {
+            centerX: am5.percent(50),
+            x: am5.percent(50),
+            layout: root.horizontalLayout,
+            marginTop: 15,
+          })
+        );
+
+        legend.itemContainers.template.events.on("pointerover", function (e) {
+          var series = e.target.dataItem.dataContext;
+          unifiedChart.series.each(function (chartSeries) {
+            if (chartSeries != series) {
+              chartSeries.strokes.template.setAll({ strokeOpacity: 0.15 });
+            } else {
+              chartSeries.strokes.template.setAll({ strokeWidth: 3 });
+            }
+          });
+        });
+
+        legend.itemContainers.template.events.on("pointerout", function (e) {
+          unifiedChart.series.each(function (chartSeries) {
+            chartSeries.strokes.template.setAll({
+              strokeOpacity: 1,
+              strokeWidth: 1,
+            });
+          });
+        });
+
+        legend.valueLabels.template.set("forceHidden", true);
+        legend.data.setAll(unifiedChart.series.values);
+
+        // Add title
+        unifiedChart.children.unshift(
+          am5.Label.new(root, {
+            text: chartTitleText,
+            fontSize: 14,
+            fontWeight: "500",
+            textAlign: "center",
+            x: am5.percent(50),
+            centerX: am5.percent(50),
+            paddingBottom: 10
+          })
+        );
+
+        // Add export
+        var exporting = am5plugins_exporting.Exporting.new(root, {
+          menu: am5plugins_exporting.ExportingMenu.new(root, {}),
+          dataSource: dataMerged,
+        });
+
+        unifiedChart.appear(1000, 100);
+      }
+
+      // Apply visibility based on toggle states
+      function applySeriesVisibility() {
+        if (!allSeries || Object.keys(allSeries).length === 0) return;
+
+        // Show/hide series
+        Object.keys(seriesVisibility).forEach(function(pollutant) {
+          const visible = seriesVisibility[pollutant];
+          const intKey = pollutant + "_int";
+          const extKey = pollutant + "_ext";
+
+          if (allSeries[intKey]) {
+            if (visible) {
+              allSeries[intKey].show();
+            } else {
+              allSeries[intKey].hide();
+            }
+          }
+          if (allSeries[extKey]) {
+            if (visible) {
+              allSeries[extKey].show();
+            } else {
+              allSeries[extKey].hide();
+            }
+          }
+        });
+
+        // Show/hide axes based on which series are visible
+        if (allAxes && Object.keys(allAxes).length > 0) {
+          // PM axis: visible if any PM series is visible
+          const pmVisible = seriesVisibility.PM1 || seriesVisibility.PM25 || seriesVisibility.PM10;
+          if (allAxes.PM) {
+            if (pmVisible) {
+              allAxes.PM.show();
+            } else {
+              allAxes.PM.hide();
+            }
+          }
+
+          // Other axes: one-to-one mapping
+          if (allAxes.TEMP) {
+            if (seriesVisibility.TEMP) {
+              allAxes.TEMP.show();
+            } else {
+              allAxes.TEMP.hide();
+            }
+          }
+
+          if (allAxes.HUM) {
+            if (seriesVisibility.HUM) {
+              allAxes.HUM.show();
+            } else {
+              allAxes.HUM.hide();
+            }
+          }
+
+          if (allAxes.COV) {
+            if (seriesVisibility.COV) {
+              allAxes.COV.show();
+            } else {
+              allAxes.COV.hide();
+            }
+          }
+
+          if (allAxes.CO2) {
+            if (seriesVisibility.CO2) {
+              allAxes.CO2.show();
+            } else {
+              allAxes.CO2.hide();
+            }
+          }
+        }
+      }
+
+      // Toggle series visibility
+      function toggleSeries(pollutant) {
+        seriesVisibility[pollutant] = !seriesVisibility[pollutant];
+
+        // Update button state
+        const btn = document.querySelector('.toggle-btn[data-series="' + pollutant + '"]');
+        if (btn) {
+          btn.classList.toggle('active', seriesVisibility[pollutant]);
+        }
+
+        // Apply to chart
+        applySeriesVisibility();
+      }
+
       function gaugeCreator(root, measure, type) {
-        console.log(measure);
+        //console.log(measure);
 
         root.numberFormatter.set("numberFormat", "####");
 
@@ -2252,21 +2839,23 @@
       }
 
       function reloadDataSensor(hours, timespan) {
+        console.log("RELOAD DATA SENSORS function");
+        
         console.log(
           "%ModuleAir 1 sensor",
           "color: yellow; font-style: bold; background-color: blue;padding: 2px"
         );
 
-        console.log(hours);
-        console.log(timespan);
+        console.log("Historique: " + hours);
+        console.log("Pas de temps: " + timespan);
 
         const end = new Date();
         const end_string = end.toISOString();
         const get_start = end.setHours(end.getHours() - hours);
         const start = new Date(get_start);
         const start_string = start.toISOString();
-        console.log(start_string);
-        console.log(end_string);
+        //console.log(start_string);
+        //console.log(end_string);
 
         switch (timespan) {
           case 2:
@@ -2350,56 +2939,19 @@
           .done(function (data) {
             console.log(data);
             if (data != null) {
-              if (
-                root5 != undefined &&
-                root6 != undefined &&
-                root7 != undefined &&
-                root8 != undefined
-              ) {
-                root5.dispose();
-                root6.dispose();
-                root7.dispose();
-                root8.dispose();
+              // Dispose old unified chart if exists
+              if (rootUnified != undefined) {
+                rootUnified.dispose();
               }
 
               setTimeout(function () {
                 am5.ready(function () {
-                  root5 = am5.Root.new("chartdiv5");
-                  graphCreator(
-                    root5,
+                  // Create unified chart
+                  rootUnified = am5.Root.new("unifiedChart");
+                  unifiedGraphCreator(
+                    rootUnified,
                     data,
                     dataNebuleAir,
-                    "PM",
-                    timespanGraph,
-                    data[data.length - 1].sensorId
-                  );
-
-                  root6 = am5.Root.new("chartdiv6");
-                  graphCreator(
-                    root6,
-                    data,
-                    dataNebuleAir,
-                    "THP",
-                    timespanGraph,
-                    data[data.length - 1].sensorId
-                  );
-
-                  root7 = am5.Root.new("chartdiv7");
-                  graphCreator(
-                    root7,
-                    data,
-                    dataNebuleAir,
-                    "COV",
-                    timespanGraph,
-                    data[data.length - 1].sensorId
-                  );
-
-                  root8 = am5.Root.new("chartdiv8");
-                  graphCreator(
-                    root8,
-                    data,
-                    dataNebuleAir,
-                    "CO2",
                     timespanGraph,
                     data[data.length - 1].sensorId
                   );
@@ -2413,12 +2965,11 @@
           })
           .fail(function () {
             console.log("Error while geting data from Aircarto API");
-            document.querySelector("#moduleair").value = "";
-            document.querySelector("#token").value = "";
           });
       }
 
       function refresh_data() {
+        console.log("REFRESH DATA");
         submit();
       }
 
@@ -2427,518 +2978,87 @@
         timespanGraph = timespan;
         reloadDataSensor(hours, timespan);
         document.getElementById("button1h").innerHTML =
-          '<button type="button" onclick="chooseTimeModuleAir(\'' +
-          id +
-          "',1," +
-          timespanGraph +
-          ')" class="btn btn-outline-secondary btn-sm">1h</button>';
+          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',1," + timespanGraph + ')" class="time-btn">1h</button>';
         document.getElementById("button3h").innerHTML =
-          '<button type="button" onclick="chooseTimeModuleAir(\'' +
-          id +
-          "',3," +
-          timespanGraph +
-          ')" class="btn btn-outline-secondary btn-sm">3h</button>';
+          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',3," + timespanGraph + ')" class="time-btn">3h</button>';
         document.getElementById("button24h").innerHTML =
-          '<button type="button" onclick="chooseTimeModuleAir(\'' +
-          id +
-          "',24," +
-          timespanGraph +
-          ')" class="btn btn-outline-secondary btn-sm">24h</button>';
+          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',24," + timespanGraph + ')" class="time-btn">24h</button>';
         document.getElementById("button48h").innerHTML =
-          '<button type="button" onclick="chooseTimeModuleAir(\'' +
-          id +
-          "',48," +
-          timespanGraph +
-          ')" class="btn btn-outline-secondary btn-sm">48h</button>';
+          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',48," + timespanGraph + ')" class="time-btn">48h</button>';
         document.getElementById("button1s").innerHTML =
-          '<button type="button" onclick="chooseTimeModuleAir(\'' +
-          id +
-          "',168," +
-          timespanGraph +
-          ')" class="btn btn-outline-secondary btn-sm">1 semaine</button>';
+          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',168," + timespanGraph + ')" class="time-btn">1 sem</button>';
         document.getElementById("button1m").innerHTML =
-          '<button type="button" onclick="chooseTimeModuleAir(\'' +
-          id +
-          "',720," +
-          timespanGraph +
-          ')" class="btn btn-outline-secondary btn-sm">1 mois</button>';
+          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',720," + timespanGraph + ')" class="time-btn">1 mois</button>';
         document.getElementById("button1a").innerHTML =
-          '<button type="button" onclick="chooseTimeModuleAir(\'' +
-          id +
-          "',8760," +
-          timespanGraph +
-          ')" class="btn btn-outline-secondary btn-sm">1 an</button>';
+          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',8760," + timespanGraph + ')" class="time-btn">1 an</button>';
         document.getElementById("button2m").innerHTML =
-          '<button type="button" onclick="chooseTimeModuleAir(\'' +
-          id +
-          "'," +
-          timeLengthGraph +
-          ',2)" class="btn btn-outline-secondary btn-sm">2m</button>';
+          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',2)" class="time-btn">2m</button>';
         document.getElementById("button15m").innerHTML =
-          '<button type="button" onclick="chooseTimeModuleAir(\'' +
-          id +
-          "'," +
-          timeLengthGraph +
-          ',15)" class="btn btn-outline-secondary btn-sm">15m</button>';
+          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',15)" class="time-btn">15m</button>';
         document.getElementById("button60m").innerHTML =
-          '<button type="button" onclick="chooseTimeModuleAir(\'' +
-          id +
-          "'," +
-          timeLengthGraph +
-          ',60)" class="btn btn-outline-secondary btn-sm">1h</button>';
+          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',60)" class="time-btn">1h</button>';
         document.getElementById("button1440m").innerHTML =
-          '<button type="button" onclick="chooseTimeModuleAir(\'' +
-          id +
-          "'," +
-          timeLengthGraph +
-          ',1440)" class="btn btn-outline-secondary btn-sm">24h</button>';
+          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',1440)" class="time-btn">24h</button>';
         buttonsSwitcher(hours, timespan);
       }
 
       function buttonsSwitcher(hours, timespan) {
-        switch (hours) {
-          case 1:
-            document
-              .getElementById("button1h")
-              .children[0].classList.replace(
-                "btn-outline-secondary",
-                "btn-secondary"
-              );
-            document
-              .getElementById("button3h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button24h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button48h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1s")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1m")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1a")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            break;
-          case 3:
-            document
-              .getElementById("button1h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button3h")
-              .children[0].classList.replace(
-                "btn-outline-secondary",
-                "btn-secondary"
-              );
-            document
-              .getElementById("button24h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button48h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1s")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1m")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1a")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            break;
-          case 24:
-            document
-              .getElementById("button1h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button3h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button24h")
-              .children[0].classList.replace(
-                "btn-outline-secondary",
-                "btn-secondary"
-              );
-            document
-              .getElementById("button48h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1s")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1m")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1a")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            break;
-          case 48:
-            document
-              .getElementById("button1h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button3h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button24h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button48h")
-              .children[0].classList.replace(
-                "btn-outline-secondary",
-                "btn-secondary"
-              );
-            document
-              .getElementById("button1s")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1m")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1a")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            break;
-          case 168:
-            document
-              .getElementById("button1h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button3h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button24h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button48h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1s")
-              .children[0].classList.replace(
-                "btn-outline-secondary",
-                "btn-secondary"
-              );
-            document
-              .getElementById("button1m")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1a")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            break;
-          case 720:
-            document
-              .getElementById("button1h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button3h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button24h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button48h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1s")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1m")
-              .children[0].classList.replace(
-                "btn-outline-secondary",
-                "btn-secondary"
-              );
-            document
-              .getElementById("button1a")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            break;
-          case 8760:
-            document
-              .getElementById("button1h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button3h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button24h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button48h")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1s")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1m")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1a")
-              .children[0].classList.replace(
-                "btn-outline-secondary",
-                "btn-secondary"
-              );
-            break;
-        }
+        // Hour buttons mapping
+        const hourButtons = {
+          1: "button1h", 3: "button3h", 24: "button24h",
+          48: "button48h", 168: "button1s", 720: "button1m", 8760: "button1a"
+        };
 
-        switch (timespan) {
-          case 2:
-            document
-              .getElementById("button2m")
-              .children[0].classList.replace(
-                "btn-outline-secondary",
-                "btn-secondary"
-              );
-            document
-              .getElementById("button15m")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button60m")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1440m")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            break;
-          case 15:
-            document
-              .getElementById("button2m")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button15m")
-              .children[0].classList.replace(
-                "btn-outline-secondary",
-                "btn-secondary"
-              );
-            document
-              .getElementById("button60m")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1440m")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            break;
-          case 60:
-            document
-              .getElementById("button2m")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button15m")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button60m")
-              .children[0].classList.replace(
-                "btn-outline-secondary",
-                "btn-secondary"
-              );
-            document
-              .getElementById("button1440m")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            break;
-          case 1440:
-            document
-              .getElementById("button2m")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button15m")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button60m")
-              .children[0].classList.replace(
-                "btn-secondary",
-                "btn-outline-secondary"
-              );
-            document
-              .getElementById("button1440m")
-              .children[0].classList.replace(
-                "btn-outline-secondary",
-                "btn-secondary"
-              );
-            break;
-        }
+        // Timespan buttons mapping
+        const timespanButtons = {
+          2: "button2m", 15: "button15m", 60: "button60m", 1440: "button1440m"
+        };
 
+        // Update hour buttons
+        Object.keys(hourButtons).forEach(function(h) {
+          const btn = document.getElementById(hourButtons[h]).children[0];
+          if (parseInt(h) === hours) {
+            btn.classList.add("active");
+          } else {
+            btn.classList.remove("active");
+          }
+        });
+
+        // Update timespan buttons
+        Object.keys(timespanButtons).forEach(function(t) {
+          const btn = document.getElementById(timespanButtons[t]).children[0];
+          if (parseInt(t) === timespan) {
+            btn.classList.add("active");
+          } else {
+            btn.classList.remove("active");
+          }
+        });
+
+        // Disable 1 year button for small timespans
+        const btn1a = document.getElementById("button1a").children[0];
         if (timespan == 2 || timespan == 15) {
-          document
-            .getElementById("button1a")
-            .children[0].setAttribute("disabled", "");
+          btn1a.setAttribute("disabled", "");
         } else {
-          document
-            .getElementById("button1a")
-            .children[0].removeAttribute("disabled");
+          btn1a.removeAttribute("disabled");
         }
 
+        // Disable small timespans for 1 year period
+        const btn2m = document.getElementById("button2m").children[0];
+        const btn15m = document.getElementById("button15m").children[0];
         if (hours == 8760) {
-          document
-            .getElementById("button2m")
-            .children[0].setAttribute("disabled", "");
-          document
-            .getElementById("button15m")
-            .children[0].setAttribute("disabled", "");
+          btn2m.setAttribute("disabled", "");
+          btn15m.setAttribute("disabled", "");
         } else {
-          document
-            .getElementById("button2m")
-            .children[0].removeAttribute("disabled");
-          document
-            .getElementById("button15m")
-            .children[0].removeAttribute("disabled");
+          btn2m.removeAttribute("disabled");
+          btn15m.removeAttribute("disabled");
         }
+      }
+
+      function logout() {
+        // Clear localStorage credentials
+        localStorage.removeItem("moduleair_id");
+        localStorage.removeItem("moduleair_token");
+        location.reload();
       }
 
       function reloadPage() {
