@@ -108,21 +108,29 @@
       padding-bottom: 40px;
     }
 
-    /* Header sticky */
+    /* Header sticky - card style */
     .app-header {
       background: var(--card-background);
       box-shadow: var(--shadow-md);
-      padding: 16px 0;
+      padding: 16px 24px;
       position: sticky;
-      top: 0;
+      top: 12px;
       z-index: 1000;
-      margin-bottom: 24px;
+      margin: 12px 12px 24px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      transition: var(--transition);
+    }
+
+    .app-header:hover {
+      box-shadow: var(--shadow-lg);
     }
 
     .app-header .container-fluid {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      padding: 0;
     }
 
     .app-header img {
@@ -358,6 +366,18 @@
       color: white;
     }
 
+    .toggle-btn.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      background: #e0e0e0;
+      border-color: #ccc;
+      color: #999;
+    }
+
+    .toggle-btn.disabled .color-dot {
+      background: #999 !important;
+    }
+
     .toggle-btn .color-dot {
       width: 12px;
       height: 12px;
@@ -486,6 +506,12 @@
     @media screen and (max-width: 768px) {
       .form {
         padding: 24px 16px;
+      }
+
+      .app-header {
+        margin: 8px;
+        padding: 12px 16px;
+        top: 8px;
       }
 
       .app-header .container-fluid {
@@ -2321,6 +2347,9 @@
         data_COV_ext = data2.map(e => ({ value: e.COV, date: new Date(e.time).getTime() }));
       }
 
+      // Update button availability based on sensor data (-1 means disconnected)
+      updatePollutantButtonsAvailability(data1);
+
       // Build chart title
       let chartTitleText = "ModuleAir-" + id + ", ";
       switch (timespan) {
@@ -2887,12 +2916,51 @@
       }
     }
 
+    // Check if all values for a pollutant are -1 (sensor disconnected)
+    function isAllMinusOne(dataArray) {
+      if (!dataArray || dataArray.length === 0) return true;
+      return dataArray.every(item => item.value === -1);
+    }
+
+    // Update pollutant buttons based on data availability
+    function updatePollutantButtonsAvailability(data1) {
+      const pollutants = {
+        PM1: data1.map(e => ({ value: e.PM1 })),
+        PM25: data1.map(e => ({ value: e.PM25 })),
+        PM10: data1.map(e => ({ value: e.PM10 })),
+        TEMP: data1.map(e => ({ value: e.TEMP })),
+        HUM: data1.map(e => ({ value: e.HUM })),
+        COV: data1.map(e => ({ value: e.COV })),
+        CO2: data1.map(e => ({ value: e.CO2 }))
+      };
+
+      for (const [pollutant, dataArray] of Object.entries(pollutants)) {
+        const btn = document.querySelector('.toggle-btn[data-series="' + pollutant + '"]');
+        if (btn) {
+          if (isAllMinusOne(dataArray)) {
+            btn.classList.add('disabled');
+            btn.classList.remove('active');
+            btn.setAttribute('title', 'Capteur déconnecté - Aucune donnée disponible');
+            seriesVisibility[pollutant] = false;
+          } else {
+            btn.classList.remove('disabled');
+            btn.removeAttribute('title');
+          }
+        }
+      }
+    }
+
     // Toggle series visibility
     function toggleSeries(pollutant) {
+      // Check if button is disabled (sensor disconnected)
+      const btn = document.querySelector('.toggle-btn[data-series="' + pollutant + '"]');
+      if (btn && btn.classList.contains('disabled')) {
+        return; // Don't toggle disabled buttons
+      }
+
       seriesVisibility[pollutant] = !seriesVisibility[pollutant];
 
       // Update button state
-      const btn = document.querySelector('.toggle-btn[data-series="' + pollutant + '"]');
       if (btn) {
         btn.classList.toggle('active', seriesVisibility[pollutant]);
       }
