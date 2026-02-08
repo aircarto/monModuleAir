@@ -601,12 +601,55 @@
       cursor: crosshair;
     }
 
+    /* Context modal - wider and compact */
+    #contextModal .modal-dialog {
+      max-width: 650px;
+    }
+
+    #contextModal .modal-body {
+      padding: 16px 20px;
+    }
+
+    #contextModal .modal-header {
+      padding: 12px 20px;
+    }
+
+    #contextModal .modal-footer {
+      padding: 12px 20px;
+    }
+
+    #contextModal .form-label {
+      font-size: 13px;
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+
+    #contextModal .mb-3 {
+      margin-bottom: 12px !important;
+    }
+
+    #contextModal .form-control {
+      padding: 6px 10px;
+      font-size: 14px;
+    }
+
+    #contextModal textarea.form-control {
+      resize: none;
+    }
+
+    /* Date row - two columns */
+    .context-date-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
     /* Context type logo grid */
     .context-type-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-top: 8px;
+      gap: 8px;
+      margin-top: 6px;
     }
 
     .context-type-option {
@@ -614,7 +657,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 16px 8px;
+      padding: 10px 6px;
       border: 2px solid var(--border-color);
       border-radius: var(--radius-sm);
       background: var(--card-background);
@@ -625,24 +668,24 @@
     .context-type-option:hover {
       border-color: var(--primary-color);
       background: rgba(37, 99, 235, 0.05);
-      transform: translateY(-2px);
+      transform: translateY(-1px);
       box-shadow: var(--shadow-sm);
     }
 
     .context-type-option.selected {
       border-color: var(--primary-color);
       background: rgba(37, 99, 235, 0.1);
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
     }
 
     .context-type-option img {
-      width: 48px;
-      height: 48px;
-      margin-bottom: 8px;
+      width: 32px;
+      height: 32px;
+      margin-bottom: 4px;
     }
 
     .context-type-option span {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 500;
       color: var(--text-secondary);
       text-align: center;
@@ -653,19 +696,103 @@
       font-weight: 600;
     }
 
+    /* Bottom row - comments and user side by side */
+    .context-bottom-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+    }
+
     @media screen and (max-width: 576px) {
       .context-type-grid {
         grid-template-columns: repeat(2, 1fr);
       }
+      .context-date-row,
+      .context-bottom-row {
+        grid-template-columns: 1fr;
+      }
+      #contextModal .modal-dialog {
+        max-width: 95%;
+        margin: 10px auto;
+      }
+    }
+
+    /* Toast personnalisé - style attention */
+    #messageToast {
+      background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+      border: none;
+      border-radius: var(--radius-md);
+      box-shadow: 0 8px 32px rgba(255, 152, 0, 0.35);
+      animation: toastSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      min-width: 320px;
+      max-width: 450px;
+    }
+
+    @keyframes toastSlideIn {
+      0% {
+        transform: translateX(100%) scale(0.8);
+        opacity: 0;
+      }
+      100% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+      }
+    }
+
+    #messageToast .toast-body {
+      color: white;
+      font-weight: 500;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    #messageToast .toast-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+      animation: iconPulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes iconPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    #messageToast .btn-close-toast {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+
+    #messageToast .btn-close-toast:hover {
+      background: rgba(255, 255, 255, 0.35);
+      transform: rotate(90deg);
     }
   </style>
 </head>
 
 <body>
-  <div class="toast-container position-fixed end-0 p-3" style="bottom: 10px">
-    <div class="toast align-items-center" id="messageToast" role="alert" aria-live="assertive" aria-atomic="true">
-      <div class="d-flex">
-        <div class="toast-body">Attention: <span id="message"></span></div>
+  <div class="toast-container position-fixed end-0 p-3" style="bottom: 20px; z-index: 9999;">
+    <div class="toast align-items-center" id="messageToast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+      <div class="toast-body">
+        <i class="bi bi-exclamation-triangle-fill toast-icon"></i>
+        <span id="message"></span>
+        <button type="button" class="btn-close-toast" data-bs-dismiss="toast" aria-label="Fermer">
+          <i class="bi bi-x"></i>
+        </button>
       </div>
     </div>
   </div>
@@ -922,15 +1049,18 @@
             </div>
             <div class="modal-body">
               <form id="contextForm">
-                <div class="mb-3">
-                  <label for="contextDateStart" class="form-label">Date/Heure de début</label>
-                  <input type="datetime-local" class="form-control" id="contextDateStart" required>
-                  <small class="text-muted">Cliquez sur le graphique pour sélectionner un timestamp</small>
+                <!-- Dates sur une ligne -->
+                <div class="context-date-row mb-3">
+                  <div>
+                    <label for="contextDateStart" class="form-label">Date/Heure de début</label>
+                    <input type="datetime-local" class="form-control" id="contextDateStart" required>
+                  </div>
+                  <div>
+                    <label for="contextDateEnd" class="form-label">Date/Heure de fin</label>
+                    <input type="datetime-local" class="form-control" id="contextDateEnd" required>
+                  </div>
                 </div>
-                <div class="mb-3">
-                  <label for="contextDateEnd" class="form-label">Date/Heure de fin</label>
-                  <input type="datetime-local" class="form-control" id="contextDateEnd" required>
-                </div>
+                <!-- Type de contexte -->
                 <div class="mb-3">
                   <label class="form-label">Type de contexte (optionnel)</label>
                   <div class="context-type-grid">
@@ -939,30 +1069,31 @@
                       <span>Incendie</span>
                     </div>
                     <div class="context-type-option" data-type="industrial" onclick="selectContextType('industrial')">
-                      <img src="https://api.aircarto.fr/context/logos/industrial-flat.svg" alt="Activité industrielle">
+                      <img src="https://api.aircarto.fr/context/logos/industrial-flat.svg" alt="Industriel">
                       <span>Industriel</span>
                     </div>
                     <div class="context-type-option" data-type="traffic" onclick="selectContextType('traffic')">
-                      <img src="https://api.aircarto.fr/context/logos/traffic-flat.svg" alt="Trafic routier">
+                      <img src="https://api.aircarto.fr/context/logos/traffic-flat.svg" alt="Trafic">
                       <span>Trafic</span>
                     </div>
-                    <div class="context-type-option" data-type="neighbourhood"
-                      onclick="selectContextType('neighbourhood')">
-                      <img src="https://api.aircarto.fr/context/logos/neighbourhood-flat.svg"
-                        alt="Activité de voisinage">
+                    <div class="context-type-option" data-type="neighbourhood" onclick="selectContextType('neighbourhood')">
+                      <img src="https://api.aircarto.fr/context/logos/neighbourhood-flat.svg" alt="Voisinage">
                       <span>Voisinage</span>
                     </div>
                   </div>
                   <input type="hidden" id="contextType" value="">
                 </div>
-                <div class="mb-3">
-                  <label for="contextComments" class="form-label">Commentaires</label>
-                  <textarea class="form-control" id="contextComments" rows="3"
-                    placeholder="Décrivez le contexte..."></textarea>
-                </div>
-                <div class="mb-3">
-                  <label for="contextUser" class="form-label">Utilisateur (optionnel)</label>
-                  <input type="text" class="form-control" id="contextUser" placeholder="Votre nom">
+                <!-- Commentaires et utilisateur sur une ligne -->
+                <div class="context-bottom-row">
+                  <div class="mb-3">
+                    <label for="contextComments" class="form-label">Commentaires</label>
+                    <textarea class="form-control" id="contextComments" rows="2"
+                      placeholder="Décrivez le contexte..."></textarea>
+                  </div>
+                  <div class="mb-3">
+                    <label for="contextUser" class="form-label">Utilisateur</label>
+                    <input type="text" class="form-control" id="contextUser" placeholder="Votre nom">
+                  </div>
                 </div>
               </form>
             </div>
@@ -1024,6 +1155,12 @@
     var selectedTimestamp = null;
     var contextModalInstance = null;
     var contextsData = []; // Store fetched contexts for the sensor
+    var contextSelectionStep = 0; // 0 = not selecting, 1 = waiting for start, 2 = waiting for end
+    var contextStartTimestamp = null;
+    var contextEndTimestamp = null;
+    var contextMarkerStart = null; // Reference to start marker on chart
+    var contextMarkerEnd = null; // Reference to end marker on chart
+    var contextRangeHighlight = null; // Reference to range highlight between markers
 
     const forms = document.querySelector(".forms"),
       pwShowHide = document.querySelectorAll(".eye-icon");
@@ -2664,10 +2801,24 @@
         dataSource: dataMerged,
       });
 
-      // Add contexts visualization
+      // Add contexts visualization - filter by current time range
       fetchContexts(function (contexts) {
         if (contexts && contexts.length > 0) {
-          addContextsToChart(root, unifiedChart, xAxis, contexts);
+          // Get data time range
+          const dataStartTime = data1.length > 0 ? new Date(data1[0].time).getTime() : null;
+          const dataEndTime = data1.length > 0 ? new Date(data1[data1.length - 1].time).getTime() : null;
+
+          // Filter contexts that overlap with the data time range
+          const filteredContexts = contexts.filter(function(context) {
+            const contextStart = new Date(context.datetime_start).getTime();
+            const contextEnd = new Date(context.datetime_stop).getTime();
+            // Check if context overlaps with data range
+            return dataStartTime && dataEndTime && contextStart <= dataEndTime && contextEnd >= dataStartTime;
+          });
+
+          if (filteredContexts.length > 0) {
+            addContextsToChart(root, unifiedChart, xAxis, filteredContexts, dataStartTime, dataEndTime);
+          }
         }
       });
 
@@ -2675,7 +2826,7 @@
     }
 
     // Add contexts to the chart
-    function addContextsToChart(root, chart, xAxis, contexts) {
+    function addContextsToChart(root, chart, xAxis, contexts, dataStartTime, dataEndTime) {
       console.log('Adding contexts to chart:', contexts);
 
       // Context type colors and logos
@@ -2691,9 +2842,13 @@
       const yAxis = chart.yAxes.getIndex(0);
 
       contexts.forEach(function (context) {
-        const startTime = new Date(context.datetime_start).getTime();
-        const endTime = new Date(context.datetime_stop).getTime();
+        let startTime = new Date(context.datetime_start).getTime();
+        let endTime = new Date(context.datetime_stop).getTime();
         const config = contextConfig[context.context_type] || contextConfig.fire;
+
+        // Clip context times to data range to avoid expanding the chart
+        if (dataStartTime && startTime < dataStartTime) startTime = dataStartTime;
+        if (dataEndTime && endTime > dataEndTime) endTime = dataEndTime;
 
         // Create range on X-axis for the context period
         const rangeDataItem = xAxis.makeDataItem({
@@ -2980,41 +3135,143 @@
       if (contextualizationMode) {
         btn.classList.add('active');
         chartDiv.classList.add('context-mode');
-        openToast('Mode contextualisation activé. Cliquez sur le graphique pour sélectionner un timestamp.');
+        contextSelectionStep = 1;
+        contextStartTimestamp = null;
+        contextEndTimestamp = null;
+        clearContextMarkers();
+        openToast('📍 Cliquez sur le graphique pour sélectionner le DÉBUT de la période.', true);
       } else {
         btn.classList.remove('active');
         chartDiv.classList.remove('context-mode');
+        contextSelectionStep = 0;
+        clearContextMarkers();
+        closeToast();
         openToast('Mode contextualisation désactivé.');
       }
+    }
+
+    // Clear context selection markers from chart
+    function clearContextMarkers() {
+      if (contextMarkerStart) {
+        contextMarkerStart.dispose();
+        contextMarkerStart = null;
+      }
+      if (contextMarkerEnd) {
+        contextMarkerEnd.dispose();
+        contextMarkerEnd = null;
+      }
+      if (contextRangeHighlight) {
+        contextRangeHighlight.dispose();
+        contextRangeHighlight = null;
+      }
+    }
+
+    // Add a visual marker on the chart at a specific timestamp
+    function addContextMarker(timestamp, isStart) {
+      if (!unifiedChart || !rootUnified) return null;
+
+      const xAxis = unifiedChart.xAxes.getIndex(0);
+      const color = isStart ? am5.color(0x28a745) : am5.color(0xdc3545); // Green for start, red for end
+
+      const rangeDataItem = xAxis.makeDataItem({
+        value: timestamp
+      });
+
+      const range = xAxis.createAxisRange(rangeDataItem);
+
+      // Vertical line
+      range.get("grid").setAll({
+        stroke: color,
+        strokeOpacity: 1,
+        strokeWidth: 3,
+        strokeDasharray: [5, 3],
+        visible: true
+      });
+
+      // Label at top
+      range.get("label").setAll({
+        text: isStart ? "DÉBUT" : "FIN",
+        fill: color,
+        fontSize: 12,
+        fontWeight: "bold",
+        paddingBottom: 5,
+        inside: true,
+        centerX: am5.p50
+      });
+
+      return range;
+    }
+
+    // Add highlight range between start and end
+    function addContextRangeHighlight(startTime, endTime) {
+      if (!unifiedChart || !rootUnified) return null;
+
+      const xAxis = unifiedChart.xAxes.getIndex(0);
+
+      const rangeDataItem = xAxis.makeDataItem({
+        value: startTime,
+        endValue: endTime
+      });
+
+      const range = xAxis.createAxisRange(rangeDataItem);
+
+      range.get("axisFill").setAll({
+        fill: am5.color(0x28a745),
+        fillOpacity: 0.15,
+        visible: true
+      });
+
+      return range;
     }
 
     // Handle chart click to capture timestamp
     function handleChartClick(timestamp) {
       if (!contextualizationMode) return;
 
-      selectedTimestamp = timestamp;
+      if (contextSelectionStep === 1) {
+        // First click - select start time
+        contextStartTimestamp = timestamp;
+        contextMarkerStart = addContextMarker(timestamp, true);
 
-      // Convert timestamp to local datetime-local format
-      const date = new Date(timestamp);
-      const localDatetime = formatDateTimeLocal(date);
+        contextSelectionStep = 2;
+        openToast('✅ Début sélectionné. Cliquez maintenant pour sélectionner la FIN de la période.', true);
 
-      // Set start time to clicked timestamp
-      document.getElementById('contextDateStart').value = localDatetime;
+      } else if (contextSelectionStep === 2) {
+        // Second click - select end time
+        contextEndTimestamp = timestamp;
 
-      // Set end time to 1 hour after start time by default
-      const endDate = new Date(timestamp + 3600000); // +1 hour
-      document.getElementById('contextDateEnd').value = formatDateTimeLocal(endDate);
+        // Ensure start is before end, swap if needed
+        if (contextEndTimestamp < contextStartTimestamp) {
+          const temp = contextStartTimestamp;
+          contextStartTimestamp = contextEndTimestamp;
+          contextEndTimestamp = temp;
+          // Update markers
+          clearContextMarkers();
+          contextMarkerStart = addContextMarker(contextStartTimestamp, true);
+        }
 
-      // Open modal
-      if (!contextModalInstance) {
-        contextModalInstance = new bootstrap.Modal(document.getElementById('contextModal'));
+        contextMarkerEnd = addContextMarker(contextEndTimestamp, false);
+        contextRangeHighlight = addContextRangeHighlight(contextStartTimestamp, contextEndTimestamp);
+
+        // Convert timestamps to local datetime-local format
+        document.getElementById('contextDateStart').value = formatDateTimeLocal(new Date(contextStartTimestamp));
+        document.getElementById('contextDateEnd').value = formatDateTimeLocal(new Date(contextEndTimestamp));
+
+        // Close the instruction toast
+        closeToast();
+
+        // Open modal
+        if (!contextModalInstance) {
+          contextModalInstance = new bootstrap.Modal(document.getElementById('contextModal'));
+        }
+        contextModalInstance.show();
+
+        // Deactivate contextualization mode (markers stay visible until modal closes)
+        contextualizationMode = false;
+        contextSelectionStep = 0;
+        document.getElementById('btnContextualization').classList.remove('active');
+        document.getElementById('unifiedChart').classList.remove('context-mode');
       }
-      contextModalInstance.show();
-
-      // Deactivate contextualization mode after click
-      contextualizationMode = false;
-      document.getElementById('btnContextualization').classList.remove('active');
-      document.getElementById('unifiedChart').classList.remove('context-mode');
     }
 
     // Format date to datetime-local input format (YYYY-MM-DDTHH:mm)
@@ -3128,6 +3385,12 @@
     function resetContextModal() {
       document.getElementById('contextForm').reset();
       selectedTimestamp = null;
+      contextStartTimestamp = null;
+      contextEndTimestamp = null;
+      contextSelectionStep = 0;
+
+      // Clear markers from chart
+      clearContextMarkers();
 
       // Clear logo selection
       const options = document.querySelectorAll('.context-type-option');
@@ -3870,12 +4133,32 @@
       });
     }
 
-    function openToast(message) {
+    function openToast(message, persistent = false) {
       let toastDiv = document.getElementById("messageToast");
       document.getElementById("message").innerText = message;
-      let toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastDiv);
-      console.log("Showing message toast");
+
+      // Dispose existing instance to apply new options
+      let existingToast = bootstrap.Toast.getInstance(toastDiv);
+      if (existingToast) {
+        existingToast.dispose();
+      }
+
+      // Create toast with appropriate options
+      let toastBootstrap = new bootstrap.Toast(toastDiv, {
+        autohide: !persistent,
+        delay: 5000
+      });
+
+      console.log("Showing message toast, persistent:", persistent);
       toastBootstrap.show();
+    }
+
+    function closeToast() {
+      let toastDiv = document.getElementById("messageToast");
+      let toastBootstrap = bootstrap.Toast.getInstance(toastDiv);
+      if (toastBootstrap) {
+        toastBootstrap.hide();
+      }
     }
 
     function timeDateCounter(timestamp) {
