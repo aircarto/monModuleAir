@@ -576,6 +576,47 @@
       font-size: 14px;
     }
 
+    .sensor-status.offline {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+    }
+
+    .sensor-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .sensor-status-badge.online {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success-color);
+    }
+
+    .sensor-status-badge.offline {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .status-dot.online {
+      background: var(--success-color);
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+    }
+
+    .status-dot.offline {
+      background: #ef4444;
+    }
+
     /* Hide old chart divs */
     #chartdiv5,
     #chartdiv6,
@@ -849,7 +890,11 @@
                   <div>
                     <h3 class="card-title mb-2">ModuleAir <span id="idm"></span></h3>
                     <div class="sensor-info">
-                      <span class="sensor-status">
+                      <span id="sensor-connection-badge" class="sensor-status-badge online">
+                        <span class="status-dot online"></span>
+                        <span id="sensor-connection-text">Capteur connecté</span>
+                      </span>
+                      <span id="sensor-timestamp-badge" class="sensor-status">
                         <i class="bi bi-clock"></i>
                         <span id="timestamp"></span>
                       </span>
@@ -1142,6 +1187,8 @@
     var measureType = "PM";
     var timespanGraph = 2;   // pas de temps en minutes
     var timeLengthGraph = 3;  //historique en heures
+    var lastSensorTimestamp = null; // dernier timestamp reçu du capteur
+    var statusCheckInterval = null; // intervalle de vérification du statut
 
     // Toggle states for series visibility
     var seriesVisibility = {
@@ -1230,6 +1277,13 @@
       reloadDataSensor(timeLengthGraph, timespanGraph);
     }, timespanGraph * 60000);
 
+    // Vérification du statut du capteur toutes les 2 minutes
+    setInterval(() => {
+      if (moduleair && token) {
+        checkSensorStatus();
+      }
+    }, 120000);
+
     function submit() {
       console.log("---------");
       console.log("---------");
@@ -1300,7 +1354,7 @@
             //const  timestamp_local = new Date(timestamp_UTC.setHours(timestamp_UTC.getHours() + offset));
 
             document.querySelector("#idm").innerText = data[0].sensorId;
-            document.querySelector("#timestamp").innerText = timeDateCounter(data[0].time);
+            updateSensorStatus(data[0].time);
 
             //let wifiLevel = 2 * (parseInt(data[0].wifi_signal) + 100);
             //document.querySelector("#wifilevel").innerText = wifiLevel + " %";
@@ -4159,6 +4213,68 @@
       if (toastBootstrap) {
         toastBootstrap.hide();
       }
+    }
+
+    function updateSensorStatus(timestamp) {
+      lastSensorTimestamp = timestamp;
+      const lastTime = new Date(timestamp);
+      const now = Date.now();
+      const diffMs = now - lastTime;
+      const diffMinutes = diffMs / 60000;
+      const isOnline = diffMinutes <= 5;
+
+      const badge = document.querySelector("#sensor-connection-badge");
+      const text = document.querySelector("#sensor-connection-text");
+      const dot = badge.querySelector(".status-dot");
+      const timestampBadge = document.querySelector("#sensor-timestamp-badge");
+
+      if (isOnline) {
+        badge.className = "sensor-status-badge online";
+        dot.className = "status-dot online";
+        text.innerText = "Capteur connecté";
+        timestampBadge.className = "sensor-status";
+        timestampBadge.style.display = "inline-flex";
+      } else {
+        badge.className = "sensor-status-badge offline";
+        dot.className = "status-dot offline";
+        text.innerText = "Capteur déconnecté";
+        timestampBadge.className = "sensor-status offline";
+        timestampBadge.style.display = "inline-flex";
+      }
+
+      // Mettre à jour le texte du timestamp
+      document.querySelector("#timestamp").innerText = isOnline
+        ? timeDateCounter(timestamp)
+        : "Dernière mesure " + timeAgoText(diffMs);
+    }
+
+    function timeAgoText(diffMs) {
+      const minutes = Math.floor(diffMs / 60000);
+      const hours = Math.floor(diffMs / 3600000);
+      const days = Math.floor(diffMs / 86400000);
+
+      if (days > 0) {
+        return "il y a " + days + " jour" + (days > 1 ? "s" : "");
+      } else if (hours > 0) {
+        return "il y a " + hours + " heure" + (hours > 1 ? "s" : "");
+      } else {
+        return "il y a " + minutes + " minute" + (minutes > 1 ? "s" : "");
+      }
+    }
+
+    function checkSensorStatus() {
+      $.ajax({
+        method: "GET",
+        url:
+          "https://api.aircarto.fr/capteurs/metadata?capteurType=ModuleAir&capteurID=" +
+          moduleair +
+          "&token=" +
+          token,
+      }).done(function (data) {
+        if (data != null && data.length > 0) {
+          updateSensorStatus(data[0].time);
+        }
+      });
     }
 
     function timeDateCounter(timestamp) {
