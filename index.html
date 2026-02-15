@@ -759,10 +759,12 @@
       .context-type-grid {
         grid-template-columns: repeat(2, 1fr);
       }
+
       .context-date-row,
       .context-bottom-row {
         grid-template-columns: 1fr;
       }
+
       #contextModal .modal-dialog {
         max-width: 95%;
         margin: 10px auto;
@@ -785,6 +787,7 @@
         transform: translateX(100%) scale(0.8);
         opacity: 0;
       }
+
       100% {
         transform: translateX(0) scale(1);
         opacity: 1;
@@ -809,8 +812,15 @@
     }
 
     @keyframes iconPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.1);
+      }
     }
 
     #messageToast .btn-close-toast {
@@ -838,7 +848,8 @@
 
 <body>
   <div class="toast-container position-fixed end-0 p-3" style="bottom: 20px; z-index: 9999;">
-    <div class="toast align-items-center" id="messageToast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+    <div class="toast align-items-center" id="messageToast" role="alert" aria-live="assertive" aria-atomic="true"
+      data-bs-delay="5000">
       <div class="toast-body">
         <i class="bi bi-exclamation-triangle-fill toast-icon"></i>
         <span id="message"></span>
@@ -986,6 +997,9 @@
                   </button>
                   <button class="toggle-btn" data-series="COV" onclick="toggleSeries('COV')">
                     <span class="color-dot"></span> COV <small>(ppb)</small>
+                  </button>
+                  <button class="toggle-btn active" data-series="COMMENTS" onclick="toggleSeries('COMMENTS')">
+                    <span class="color-dot" style="background-color: #6c757d;"></span> Commentaires
                   </button>
                 </div>
 
@@ -1136,7 +1150,8 @@
                       <img src="https://api.aircarto.fr/context/logos/traffic-flat.svg" alt="Trafic">
                       <span>Trafic</span>
                     </div>
-                    <div class="context-type-option" data-type="neighbourhood" onclick="selectContextType('neighbourhood')">
+                    <div class="context-type-option" data-type="neighbourhood"
+                      onclick="selectContextType('neighbourhood')">
                       <img src="https://api.aircarto.fr/context/logos/neighbourhood-flat.svg" alt="Voisinage">
                       <span>Voisinage</span>
                     </div>
@@ -1189,7 +1204,8 @@
       </div>
 
       <!-- Custom Period Modal -->
-      <div class="modal fade" id="customPeriodModal" tabindex="-1" aria-labelledby="customPeriodModalLabel" aria-hidden="true">
+      <div class="modal fade" id="customPeriodModal" tabindex="-1" aria-labelledby="customPeriodModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-header">
@@ -1247,7 +1263,8 @@
     var seriesVisibility = {
       PM1: false, PM25: true, PM10: false,
       TEMP: false, HUM: false,
-      COV: false, CO2: true
+      COV: false, CO2: true,
+      COMMENTS: true
     };
 
     // Contextualization mode variables
@@ -1522,7 +1539,7 @@
             console.log(start_string);
             console.log(end_string);
 
-            var freqStr = ({2: "2m", 15: "15m", 60: "1h", 1440: "1d"}[timespanGraph] || "2m");
+            var freqStr = ({ 2: "2m", 15: "15m", 60: "1h", 1440: "1d" }[timespanGraph] || "2m");
 
             if (data[0].link != null && data[0].link != "" && data[0].link.includes("nebuleair-")) {
               nebuleair = data[0].link;
@@ -2926,7 +2943,7 @@
           const dataEndTime = data1.length > 0 ? new Date(data1[data1.length - 1].time).getTime() : null;
 
           // Filter contexts that overlap with the data time range
-          const filteredContexts = contexts.filter(function(context) {
+          const filteredContexts = contexts.filter(function (context) {
             const contextStart = new Date(context.datetime_start).getTime();
             const contextEnd = new Date(context.datetime_stop).getTime();
             // Check if context overlaps with data range
@@ -3013,6 +3030,9 @@
             valueXField: "date"
           })
         );
+
+        // Store reference for toggling
+        allSeries.COMMENTS = contextSeries;
 
         contextSeries.strokes.template.set("visible", false);
 
@@ -3122,6 +3142,19 @@
       // Show/hide series
       Object.keys(seriesVisibility).forEach(function (pollutant) {
         const visible = seriesVisibility[pollutant];
+
+        // Handle context comments special case
+        if (pollutant === 'COMMENTS') {
+          if (allSeries.COMMENTS) {
+            if (visible) {
+              allSeries.COMMENTS.show();
+            } else {
+              allSeries.COMMENTS.hide();
+            }
+          }
+          return;
+        }
+
         const intKey = pollutant + "_int";
         const extKey = pollutant + "_ext";
 
