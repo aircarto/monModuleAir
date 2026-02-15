@@ -642,6 +642,17 @@
       cursor: crosshair;
     }
 
+    /* Custom period modal */
+    #customPeriodModal .modal-dialog {
+      max-width: 500px;
+    }
+
+    #customPeriodModal .form-label {
+      font-size: 13px;
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+
     /* Context modal - wider and compact */
     #contextModal .modal-dialog {
       max-width: 650px;
@@ -939,6 +950,10 @@
                     <span id="button1s"></span>
                     <span id="button1m"></span>
                     <span id="button1a"></span>
+                    <span id="button3mo"></span>
+                    <button type="button" class="time-btn" id="btnCustomPeriod" onclick="openCustomPeriodModal()">
+                      <i class="bi bi-calendar-range"></i> Personnalisée
+                    </button>
                   </div>
                   <div class="time-controls-group">
                     <span class="time-controls-label">Résolution :</span>
@@ -1172,6 +1187,42 @@
           </div>
         </div>
       </div>
+
+      <!-- Custom Period Modal -->
+      <div class="modal fade" id="customPeriodModal" tabindex="-1" aria-labelledby="customPeriodModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="customPeriodModalLabel">
+                <i class="bi bi-calendar-range"></i> Période personnalisée
+              </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="context-date-row mb-3">
+                <div>
+                  <label for="customPeriodStart" class="form-label">Date de début</label>
+                  <input type="datetime-local" class="form-control" id="customPeriodStart" required>
+                </div>
+                <div>
+                  <label for="customPeriodEnd" class="form-label">Date de fin</label>
+                  <input type="datetime-local" class="form-control" id="customPeriodEnd" required>
+                </div>
+              </div>
+              <div id="customPeriodWarning" class="alert alert-warning d-none" style="font-size: 13px;">
+                <i class="bi bi-exclamation-triangle"></i> <span id="customPeriodWarningText"></span>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+              <button type="button" class="btn btn-success" id="btnApplyCustomPeriod" onclick="applyCustomPeriod()">
+                <i class="bi bi-check-lg"></i> Appliquer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </section>
   </div>
 
@@ -1185,8 +1236,10 @@
     var allAxes = {}; // Store Y-axes references
 
     var measureType = "PM";
-    var timespanGraph = 2;   // pas de temps en minutes
-    var timeLengthGraph = 3;  //historique en heures
+    var timespanGraph = parseInt(localStorage.getItem("moduleair_timespan")) || 2;   // pas de temps en minutes
+    var timeLengthGraph = parseInt(localStorage.getItem("moduleair_timelength")) || 3;  //historique en heures
+    // Constraint: no 2min on > 1 month
+    if (timeLengthGraph > 720 && timespanGraph === 2) { timespanGraph = 15; }
     var lastSensorTimestamp = null; // dernier timestamp reçu du capteur
     var statusCheckInterval = null; // intervalle de vérification du statut
 
@@ -1207,6 +1260,10 @@
     var contextEndTimestamp = null;
     var contextMarkerStart = null; // Reference to start marker on chart
     var contextMarkerEnd = null; // Reference to end marker on chart
+    var customPeriodModalInstance = null;
+    var isCustomPeriod = false; // Track if we're using a custom period
+    var customStartDate = null;
+    var customEndDate = null;
     var contextRangeHighlight = null; // Reference to range highlight between markers
 
     const forms = document.querySelector(".forms"),
@@ -1338,7 +1395,10 @@
             if (difference > 168 && difference <= 720) {
               timeLengthGraph = 720;
             }
-            if (difference > 720 && difference <= 8760) {
+            if (difference > 720 && difference <= 2160) {
+              timeLengthGraph = 2160;
+            }
+            if (difference > 2160 && difference <= 8760) {
               timeLengthGraph = 8760;
             }
 
@@ -1441,7 +1501,9 @@
             document.getElementById("button1m").innerHTML =
               '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',720," + timespanGraph + ')" class="time-btn">1 mois</button>';
             document.getElementById("button1a").innerHTML =
-              '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',8760," + timespanGraph + ')" class="time-btn" disabled>1 an</button>';
+              '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',8760," + timespanGraph + ')" class="time-btn">1 an</button>';
+            document.getElementById("button3mo").innerHTML =
+              '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',2160," + timespanGraph + ')" class="time-btn">3 mois</button>';
             document.getElementById("button2m").innerHTML =
               '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',2)" class="time-btn">2m</button>';
             document.getElementById("button15m").innerHTML =
@@ -1460,9 +1522,10 @@
             console.log(start_string);
             console.log(end_string);
 
+            var freqStr = ({2: "2m", 15: "15m", 60: "1h", 1440: "1d"}[timespanGraph] || "2m");
+
             if (data[0].link != null && data[0].link != "" && data[0].link.includes("nebuleair-")) {
               nebuleair = data[0].link;
-
               console.log(
                 "https://api.aircarto.fr/capteurs/dataNebuleAir?capteurID=" +
                 data[0].link +
@@ -1470,7 +1533,7 @@
                 start_string +
                 "&end=" +
                 end_string +
-                "&freq=2m"
+                "&freq=" + freqStr
               );
 
               $.ajax({
@@ -1482,7 +1545,7 @@
                   start_string +
                   "&end=" +
                   end_string +
-                  "&freq=2m",
+                  "&freq=" + freqStr,
               })
                 .done(function (data) {
                   console.log("Getting NebuleAir data from aircarto API (data) :");
@@ -1504,7 +1567,7 @@
               start_string +
               "&end=" +
               end_string +
-              "&freq=2m&token=" +
+              "&freq=" + freqStr + "&token=" +
               token
             );
 
@@ -1517,7 +1580,7 @@
                 start_string +
                 "&end=" +
                 end_string +
-                "&freq=2m" +
+                "&freq=" + freqStr +
                 "&token=" +
                 token,
             })
@@ -3889,8 +3952,53 @@
     }
 
     function chooseTimeModuleAir(id, hours, timespan) {
+      // If custom period is active, check if user clicked a resolution button or a period button
+      // Period buttons pass a specific hours value with current timespanGraph
+      // Resolution buttons pass current timeLengthGraph with a specific timespan value
+      var periodButtonValues = [1, 3, 24, 48, 168, 720, 2160, 8760];
+      var isResolutionChange = !periodButtonValues.includes(hours) || (hours === timeLengthGraph && timespan !== timespanGraph);
+
+      if (isCustomPeriod && customStartDate && customEndDate && isResolutionChange) {
+        timespanGraph = timespan;
+        localStorage.setItem("moduleair_timespan", timespanGraph);
+        var durationHours = (customEndDate - customStartDate) / (1000 * 60 * 60);
+        if (durationHours > 720 && timespan === 2) {
+          openToast("La résolution 2 min n'est pas disponible pour les périodes de plus d'un mois.");
+          return;
+        }
+        reloadDataSensorCustom(customStartDate, customEndDate, timespan);
+        document.getElementById("button2m").innerHTML =
+          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',2)" class="time-btn">2m</button>';
+        document.getElementById("button15m").innerHTML =
+          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',15)" class="time-btn">15m</button>';
+        document.getElementById("button60m").innerHTML =
+          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',60)" class="time-btn">1h</button>';
+        document.getElementById("button1440m").innerHTML =
+          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',1440)" class="time-btn">24h</button>';
+        updateCustomPeriodButtonStates();
+        return;
+      }
+
       timeLengthGraph = hours;
       timespanGraph = timespan;
+
+      // Standard period selected: clear custom period
+      isCustomPeriod = false;
+      customStartDate = null;
+      customEndDate = null;
+      document.getElementById("btnCustomPeriod").classList.remove("active");
+
+      // Constraint: no 2min on > 1 month
+      if (hours > 720 && timespan === 2) {
+        timespanGraph = 15;
+        timespan = 15;
+        openToast("La résolution 2 min n'est pas disponible pour les périodes de plus d'un mois. Passage automatique à 15 min.");
+      }
+
+      // Save to localStorage
+      localStorage.setItem("moduleair_timelength", timeLengthGraph);
+      localStorage.setItem("moduleair_timespan", timespanGraph);
+
       reloadDataSensor(hours, timespan);
       document.getElementById("button1h").innerHTML =
         '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',1," + timespanGraph + ')" class="time-btn">1h</button>';
@@ -3906,6 +4014,8 @@
         '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',720," + timespanGraph + ')" class="time-btn">1 mois</button>';
       document.getElementById("button1a").innerHTML =
         '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',8760," + timespanGraph + ')" class="time-btn">1 an</button>';
+      document.getElementById("button3mo").innerHTML =
+        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',2160," + timespanGraph + ')" class="time-btn">3 mois</button>';
       document.getElementById("button2m").innerHTML =
         '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',2)" class="time-btn">2m</button>';
       document.getElementById("button15m").innerHTML =
@@ -3921,7 +4031,7 @@
       // Hour buttons mapping
       const hourButtons = {
         1: "button1h", 3: "button3h", 24: "button24h",
-        48: "button48h", 168: "button1s", 720: "button1m", 8760: "button1a"
+        48: "button48h", 168: "button1s", 720: "button1m", 8760: "button1a", 2160: "button3mo"
       };
 
       // Timespan buttons mapping
@@ -3949,30 +4059,207 @@
         }
       });
 
-      // Disable 1 year button for small timespans
+      // Deactivate custom period button when using standard periods
+      document.getElementById("btnCustomPeriod").classList.remove("active");
+
+      // Disable 1 year and 3 months buttons for 2min resolution
       const btn1a = document.getElementById("button1a").children[0];
-      if (timespan == 2 || timespan == 15) {
+      const btn3mo = document.getElementById("button3mo").children[0];
+      if (timespan == 2) {
         btn1a.setAttribute("disabled", "");
+        btn3mo.setAttribute("disabled", "");
+      } else if (timespan == 15) {
+        btn1a.setAttribute("disabled", "");
+        btn3mo.removeAttribute("disabled");
       } else {
         btn1a.removeAttribute("disabled");
+        btn3mo.removeAttribute("disabled");
       }
 
-      // Disable small timespans for 1 year period
+      // Disable 2min resolution for periods > 1 month (720h)
       const btn2m = document.getElementById("button2m").children[0];
       const btn15m = document.getElementById("button15m").children[0];
-      if (hours == 8760) {
+      if (hours > 720) {
         btn2m.setAttribute("disabled", "");
-        btn15m.setAttribute("disabled", "");
+        // Also disable 15min for 1 year
+        if (hours >= 8760) {
+          btn15m.setAttribute("disabled", "");
+        } else {
+          btn15m.removeAttribute("disabled");
+        }
       } else {
         btn2m.removeAttribute("disabled");
         btn15m.removeAttribute("disabled");
       }
     }
 
+    function openCustomPeriodModal() {
+      if (!customPeriodModalInstance) {
+        customPeriodModalInstance = new bootstrap.Modal(document.getElementById('customPeriodModal'));
+      }
+      // Set default dates: end = now, start = 24h ago
+      var now = new Date();
+      var yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      document.getElementById('customPeriodEnd').value = formatDateTimeLocal(now);
+      document.getElementById('customPeriodStart').value = formatDateTimeLocal(yesterday);
+      document.getElementById('customPeriodWarning').classList.add('d-none');
+      document.getElementById('btnApplyCustomPeriod').removeAttribute('disabled');
+      customPeriodModalInstance.show();
+    }
+
+    function formatDateTimeLocal(date) {
+      var y = date.getFullYear();
+      var m = String(date.getMonth() + 1).padStart(2, '0');
+      var d = String(date.getDate()).padStart(2, '0');
+      var h = String(date.getHours()).padStart(2, '0');
+      var min = String(date.getMinutes()).padStart(2, '0');
+      return y + '-' + m + '-' + d + 'T' + h + ':' + min;
+    }
+
+    function applyCustomPeriod() {
+      var startInput = document.getElementById('customPeriodStart').value;
+      var endInput = document.getElementById('customPeriodEnd').value;
+
+      if (!startInput || !endInput) {
+        showCustomPeriodWarning("Veuillez renseigner les deux dates.");
+        return;
+      }
+
+      var startDate = new Date(startInput);
+      var endDate = new Date(endInput);
+
+      if (startDate >= endDate) {
+        showCustomPeriodWarning("La date de début doit être antérieure à la date de fin.");
+        return;
+      }
+
+      if (endDate > new Date()) {
+        showCustomPeriodWarning("La date de fin ne peut pas être dans le futur.");
+        return;
+      }
+
+      // Calculate duration in hours
+      var durationMs = endDate - startDate;
+      var durationHours = durationMs / (1000 * 60 * 60);
+
+      // Check resolution constraint: no 2min data on periods > 1 month (720h)
+      if (durationHours > 720 && timespanGraph === 2) {
+        timespanGraph = 15;
+        openToast("La résolution 2 min n'est pas disponible pour les périodes de plus d'un mois. Passage automatique à 15 min.");
+      }
+
+      // Save resolution to localStorage
+      localStorage.setItem("moduleair_timespan", timespanGraph);
+
+      // Store custom period state
+      isCustomPeriod = true;
+      customStartDate = startDate;
+      customEndDate = endDate;
+
+      reloadDataSensorCustom(startDate, endDate, timespanGraph);
+      updateCustomPeriodButtonStates();
+      customPeriodModalInstance.hide();
+    }
+
+    function showCustomPeriodWarning(msg) {
+      var warningEl = document.getElementById('customPeriodWarning');
+      document.getElementById('customPeriodWarningText').textContent = msg;
+      warningEl.classList.remove('d-none');
+    }
+
+    function reloadDataSensorCustom(startDate, endDate, timespan) {
+      console.log("RELOAD DATA SENSORS CUSTOM PERIOD");
+
+      var start_string = startDate.toISOString();
+      var end_string = endDate.toISOString();
+
+      console.log("Custom période: " + start_string + " -> " + end_string);
+      console.log("Pas de temps: " + timespan);
+
+      switch (timespan) {
+        case 2: timespan = "2m"; break;
+        case 15: timespan = "15m"; break;
+        case 60: timespan = "1h"; break;
+        case 1440: timespan = "1d"; break;
+      }
+
+      if (nebuleair != null) {
+        $.ajax({
+          method: "GET",
+          url: "https://api.aircarto.fr/capteurs/dataNebuleAir?capteurID=" +
+            nebuleair + "&start=" + start_string + "&end=" + end_string + "&freq=" + timespan,
+        }).done(function (data) {
+          dataNebuleAir = data;
+          if (data == null) {
+            openToast("Pas de donnée NebuleAir sur cet intervalle.");
+          }
+        }).fail(function () {
+          console.log("Error while geting data from Aircarto API");
+        });
+      }
+
+      $.ajax({
+        method: "GET",
+        url: "https://api.aircarto.fr/capteurs/dataModuleAir?capteurID=" +
+          moduleair + "&start=" + start_string + "&end=" + end_string + "&freq=" + timespan + "&token=" + token,
+      }).done(function (data) {
+        if (data != null) {
+          if (rootUnified != undefined) {
+            rootUnified.dispose();
+          }
+          setTimeout(function () {
+            am5.ready(function () {
+              rootUnified = am5.Root.new("unifiedChart");
+              unifiedGraphCreator(rootUnified, data, dataNebuleAir, timespanGraph, data[data.length - 1].sensorId);
+            });
+          }, 1000);
+        } else {
+          openToast("Pas de donnée sur cet intervalle. Veuillez choisir une période plus longue.");
+        }
+      }).fail(function () {
+        console.log("Error while geting data from Aircarto API");
+      });
+    }
+
+    function updateCustomPeriodButtonStates() {
+      // Deactivate all period buttons
+      var hourButtons = { 1: "button1h", 3: "button3h", 24: "button24h", 48: "button48h", 168: "button1s", 720: "button1m", 8760: "button1a", 2160: "button3mo" };
+      Object.keys(hourButtons).forEach(function (h) {
+        var el = document.getElementById(hourButtons[h]);
+        if (el.children[0]) el.children[0].classList.remove("active");
+      });
+      // Activate custom period button
+      document.getElementById("btnCustomPeriod").classList.add("active");
+
+      // Update timespan buttons states
+      var timespanButtons = { 2: "button2m", 15: "button15m", 60: "button60m", 1440: "button1440m" };
+      Object.keys(timespanButtons).forEach(function (t) {
+        var btn = document.getElementById(timespanButtons[t]).children[0];
+        if (parseInt(t) === timespanGraph) {
+          btn.classList.add("active");
+        } else {
+          btn.classList.remove("active");
+        }
+      });
+
+      // Apply resolution constraints for custom period: no 2min on > 1 month
+      var durationHours = (customEndDate - customStartDate) / (1000 * 60 * 60);
+      var btn2m = document.getElementById("button2m").children[0];
+      var btn15m = document.getElementById("button15m").children[0];
+      if (durationHours > 720) {
+        btn2m.setAttribute("disabled", "");
+      } else {
+        btn2m.removeAttribute("disabled");
+      }
+      btn15m.removeAttribute("disabled");
+    }
+
     function logout() {
-      // Clear localStorage credentials
+      // Clear localStorage credentials and settings
       localStorage.removeItem("moduleair_id");
       localStorage.removeItem("moduleair_token");
+      localStorage.removeItem("moduleair_timelength");
+      localStorage.removeItem("moduleair_timespan");
       location.reload();
     }
 
