@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
   <meta charset="UTF-8" />
@@ -8,7 +8,7 @@
 
   <!-- <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"> -->
 
-  <title>My ModuleAir sign in</title>
+  <title>Mon ModuleAir</title>
 
   <link rel="icon" type="image/x-icon" href="https://moduleair.fr/img/favicon.png" />
 
@@ -843,6 +843,37 @@
       background: rgba(255, 255, 255, 0.35);
       transform: rotate(90deg);
     }
+
+    /* Language switcher */
+    .lang-switcher {
+      display: inline-flex;
+      border: 2px solid var(--border-color);
+      border-radius: 20px;
+      overflow: hidden;
+      background: var(--card-background);
+    }
+
+    .lang-btn {
+      border: none;
+      background: transparent;
+      padding: 4px 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: var(--transition);
+      line-height: 1.4;
+    }
+
+    .lang-btn:hover {
+      color: var(--primary-color);
+      background: rgba(37, 99, 235, 0.05);
+    }
+
+    .lang-btn.active {
+      background: var(--primary-color);
+      color: white;
+    }
   </style>
 </head>
 
@@ -853,7 +884,7 @@
       <div class="toast-body">
         <i class="bi bi-exclamation-triangle-fill toast-icon"></i>
         <span id="message"></span>
-        <button type="button" class="btn-close-toast" data-bs-dismiss="toast" aria-label="Fermer">
+        <button type="button" class="btn-close-toast" data-bs-dismiss="toast" aria-label="Close">
           <i class="bi bi-x"></i>
         </button>
       </div>
@@ -865,24 +896,31 @@
     <section id="container_form">
       <div class="form login">
         <div class="form-content">
+          <div class="d-flex justify-content-end mb-2">
+            <div class="lang-switcher">
+              <button type="button" class="lang-btn active" data-lang="fr" onclick="changeLanguage('fr')">FR</button>
+              <button type="button" class="lang-btn" data-lang="en" onclick="changeLanguage('en')">EN</button>
+              <button type="button" class="lang-btn" data-lang="it" onclick="changeLanguage('it')">IT</button>
+            </div>
+          </div>
           <header>
-            <h2 class="fw-bold mb-2">Mon ModuleAir</h2>
+            <h2 class="fw-bold mb-2" data-i18n="login.title">Mon ModuleAir</h2>
           </header>
-          <p style="text-align: center">
+          <p style="text-align: center" data-i18n="login.instructions">
             Veuillez entrer le nom du ModuleAir ainsi que son token (indiqué au
             dos de l'appareil)
           </p>
           <div class="field input-field">
-            <input type="text" placeholder="Nom (device ID)" class="input" id="moduleair" />
+            <input type="text" placeholder="Nom (device ID)" class="input" id="moduleair" data-i18n-placeholder="login.placeholder.device" />
           </div>
 
           <div class="field input-field">
-            <input type="password" placeholder="Token" class="password" id="token" />
+            <input type="password" placeholder="Token" class="password" id="token" data-i18n-placeholder="login.placeholder.token" />
             <i class="bi bi-eye-slash eye-icon"></i>
           </div>
 
           <div class="field button-field">
-            <button id="submit">Se connecter</button>
+            <button id="submit" data-i18n="login.submit">Se connecter</button>
           </div>
         </div>
       </div>
@@ -896,9 +934,16 @@
             <img src="/img/logoModuleAirColor_long.png" alt="ModuleAir" />
             <img src="./img/LogoAirCarto.png" alt="AirCarto" />
           </div>
-          <button class="btn-logout" id="logout">
-            <i class="bi bi-box-arrow-right"></i> Déconnexion
-          </button>
+          <div class="d-flex align-items-center gap-3">
+            <div class="lang-switcher">
+              <button type="button" class="lang-btn active" data-lang="fr" onclick="changeLanguage('fr')">FR</button>
+              <button type="button" class="lang-btn" data-lang="en" onclick="changeLanguage('en')">EN</button>
+              <button type="button" class="lang-btn" data-lang="it" onclick="changeLanguage('it')">IT</button>
+            </div>
+            <button class="btn-logout" id="logout">
+              <i class="bi bi-box-arrow-right"></i> <span data-i18n="nav.logout">Déconnexion</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -914,7 +959,7 @@
                     <div class="sensor-info">
                       <span id="sensor-connection-badge" class="sensor-status-badge online">
                         <span class="status-dot online"></span>
-                        <span id="sensor-connection-text">Capteur connecté</span>
+                        <span id="sensor-connection-text" data-i18n="sensor.online">Capteur connecté</span>
                       </span>
                       <span id="sensor-timestamp-badge" class="sensor-status">
                         <i class="bi bi-clock"></i>
@@ -923,7 +968,7 @@
                     </div>
                   </div>
                   <button type="button" onclick="refresh_data()" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-clockwise"></i> Actualiser
+                    <i class="bi bi-arrow-clockwise"></i> <span data-i18n="btn.refresh">Actualiser</span>
                   </button>
                 </div>
 
@@ -944,16 +989,16 @@
             <div class="card">
               <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                  <h5 class="card-title mb-0">Historique des mesures</h5>
+                  <h5 class="card-title mb-0" data-i18n="history.title">Historique des mesures</h5>
                   <button type="button" id="btnContextualization" class="btn btn-outline-secondary"
                     onclick="toggleContextualizationMode()">
-                    <i class="bi bi-plus-circle"></i> Ajouter contextualisation
+                    <i class="bi bi-plus-circle"></i> <span data-i18n="history.addContext">Ajouter contextualisation</span>
                   </button>
                 </div>
 
                 <div class="time-controls">
                   <div class="time-controls-group">
-                    <span class="time-controls-label">Période :</span>
+                    <span class="time-controls-label" data-i18n="history.period">Période :</span>
                     <span id="button1h"></span>
                     <span id="button3h"></span>
                     <span id="button24h"></span>
@@ -963,11 +1008,11 @@
                     <span id="button1a"></span>
                     <span id="button3mo"></span>
                     <button type="button" class="time-btn" id="btnCustomPeriod" onclick="openCustomPeriodModal()">
-                      <i class="bi bi-calendar-range"></i> Personnalisée
+                      <i class="bi bi-calendar-range"></i> <span data-i18n="history.custom">Personnalisée</span>
                     </button>
                   </div>
                   <div class="time-controls-group">
-                    <span class="time-controls-label">Résolution :</span>
+                    <span class="time-controls-label" data-i18n="history.resolution">Résolution :</span>
                     <span id="button2m"></span>
                     <span id="button15m"></span>
                     <span id="button60m"></span>
@@ -993,13 +1038,13 @@
                     <span class="color-dot"></span> Temp <small>(°C)</small>
                   </button>
                   <button class="toggle-btn" data-series="HUM" onclick="toggleSeries('HUM')">
-                    <span class="color-dot"></span> Humidité <small>(%)</small>
+                    <span class="color-dot"></span> <span data-i18n="btn.humidity">Humidité</span> <small>(%)</small>
                   </button>
                   <button class="toggle-btn" data-series="COV" onclick="toggleSeries('COV')">
                     <span class="color-dot"></span> COV <small>(ppb)</small>
                   </button>
                   <button class="toggle-btn active" data-series="COMMENTS" onclick="toggleSeries('COMMENTS')">
-                    <span class="color-dot" style="background-color: #6c757d;"></span> Commentaires
+                    <span class="color-dot" style="background-color: #6c757d;"></span> <span data-i18n="btn.comments">Commentaires</span>
                   </button>
                 </div>
 
@@ -1022,16 +1067,16 @@
             <div class="card h-100">
               <div class="card-body">
                 <h5 class="card-title">
-                  <i class="bi bi-link-45deg"></i> Connecter un NebuleAir
+                  <i class="bi bi-link-45deg"></i> <span data-i18n="nebuleair.title">Connecter un NebuleAir</span>
                 </h5>
-                <p class="text-muted mb-3">
+                <p class="text-muted mb-3" data-i18n="nebuleair.description">
                   Liez votre ModuleAir à un NebuleAir pour comparer les mesures intérieures et extérieures.
                 </p>
                 <div class="d-flex gap-2 align-items-center">
                   <input type="text" id="linkNebuleAir" placeholder="ID du NebuleAir" class="form-control"
-                    style="max-width: 200px;" />
+                    style="max-width: 200px;" data-i18n-placeholder="nebuleair.placeholder" />
                   <button type="button" id="updateLink" class="btn btn-success">
-                    <i class="bi bi-check-lg"></i> Valider
+                    <i class="bi bi-check-lg"></i> <span data-i18n="btn.validate">Valider</span>
                   </button>
                 </div>
               </div>
@@ -1043,13 +1088,13 @@
             <div class="card h-100">
               <div class="card-body">
                 <h5 class="card-title">
-                  <i class="bi bi-house"></i> Position dans la maison
+                  <i class="bi bi-house"></i> <span data-i18n="room.title">Position dans la maison</span>
                 </h5>
-                <p class="text-muted mb-3">
+                <p class="text-muted mb-3" data-i18n="room.description">
                   Indiquez la pièce dans laquelle se trouve le ModuleAir.
                 </p>
                 <select id="room" class="form-select" style="max-width: 250px;">
-                  <option value="null">Choix de la pièce</option>
+                  <option value="null" data-i18n="room.select">Choix de la pièce</option>
                   <option value="cuisine">Cuisine</option>
                   <option value="salle_a_manger">Salle à manger</option>
                   <option value="salon">Salon</option>
@@ -1070,15 +1115,15 @@
             <div class="card">
               <div class="card-body">
                 <h5 class="card-title">
-                  <i class="bi bi-geo-alt"></i> Géolocaliser mon capteur
+                  <i class="bi bi-geo-alt"></i> <span data-i18n="geo.title">Géolocaliser mon capteur</span>
                 </h5>
 
                 <div id="search">
                   <div class="d-flex gap-2 mb-3 flex-wrap">
                     <input type="text" name="addr" id="addr" class="form-control"
-                      placeholder="Entrez l'adresse du ModuleAir..." style="flex: 1; min-width: 250px;" />
+                      placeholder="Entrez l'adresse du ModuleAir..." style="flex: 1; min-width: 250px;" data-i18n-placeholder="geo.placeholder" />
                     <button type="button" class="btn btn-outline-secondary" onclick="addr_search();">
-                      <i class="bi bi-search"></i> Rechercher
+                      <i class="bi bi-search"></i> <span data-i18n="btn.search">Rechercher</span>
                     </button>
                   </div>
 
@@ -1090,7 +1135,7 @@
                     <input type="text" name="new_lon" id="lon" placeholder="Longitude" class="form-control"
                       style="max-width: 150px;" />
                     <button type="button" id="updateLoc" class="btn btn-success">
-                      <i class="bi bi-check-lg"></i> Valider
+                      <i class="bi bi-check-lg"></i> <span data-i18n="btn.validate">Valider</span>
                     </button>
                   </div>
                 </div>
@@ -1117,7 +1162,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="contextModalLabel">
-                <i class="bi bi-plus-circle"></i> Ajouter une contextualisation
+                <i class="bi bi-plus-circle"></i> <span data-i18n="modal.context.title">Ajouter une contextualisation</span>
               </h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -1126,34 +1171,34 @@
                 <!-- Dates sur une ligne -->
                 <div class="context-date-row mb-3">
                   <div>
-                    <label for="contextDateStart" class="form-label">Date/Heure de début</label>
+                    <label for="contextDateStart" class="form-label" data-i18n="modal.context.dateStart">Date/Heure de début</label>
                     <input type="datetime-local" class="form-control" id="contextDateStart" required>
                   </div>
                   <div>
-                    <label for="contextDateEnd" class="form-label">Date/Heure de fin</label>
+                    <label for="contextDateEnd" class="form-label" data-i18n="modal.context.dateEnd">Date/Heure de fin</label>
                     <input type="datetime-local" class="form-control" id="contextDateEnd" required>
                   </div>
                 </div>
                 <!-- Type de contexte -->
                 <div class="mb-3">
-                  <label class="form-label">Type de contexte (optionnel)</label>
+                  <label class="form-label" data-i18n="modal.context.type">Type de contexte (optionnel)</label>
                   <div class="context-type-grid">
                     <div class="context-type-option" data-type="fire" onclick="selectContextType('fire')">
                       <img src="https://api.aircarto.fr/context/logos/fire-flat.svg" alt="Incendie">
-                      <span>Incendie</span>
+                      <span data-i18n="modal.context.fire">Incendie</span>
                     </div>
                     <div class="context-type-option" data-type="industrial" onclick="selectContextType('industrial')">
                       <img src="https://api.aircarto.fr/context/logos/industrial-flat.svg" alt="Industriel">
-                      <span>Industriel</span>
+                      <span data-i18n="modal.context.industrial">Industriel</span>
                     </div>
                     <div class="context-type-option" data-type="traffic" onclick="selectContextType('traffic')">
                       <img src="https://api.aircarto.fr/context/logos/traffic-flat.svg" alt="Trafic">
-                      <span>Trafic</span>
+                      <span data-i18n="modal.context.traffic">Trafic</span>
                     </div>
                     <div class="context-type-option" data-type="neighbourhood"
                       onclick="selectContextType('neighbourhood')">
                       <img src="https://api.aircarto.fr/context/logos/neighbourhood-flat.svg" alt="Voisinage">
-                      <span>Voisinage</span>
+                      <span data-i18n="modal.context.neighbourhood">Voisinage</span>
                     </div>
                   </div>
                   <input type="hidden" id="contextType" value="">
@@ -1161,21 +1206,21 @@
                 <!-- Commentaires et utilisateur sur une ligne -->
                 <div class="context-bottom-row">
                   <div class="mb-3">
-                    <label for="contextComments" class="form-label">Commentaires</label>
+                    <label for="contextComments" class="form-label" data-i18n="modal.context.comments">Commentaires</label>
                     <textarea class="form-control" id="contextComments" rows="2"
-                      placeholder="Décrivez le contexte..."></textarea>
+                      placeholder="Décrivez le contexte..." data-i18n-placeholder="modal.context.commentsPlaceholder"></textarea>
                   </div>
                   <div class="mb-3">
-                    <label for="contextUser" class="form-label">Utilisateur</label>
-                    <input type="text" class="form-control" id="contextUser" placeholder="Votre nom">
+                    <label for="contextUser" class="form-label" data-i18n="modal.context.user">Utilisateur</label>
+                    <input type="text" class="form-control" id="contextUser" placeholder="Votre nom" data-i18n-placeholder="modal.context.userPlaceholder">
                   </div>
                 </div>
               </form>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="btn.cancel">Annuler</button>
               <button type="button" class="btn btn-success" onclick="submitContextualization()">
-                <i class="bi bi-check-lg"></i> Enregistrer
+                <i class="bi bi-check-lg"></i> <span data-i18n="btn.save">Enregistrer</span>
               </button>
             </div>
           </div>
@@ -1189,7 +1234,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="contextDetailsModalLabel">
-                <i class="bi bi-info-circle"></i> Détails du contexte
+                <i class="bi bi-info-circle"></i> <span data-i18n="modal.contextDetails.title">Détails du contexte</span>
               </h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -1197,7 +1242,7 @@
               <!-- Content will be populated by JavaScript -->
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fermer</button>
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="btn.close">Fermer</button>
             </div>
           </div>
         </div>
@@ -1210,18 +1255,18 @@
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="customPeriodModalLabel">
-                <i class="bi bi-calendar-range"></i> Période personnalisée
+                <i class="bi bi-calendar-range"></i> <span data-i18n="modal.customPeriod.title">Période personnalisée</span>
               </h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
               <div class="context-date-row mb-3">
                 <div>
-                  <label for="customPeriodStart" class="form-label">Date de début</label>
+                  <label for="customPeriodStart" class="form-label" data-i18n="modal.customPeriod.dateStart">Date de début</label>
                   <input type="datetime-local" class="form-control" id="customPeriodStart" required>
                 </div>
                 <div>
-                  <label for="customPeriodEnd" class="form-label">Date de fin</label>
+                  <label for="customPeriodEnd" class="form-label" data-i18n="modal.customPeriod.dateEnd">Date de fin</label>
                   <input type="datetime-local" class="form-control" id="customPeriodEnd" required>
                 </div>
               </div>
@@ -1230,9 +1275,9 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="btn.cancel">Annuler</button>
               <button type="button" class="btn btn-success" id="btnApplyCustomPeriod" onclick="applyCustomPeriod()">
-                <i class="bi bi-check-lg"></i> Appliquer
+                <i class="bi bi-check-lg"></i> <span data-i18n="btn.apply">Appliquer</span>
               </button>
             </div>
           </div>
@@ -1244,6 +1289,348 @@
 
   <!-- JavaScript -->
   <script>
+    // ========== i18n INTERNATIONALIZATION SYSTEM ==========
+    const i18n = {
+      fr: {
+        "page.title": "Mon ModuleAir",
+        "login.title": "Mon ModuleAir",
+        "login.instructions": "Veuillez entrer le nom du ModuleAir ainsi que son token (indiqué au dos de l'appareil)",
+        "login.placeholder.device": "Nom (device ID)",
+        "login.placeholder.token": "Token",
+        "login.submit": "Se connecter",
+        "nav.logout": "Déconnexion",
+        "sensor.online": "Capteur connecté",
+        "sensor.offline": "Capteur déconnecté",
+        "sensor.disconnectedTitle": "Capteur déconnecté - Aucune donnée disponible",
+        "btn.refresh": "Actualiser",
+        "history.title": "Historique des mesures",
+        "history.period": "Période :",
+        "history.resolution": "Résolution :",
+        "history.custom": "Personnalisée",
+        "history.addContext": "Ajouter contextualisation",
+        "btn.comments": "Commentaires",
+        "btn.humidity": "Humidité",
+        "nebuleair.title": "Connecter un NebuleAir",
+        "nebuleair.description": "Liez votre ModuleAir à un NebuleAir pour comparer les mesures intérieures et extérieures.",
+        "nebuleair.placeholder": "ID du NebuleAir",
+        "btn.validate": "Valider",
+        "room.title": "Position dans la maison",
+        "room.description": "Indiquez la pièce dans laquelle se trouve le ModuleAir.",
+        "room.select": "Choix de la pièce",
+        "geo.title": "Géolocaliser mon capteur",
+        "geo.placeholder": "Entrez l'adresse du ModuleAir...",
+        "btn.search": "Rechercher",
+        "modal.context.title": "Ajouter une contextualisation",
+        "modal.context.dateStart": "Date/Heure de début",
+        "modal.context.dateEnd": "Date/Heure de fin",
+        "modal.context.type": "Type de contexte (optionnel)",
+        "modal.context.fire": "Incendie",
+        "modal.context.industrial": "Industriel",
+        "modal.context.traffic": "Trafic",
+        "modal.context.neighbourhood": "Voisinage",
+        "modal.context.comments": "Commentaires",
+        "modal.context.commentsPlaceholder": "Décrivez le contexte...",
+        "modal.context.user": "Utilisateur",
+        "modal.context.userPlaceholder": "Votre nom",
+        "btn.cancel": "Annuler",
+        "btn.save": "Enregistrer",
+        "modal.contextDetails.title": "Détails du contexte",
+        "btn.close": "Fermer",
+        "modal.customPeriod.title": "Période personnalisée",
+        "modal.customPeriod.dateStart": "Date de début",
+        "modal.customPeriod.dateEnd": "Date de fin",
+        "btn.apply": "Appliquer",
+        "toast.noNebuleairData": "Pas de donnée NebuleAir sur cet intervalle.",
+        "toast.noData": "Pas de donnée sur cet intervalle. Veuillez choisir une période plus longue.",
+        "toast.addressChanged": "Adresse modifiée.",
+        "toast.addressError": "Erreur pour le changement de localisation.",
+        "toast.roomChanged": "Pièce changée.",
+        "toast.roomError": "Erreur pour le changement de la pièce.",
+        "toast.contextSaved": "Contextualisation enregistrée avec succès !",
+        "toast.contextError": "Erreur lors de l'enregistrement de la contextualisation.",
+        "toast.contextDatesRequired": "Veuillez renseigner les dates de début et de fin.",
+        "toast.contextSelectStart": "Cliquez sur le graphique pour sélectionner le DÉBUT de la période.",
+        "toast.contextSelectEnd": "Début sélectionné. Cliquez maintenant pour sélectionner la FIN de la période.",
+        "toast.contextModeOff": "Mode contextualisation désactivé.",
+        "toast.resolution2minUnavailable": "La résolution 2 min n'est pas disponible pour les périodes de plus d'un mois.",
+        "toast.resolution2minAutoSwitch": "La résolution 2 min n'est pas disponible pour les périodes de plus d'un mois. Passage automatique à 15 min.",
+        "toast.customPeriodDatesRequired": "Veuillez renseigner les deux dates.",
+        "toast.customPeriodStartBeforeEnd": "La date de début doit être antérieure à la date de fin.",
+        "toast.customPeriodFutureEnd": "La date de fin ne peut pas être dans le futur.",
+        "toast.noResults": "Désolé, aucun résultat...",
+        "chart.measures2m": "mesures à 2 minutes",
+        "chart.measures15m": "moyennes quart-horaires",
+        "chart.measures1h": "moyennes horaires",
+        "chart.measures24h": "moyennes journalières",
+        "time.today": "aujourd'hui",
+        "time.yesterday": "hier",
+        "time.dayBeforeYesterday": "avant-hier",
+        "time.on": "le",
+        "time.at": "à",
+        "time.lastMeasure": "Dernière mesure",
+        "time.ago.days": "il y a {count} jour{plural}",
+        "time.ago.hours": "il y a {count} heure{plural}",
+        "time.ago.minutes": "il y a {count} minute{plural}",
+        "btn.1week": "1 sem",
+        "btn.1month": "1 mois",
+        "btn.1year": "1 an",
+        "btn.3months": "3 mois",
+        "contextDetails.start": "Début:",
+        "contextDetails.end": "Fin:",
+        "contextDetails.comments": "Commentaires:",
+        "contextDetails.user": "Utilisateur:",
+        "contextDetails.typeUnknown": "Non spécifié",
+        "contextDetails.fire": "Incendie",
+        "contextDetails.industrial": "Activité industrielle",
+        "contextDetails.traffic": "Trafic routier",
+        "contextDetails.neighbourhood": "Activité de voisinage",
+        "marker.start": "DÉBUT",
+        "marker.end": "FIN"
+      },
+      en: {
+        "page.title": "My ModuleAir",
+        "login.title": "My ModuleAir",
+        "login.instructions": "Please enter the ModuleAir name and its token (indicated on the back of the device)",
+        "login.placeholder.device": "Name (device ID)",
+        "login.placeholder.token": "Token",
+        "login.submit": "Log in",
+        "nav.logout": "Log out",
+        "sensor.online": "Sensor connected",
+        "sensor.offline": "Sensor disconnected",
+        "sensor.disconnectedTitle": "Sensor disconnected - No data available",
+        "btn.refresh": "Refresh",
+        "history.title": "Measurement history",
+        "history.period": "Period:",
+        "history.resolution": "Resolution:",
+        "history.custom": "Custom",
+        "history.addContext": "Add context",
+        "btn.comments": "Comments",
+        "btn.humidity": "Humidity",
+        "nebuleair.title": "Connect a NebuleAir",
+        "nebuleair.description": "Link your ModuleAir to a NebuleAir to compare indoor and outdoor measurements.",
+        "nebuleair.placeholder": "NebuleAir ID",
+        "btn.validate": "Validate",
+        "room.title": "Position in the house",
+        "room.description": "Indicate the room where the ModuleAir is located.",
+        "room.select": "Choose room",
+        "geo.title": "Geolocate my sensor",
+        "geo.placeholder": "Enter the ModuleAir address...",
+        "btn.search": "Search",
+        "modal.context.title": "Add a contextualization",
+        "modal.context.dateStart": "Start date/time",
+        "modal.context.dateEnd": "End date/time",
+        "modal.context.type": "Context type (optional)",
+        "modal.context.fire": "Fire",
+        "modal.context.industrial": "Industrial",
+        "modal.context.traffic": "Traffic",
+        "modal.context.neighbourhood": "Neighbourhood",
+        "modal.context.comments": "Comments",
+        "modal.context.commentsPlaceholder": "Describe the context...",
+        "modal.context.user": "User",
+        "modal.context.userPlaceholder": "Your name",
+        "btn.cancel": "Cancel",
+        "btn.save": "Save",
+        "modal.contextDetails.title": "Context details",
+        "btn.close": "Close",
+        "modal.customPeriod.title": "Custom period",
+        "modal.customPeriod.dateStart": "Start date",
+        "modal.customPeriod.dateEnd": "End date",
+        "btn.apply": "Apply",
+        "toast.noNebuleairData": "No NebuleAir data for this interval.",
+        "toast.noData": "No data for this interval. Please choose a longer period.",
+        "toast.addressChanged": "Address updated.",
+        "toast.addressError": "Error changing location.",
+        "toast.roomChanged": "Room changed.",
+        "toast.roomError": "Error changing room.",
+        "toast.contextSaved": "Contextualization saved successfully!",
+        "toast.contextError": "Error saving contextualization.",
+        "toast.contextDatesRequired": "Please fill in the start and end dates.",
+        "toast.contextSelectStart": "Click on the chart to select the START of the period.",
+        "toast.contextSelectEnd": "Start selected. Now click to select the END of the period.",
+        "toast.contextModeOff": "Contextualization mode disabled.",
+        "toast.resolution2minUnavailable": "2 min resolution is not available for periods longer than one month.",
+        "toast.resolution2minAutoSwitch": "2 min resolution is not available for periods longer than one month. Automatically switched to 15 min.",
+        "toast.customPeriodDatesRequired": "Please fill in both dates.",
+        "toast.customPeriodStartBeforeEnd": "Start date must be before end date.",
+        "toast.customPeriodFutureEnd": "End date cannot be in the future.",
+        "toast.noResults": "Sorry, no results...",
+        "chart.measures2m": "2-minute measurements",
+        "chart.measures15m": "15-minute averages",
+        "chart.measures1h": "hourly averages",
+        "chart.measures24h": "daily averages",
+        "time.today": "today",
+        "time.yesterday": "yesterday",
+        "time.dayBeforeYesterday": "day before yesterday",
+        "time.on": "on",
+        "time.at": "at",
+        "time.lastMeasure": "Last measurement",
+        "time.ago.days": "{count} day{plural} ago",
+        "time.ago.hours": "{count} hour{plural} ago",
+        "time.ago.minutes": "{count} minute{plural} ago",
+        "btn.1week": "1 week",
+        "btn.1month": "1 month",
+        "btn.1year": "1 year",
+        "btn.3months": "3 months",
+        "contextDetails.start": "Start:",
+        "contextDetails.end": "End:",
+        "contextDetails.comments": "Comments:",
+        "contextDetails.user": "User:",
+        "contextDetails.typeUnknown": "Not specified",
+        "contextDetails.fire": "Fire",
+        "contextDetails.industrial": "Industrial activity",
+        "contextDetails.traffic": "Road traffic",
+        "contextDetails.neighbourhood": "Neighbourhood activity",
+        "marker.start": "START",
+        "marker.end": "END"
+      },
+      it: {
+        "page.title": "Il mio ModuleAir",
+        "login.title": "Il mio ModuleAir",
+        "login.instructions": "Inserire il nome del ModuleAir e il suo token (indicato sul retro del dispositivo)",
+        "login.placeholder.device": "Nome (device ID)",
+        "login.placeholder.token": "Token",
+        "login.submit": "Accedi",
+        "nav.logout": "Disconnetti",
+        "sensor.online": "Sensore connesso",
+        "sensor.offline": "Sensore disconnesso",
+        "sensor.disconnectedTitle": "Sensore disconnesso - Nessun dato disponibile",
+        "btn.refresh": "Aggiorna",
+        "history.title": "Storico delle misure",
+        "history.period": "Periodo:",
+        "history.resolution": "Risoluzione:",
+        "history.custom": "Personalizzato",
+        "history.addContext": "Aggiungi contestualizzazione",
+        "btn.comments": "Commenti",
+        "btn.humidity": "Umidità",
+        "nebuleair.title": "Collegare un NebuleAir",
+        "nebuleair.description": "Collega il tuo ModuleAir a un NebuleAir per confrontare le misure interne ed esterne.",
+        "nebuleair.placeholder": "ID del NebuleAir",
+        "btn.validate": "Conferma",
+        "room.title": "Posizione nella casa",
+        "room.description": "Indica la stanza in cui si trova il ModuleAir.",
+        "room.select": "Scelta della stanza",
+        "geo.title": "Geolocalizza il mio sensore",
+        "geo.placeholder": "Inserire l'indirizzo del ModuleAir...",
+        "btn.search": "Cerca",
+        "modal.context.title": "Aggiungere una contestualizzazione",
+        "modal.context.dateStart": "Data/Ora di inizio",
+        "modal.context.dateEnd": "Data/Ora di fine",
+        "modal.context.type": "Tipo di contesto (opzionale)",
+        "modal.context.fire": "Incendio",
+        "modal.context.industrial": "Industriale",
+        "modal.context.traffic": "Traffico",
+        "modal.context.neighbourhood": "Vicinato",
+        "modal.context.comments": "Commenti",
+        "modal.context.commentsPlaceholder": "Descrivi il contesto...",
+        "modal.context.user": "Utente",
+        "modal.context.userPlaceholder": "Il tuo nome",
+        "btn.cancel": "Annulla",
+        "btn.save": "Salva",
+        "modal.contextDetails.title": "Dettagli del contesto",
+        "btn.close": "Chiudi",
+        "modal.customPeriod.title": "Periodo personalizzato",
+        "modal.customPeriod.dateStart": "Data di inizio",
+        "modal.customPeriod.dateEnd": "Data di fine",
+        "btn.apply": "Applica",
+        "toast.noNebuleairData": "Nessun dato NebuleAir per questo intervallo.",
+        "toast.noData": "Nessun dato per questo intervallo. Scegliere un periodo più lungo.",
+        "toast.addressChanged": "Indirizzo modificato.",
+        "toast.addressError": "Errore nella modifica della posizione.",
+        "toast.roomChanged": "Stanza cambiata.",
+        "toast.roomError": "Errore nel cambio della stanza.",
+        "toast.contextSaved": "Contestualizzazione salvata con successo!",
+        "toast.contextError": "Errore durante il salvataggio della contestualizzazione.",
+        "toast.contextDatesRequired": "Inserire le date di inizio e di fine.",
+        "toast.contextSelectStart": "Clicca sul grafico per selezionare l'INIZIO del periodo.",
+        "toast.contextSelectEnd": "Inizio selezionato. Clicca ora per selezionare la FINE del periodo.",
+        "toast.contextModeOff": "Modalità contestualizzazione disattivata.",
+        "toast.resolution2minUnavailable": "La risoluzione a 2 min non è disponibile per periodi superiori a un mese.",
+        "toast.resolution2minAutoSwitch": "La risoluzione a 2 min non è disponibile per periodi superiori a un mese. Passaggio automatico a 15 min.",
+        "toast.customPeriodDatesRequired": "Inserire entrambe le date.",
+        "toast.customPeriodStartBeforeEnd": "La data di inizio deve essere anteriore alla data di fine.",
+        "toast.customPeriodFutureEnd": "La data di fine non può essere nel futuro.",
+        "toast.noResults": "Nessun risultato trovato...",
+        "chart.measures2m": "misure a 2 minuti",
+        "chart.measures15m": "medie a 15 minuti",
+        "chart.measures1h": "medie orarie",
+        "chart.measures24h": "medie giornaliere",
+        "time.today": "oggi",
+        "time.yesterday": "ieri",
+        "time.dayBeforeYesterday": "l'altro ieri",
+        "time.on": "il",
+        "time.at": "alle",
+        "time.lastMeasure": "Ultima misura",
+        "time.ago.days": "{count} giorn{plural} fa",
+        "time.ago.hours": "{count} or{plural} fa",
+        "time.ago.minutes": "{count} minut{plural} fa",
+        "btn.1week": "1 sett",
+        "btn.1month": "1 mese",
+        "btn.1year": "1 anno",
+        "btn.3months": "3 mesi",
+        "contextDetails.start": "Inizio:",
+        "contextDetails.end": "Fine:",
+        "contextDetails.comments": "Commenti:",
+        "contextDetails.user": "Utente:",
+        "contextDetails.typeUnknown": "Non specificato",
+        "contextDetails.fire": "Incendio",
+        "contextDetails.industrial": "Attività industriale",
+        "contextDetails.traffic": "Traffico stradale",
+        "contextDetails.neighbourhood": "Attività di vicinato",
+        "marker.start": "INIZIO",
+        "marker.end": "FINE"
+      }
+    };
+
+    let currentLang = localStorage.getItem('lang') || 'fr';
+
+    function t(key, params) {
+      let str = (i18n[currentLang] && i18n[currentLang][key]) || i18n['fr'][key] || key;
+      if (params) {
+        Object.keys(params).forEach(function(k) {
+          str = str.replace('{' + k + '}', params[k]);
+        });
+      }
+      return str;
+    }
+
+    function pluralSuffix(count) {
+      if (currentLang === 'it') {
+        return ''; // Italian plurals handled inline
+      }
+      return count > 1 ? 's' : '';
+    }
+
+    function applyTranslations() {
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        el.textContent = t(el.dataset.i18n);
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+        el.placeholder = t(el.dataset.i18nPlaceholder);
+      });
+      document.querySelectorAll('[data-i18n-title]').forEach(function(el) {
+        el.title = t(el.dataset.i18nTitle);
+      });
+      document.querySelectorAll('[data-i18n-html]').forEach(function(el) {
+        el.innerHTML = '<i class="' + el.dataset.i18nIcon + '"></i> ' + t(el.dataset.i18nHtml);
+      });
+      document.documentElement.lang = currentLang;
+      document.title = t('page.title');
+    }
+
+    function changeLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+      // Sync all language buttons
+      document.querySelectorAll('.lang-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+      applyTranslations();
+      // Update dynamic elements if sensor is loaded
+      if (lastSensorTimestamp) {
+        updateSensorStatus(lastSensorTimestamp);
+      }
+    }
+
     var moduleair, token;
     var nebuleair;
     var dataNebuleAir = null;
@@ -1291,6 +1678,13 @@
 
     // Auto-login from localStorage
     window.addEventListener("DOMContentLoaded", function () {
+      // Initialize language
+      currentLang = localStorage.getItem('lang') || 'fr';
+      document.querySelectorAll('.lang-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.lang === currentLang);
+      });
+      applyTranslations();
+
       const savedModuleair = localStorage.getItem("moduleair_id");
       const savedToken = localStorage.getItem("moduleair_token");
 
@@ -1505,30 +1899,7 @@
 
             let id = moduleair;
 
-            document.getElementById("button1h").innerHTML =
-              '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',1," + timespanGraph + ')" class="time-btn">1h</button>';
-            document.getElementById("button3h").innerHTML =
-              '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',3," + timespanGraph + ')" class="time-btn">3h</button>';
-            document.getElementById("button24h").innerHTML =
-              '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',24," + timespanGraph + ')" class="time-btn">24h</button>';
-            document.getElementById("button48h").innerHTML =
-              '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',48," + timespanGraph + ')" class="time-btn">48h</button>';
-            document.getElementById("button1s").innerHTML =
-              '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',168," + timespanGraph + ')" class="time-btn">1 sem</button>';
-            document.getElementById("button1m").innerHTML =
-              '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',720," + timespanGraph + ')" class="time-btn">1 mois</button>';
-            document.getElementById("button1a").innerHTML =
-              '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',8760," + timespanGraph + ')" class="time-btn">1 an</button>';
-            document.getElementById("button3mo").innerHTML =
-              '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',2160," + timespanGraph + ')" class="time-btn">3 mois</button>';
-            document.getElementById("button2m").innerHTML =
-              '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',2)" class="time-btn">2m</button>';
-            document.getElementById("button15m").innerHTML =
-              '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',15)" class="time-btn">15m</button>';
-            document.getElementById("button60m").innerHTML =
-              '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',60)" class="time-btn">1h</button>';
-            document.getElementById("button1440m").innerHTML =
-              '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',1440)" class="time-btn">24h</button>';
+            renderTimeButtons(id, timeLengthGraph, timespanGraph);
             buttonsSwitcher(timeLengthGraph, timespanGraph);
 
             const end = new Date();
@@ -1569,7 +1940,7 @@
                   console.log(data);
                   dataNebuleAir = data;
                   if (data == null) {
-                    openToast("Pas de donnée NebuleAir sur cet intervalle.");
+                    openToast(t("toast.noNebuleairData"));
                   }
                 })
                 .fail(function () {
@@ -1623,9 +1994,7 @@
                         data[0].sensorId
                       );
                     } else {
-                      openToast(
-                        "Pas de donnée sur cet intervalle. Veuillez choisir une période plus longue."
-                      );
+                      openToast(t("toast.noData"));
                     }
                   });
                 }, 1000);
@@ -1727,16 +2096,16 @@
 
       switch (timespan) {
         case 2:
-          chartTitleText += "mesures à 2 minutes, ";
+          chartTitleText += t("chart.measures2m") + ", ";
           break;
         case 15:
-          chartTitleText += "moyennes quart-horaires, ";
+          chartTitleText += t("chart.measures15m") + ", ";
           break;
         case 60:
-          chartTitleText += "moyennes horaires, ";
+          chartTitleText += t("chart.measures1h") + ", ";
           break;
         case 1440:
-          chartTitleText += "moyennes journalières, ";
+          chartTitleText += t("chart.measures24h") + ", ";
           break;
       }
 
@@ -2624,10 +2993,10 @@
       // Build chart title
       let chartTitleText = "ModuleAir-" + id + ", ";
       switch (timespan) {
-        case 2: chartTitleText += "mesures à 2 minutes"; break;
-        case 15: chartTitleText += "moyennes quart-horaires"; break;
-        case 60: chartTitleText += "moyennes horaires"; break;
-        case 1440: chartTitleText += "moyennes journalières"; break;
+        case 2: chartTitleText += t("chart.measures2m"); break;
+        case 15: chartTitleText += t("chart.measures15m"); break;
+        case 60: chartTitleText += t("chart.measures1h"); break;
+        case 1440: chartTitleText += t("chart.measures24h"); break;
       }
 
       root.numberFormatter.set("numberFormat", "#.#");
@@ -3093,10 +3462,10 @@
       const endDate = new Date(context.datetime_stop);
 
       const typeLabels = {
-        fire: 'Incendie',
-        industrial: 'Activité industrielle',
-        traffic: 'Trafic routier',
-        neighbourhood: 'Activité de voisinage'
+        fire: t('contextDetails.fire'),
+        industrial: t('contextDetails.industrial'),
+        traffic: t('contextDetails.traffic'),
+        neighbourhood: t('contextDetails.neighbourhood')
       };
 
       const typeIcons = {
@@ -3106,25 +3475,26 @@
         neighbourhood: '🏘️'
       };
 
-      const typeLabel = typeLabels[context.context_type] || context.context_type || 'Non spécifié';
+      const typeLabel = typeLabels[context.context_type] || context.context_type || t('contextDetails.typeUnknown');
       const typeIcon = typeIcons[context.context_type] || '📍';
 
       // Build modal content with better formatting
+      var dateLang = currentLang === 'fr' ? 'fr-FR' : (currentLang === 'it' ? 'it-IT' : 'en-GB');
       const modalContent =
         '<div class="context-details">' +
         '<div class="mb-3">' +
         '<h6>' + typeIcon + ' ' + typeLabel + '</h6>' +
         '</div>' +
         '<div class="mb-2">' +
-        '<strong><i class="bi bi-calendar-event"></i> Début:</strong><br>' +
-        '<span class="text-muted">' + startDate.toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' }) + '</span>' +
+        '<strong><i class="bi bi-calendar-event"></i> ' + t('contextDetails.start') + '</strong><br>' +
+        '<span class="text-muted">' + startDate.toLocaleString(dateLang, { dateStyle: 'full', timeStyle: 'short' }) + '</span>' +
         '</div>' +
         '<div class="mb-2">' +
-        '<strong><i class="bi bi-calendar-check"></i> Fin:</strong><br>' +
-        '<span class="text-muted">' + endDate.toLocaleString('fr-FR', { dateStyle: 'full', timeStyle: 'short' }) + '</span>' +
+        '<strong><i class="bi bi-calendar-check"></i> ' + t('contextDetails.end') + '</strong><br>' +
+        '<span class="text-muted">' + endDate.toLocaleString(dateLang, { dateStyle: 'full', timeStyle: 'short' }) + '</span>' +
         '</div>' +
-        (context.comments ? '<div class="mb-2"><strong><i class="bi bi-chat-left-text"></i> Commentaires:</strong><br><span class="text-muted">' + context.comments + '</span></div>' : '') +
-        (context.user ? '<div class="mb-2"><strong><i class="bi bi-person"></i> Utilisateur:</strong><br><span class="text-muted">' + context.user + '</span></div>' : '') +
+        (context.comments ? '<div class="mb-2"><strong><i class="bi bi-chat-left-text"></i> ' + t('contextDetails.comments') + '</strong><br><span class="text-muted">' + context.comments + '</span></div>' : '') +
+        (context.user ? '<div class="mb-2"><strong><i class="bi bi-person"></i> ' + t('contextDetails.user') + '</strong><br><span class="text-muted">' + context.user + '</span></div>' : '') +
         '</div>';
 
       // Update modal content
@@ -3245,7 +3615,7 @@
           if (isAllMinusOne(dataArray)) {
             btn.classList.add('disabled');
             btn.classList.remove('active');
-            btn.setAttribute('title', 'Capteur déconnecté - Aucune donnée disponible');
+            btn.setAttribute('title', t('sensor.disconnectedTitle'));
             seriesVisibility[pollutant] = false;
           } else {
             btn.classList.remove('disabled');
@@ -3289,14 +3659,14 @@
         contextStartTimestamp = null;
         contextEndTimestamp = null;
         clearContextMarkers();
-        openToast('📍 Cliquez sur le graphique pour sélectionner le DÉBUT de la période.', true);
+        openToast(t('toast.contextSelectStart'), true);
       } else {
         btn.classList.remove('active');
         chartDiv.classList.remove('context-mode');
         contextSelectionStep = 0;
         clearContextMarkers();
         closeToast();
-        openToast('Mode contextualisation désactivé.');
+        openToast(t('toast.contextModeOff'));
       }
     }
 
@@ -3340,7 +3710,7 @@
 
       // Label at top
       range.get("label").setAll({
-        text: isStart ? "DÉBUT" : "FIN",
+        text: isStart ? t("marker.start") : t("marker.end"),
         fill: color,
         fontSize: 12,
         fontWeight: "bold",
@@ -3384,7 +3754,7 @@
         contextMarkerStart = addContextMarker(timestamp, true);
 
         contextSelectionStep = 2;
-        openToast('✅ Début sélectionné. Cliquez maintenant pour sélectionner la FIN de la période.', true);
+        openToast(t('toast.contextSelectEnd'), true);
 
       } else if (contextSelectionStep === 2) {
         // Second click - select end time
@@ -3444,7 +3814,7 @@
 
       // Validate required fields
       if (!startInput || !endInput) {
-        openToast('Veuillez renseigner les dates de début et de fin.');
+        openToast(t('toast.contextDatesRequired'));
         return;
       }
 
@@ -3474,7 +3844,7 @@
       })
         .done(function (response) {
           console.log('Context saved successfully:', response);
-          openToast('Contextualisation enregistrée avec succès !');
+          openToast(t('toast.contextSaved'));
 
           // Close modal and reset form
           if (contextModalInstance) {
@@ -3488,7 +3858,7 @@
         .fail(function (xhr, status, error) {
           console.error('Error saving context:', error);
           console.error('Response:', xhr.responseText);
-          openToast('Erreur lors de l\'enregistrement de la contextualisation.');
+          openToast(t('toast.contextError'));
         });
     }
 
@@ -3912,7 +4282,7 @@
             dataNebuleAir = data;
 
             if (data == null) {
-              openToast("Pas de donnée NebuleAir sur cet intervalle.");
+              openToast(t("toast.noNebuleairData"));
             }
           })
           .fail(function () {
@@ -3969,9 +4339,7 @@
               });
             }, 1000);
           } else {
-            openToast(
-              "Pas de donnée sur cet intervalle. Veuillez choisir une période plus longue."
-            );
+            openToast(t("toast.noData"));
           }
         })
         .fail(function () {
@@ -3996,18 +4364,11 @@
         localStorage.setItem("moduleair_timespan", timespanGraph);
         var durationHours = (customEndDate - customStartDate) / (1000 * 60 * 60);
         if (durationHours > 720 && timespan === 2) {
-          openToast("La résolution 2 min n'est pas disponible pour les périodes de plus d'un mois.");
+          openToast(t("toast.resolution2minUnavailable"));
           return;
         }
         reloadDataSensorCustom(customStartDate, customEndDate, timespan);
-        document.getElementById("button2m").innerHTML =
-          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',2)" class="time-btn">2m</button>';
-        document.getElementById("button15m").innerHTML =
-          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',15)" class="time-btn">15m</button>';
-        document.getElementById("button60m").innerHTML =
-          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',60)" class="time-btn">1h</button>';
-        document.getElementById("button1440m").innerHTML =
-          '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',1440)" class="time-btn">24h</button>';
+        renderTimeButtons(id, timeLengthGraph, timespanGraph);
         updateCustomPeriodButtonStates();
         return;
       }
@@ -4025,7 +4386,7 @@
       if (hours > 720 && timespan === 2) {
         timespanGraph = 15;
         timespan = 15;
-        openToast("La résolution 2 min n'est pas disponible pour les périodes de plus d'un mois. Passage automatique à 15 min.");
+        openToast(t("toast.resolution2minAutoSwitch"));
       }
 
       // Save to localStorage
@@ -4033,31 +4394,35 @@
       localStorage.setItem("moduleair_timespan", timespanGraph);
 
       reloadDataSensor(hours, timespan);
-      document.getElementById("button1h").innerHTML =
-        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',1," + timespanGraph + ')" class="time-btn">1h</button>';
-      document.getElementById("button3h").innerHTML =
-        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',3," + timespanGraph + ')" class="time-btn">3h</button>';
-      document.getElementById("button24h").innerHTML =
-        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',24," + timespanGraph + ')" class="time-btn">24h</button>';
-      document.getElementById("button48h").innerHTML =
-        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',48," + timespanGraph + ')" class="time-btn">48h</button>';
-      document.getElementById("button1s").innerHTML =
-        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',168," + timespanGraph + ')" class="time-btn">1 sem</button>';
-      document.getElementById("button1m").innerHTML =
-        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',720," + timespanGraph + ')" class="time-btn">1 mois</button>';
-      document.getElementById("button1a").innerHTML =
-        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',8760," + timespanGraph + ')" class="time-btn">1 an</button>';
-      document.getElementById("button3mo").innerHTML =
-        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',2160," + timespanGraph + ')" class="time-btn">3 mois</button>';
-      document.getElementById("button2m").innerHTML =
-        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',2)" class="time-btn">2m</button>';
-      document.getElementById("button15m").innerHTML =
-        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',15)" class="time-btn">15m</button>';
-      document.getElementById("button60m").innerHTML =
-        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',60)" class="time-btn">1h</button>';
-      document.getElementById("button1440m").innerHTML =
-        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + timeLengthGraph + ',1440)" class="time-btn">24h</button>';
+      renderTimeButtons(id, timeLengthGraph, timespanGraph);
       buttonsSwitcher(hours, timespan);
+    }
+
+    function renderTimeButtons(id, hours, timespan) {
+      document.getElementById("button1h").innerHTML =
+        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',1," + timespan + ')" class="time-btn">1h</button>';
+      document.getElementById("button3h").innerHTML =
+        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',3," + timespan + ')" class="time-btn">3h</button>';
+      document.getElementById("button24h").innerHTML =
+        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',24," + timespan + ')" class="time-btn">24h</button>';
+      document.getElementById("button48h").innerHTML =
+        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',48," + timespan + ')" class="time-btn">48h</button>';
+      document.getElementById("button1s").innerHTML =
+        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',168," + timespan + ')" class="time-btn">' + t('btn.1week') + '</button>';
+      document.getElementById("button1m").innerHTML =
+        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',720," + timespan + ')" class="time-btn">' + t('btn.1month') + '</button>';
+      document.getElementById("button1a").innerHTML =
+        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',8760," + timespan + ')" class="time-btn">' + t('btn.1year') + '</button>';
+      document.getElementById("button3mo").innerHTML =
+        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "',2160," + timespan + ')" class="time-btn">' + t('btn.3months') + '</button>';
+      document.getElementById("button2m").innerHTML =
+        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + hours + ',2)" class="time-btn">2m</button>';
+      document.getElementById("button15m").innerHTML =
+        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + hours + ',15)" class="time-btn">15m</button>';
+      document.getElementById("button60m").innerHTML =
+        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + hours + ',60)" class="time-btn">1h</button>';
+      document.getElementById("button1440m").innerHTML =
+        '<button type="button" onclick="chooseTimeModuleAir(\'' + id + "'," + hours + ',1440)" class="time-btn">24h</button>';
     }
 
     function buttonsSwitcher(hours, timespan) {
@@ -4154,7 +4519,7 @@
       var endInput = document.getElementById('customPeriodEnd').value;
 
       if (!startInput || !endInput) {
-        showCustomPeriodWarning("Veuillez renseigner les deux dates.");
+        showCustomPeriodWarning(t("toast.customPeriodDatesRequired"));
         return;
       }
 
@@ -4162,12 +4527,12 @@
       var endDate = new Date(endInput);
 
       if (startDate >= endDate) {
-        showCustomPeriodWarning("La date de début doit être antérieure à la date de fin.");
+        showCustomPeriodWarning(t("toast.customPeriodStartBeforeEnd"));
         return;
       }
 
       if (endDate > new Date()) {
-        showCustomPeriodWarning("La date de fin ne peut pas être dans le futur.");
+        showCustomPeriodWarning(t("toast.customPeriodFutureEnd"));
         return;
       }
 
@@ -4178,7 +4543,7 @@
       // Check resolution constraint: no 2min data on periods > 1 month (720h)
       if (durationHours > 720 && timespanGraph === 2) {
         timespanGraph = 15;
-        openToast("La résolution 2 min n'est pas disponible pour les périodes de plus d'un mois. Passage automatique à 15 min.");
+        openToast(t("toast.resolution2minAutoSwitch"));
       }
 
       // Save resolution to localStorage
@@ -4224,7 +4589,7 @@
         }).done(function (data) {
           dataNebuleAir = data;
           if (data == null) {
-            openToast("Pas de donnée NebuleAir sur cet intervalle.");
+            openToast(t("toast.noNebuleairData"));
           }
         }).fail(function () {
           console.log("Error while geting data from Aircarto API");
@@ -4247,7 +4612,7 @@
             });
           }, 1000);
         } else {
-          openToast("Pas de donnée sur cet intervalle. Veuillez choisir une période plus longue.");
+          openToast(t("toast.noData"));
         }
       }).fail(function () {
         console.log("Error while geting data from Aircarto API");
@@ -4333,7 +4698,7 @@
         }
         document.getElementById("results").innerHTML = out;
       } else {
-        document.getElementById("results").innerHTML = "Sorry, no results...";
+        document.getElementById("results").innerHTML = t("toast.noResults");
       }
     }
 
@@ -4375,11 +4740,11 @@
           "&token=" +
           token,
         success: function (result) {
-          openToast("Adresse modifiée.");
+          openToast(t("toast.addressChanged"));
         },
       }).fail(function () {
         console.log("Error while posting data to Aircarto API");
-        openToast("Erreur pour le changement de localisation.");
+        openToast(t("toast.addressError"));
       });
     }
 
@@ -4499,11 +4864,11 @@
           "&token=" +
           token,
         success: function (result) {
-          openToast("Pièce changée.");
+          openToast(t("toast.roomChanged"));
         },
       }).fail(function () {
         console.log("Error while posting data to Aircarto API");
-        openToast("Erreur pour le changement de la pièce.");
+        openToast(t("toast.roomError"));
       });
     }
 
@@ -4551,13 +4916,13 @@
       if (isOnline) {
         badge.className = "sensor-status-badge online";
         dot.className = "status-dot online";
-        text.innerText = "Capteur connecté";
+        text.innerText = t("sensor.online");
         timestampBadge.className = "sensor-status";
         timestampBadge.style.display = "inline-flex";
       } else {
         badge.className = "sensor-status-badge offline";
         dot.className = "status-dot offline";
-        text.innerText = "Capteur déconnecté";
+        text.innerText = t("sensor.offline");
         timestampBadge.className = "sensor-status offline";
         timestampBadge.style.display = "inline-flex";
       }
@@ -4565,7 +4930,7 @@
       // Mettre à jour le texte du timestamp
       document.querySelector("#timestamp").innerText = isOnline
         ? timeDateCounter(timestamp)
-        : "Dernière mesure " + timeAgoText(diffMs);
+        : t("time.lastMeasure") + " " + timeAgoText(diffMs);
     }
 
     function timeAgoText(diffMs) {
@@ -4574,11 +4939,14 @@
       const days = Math.floor(diffMs / 86400000);
 
       if (days > 0) {
-        return "il y a " + days + " jour" + (days > 1 ? "s" : "");
+        var pluralD = currentLang === 'it' ? (days > 1 ? 'i' : 'o') : (days > 1 ? 's' : '');
+        return t("time.ago.days", { count: days, plural: pluralD });
       } else if (hours > 0) {
-        return "il y a " + hours + " heure" + (hours > 1 ? "s" : "");
+        var pluralH = currentLang === 'it' ? (hours > 1 ? 'e' : 'a') : (hours > 1 ? 's' : '');
+        return t("time.ago.hours", { count: hours, plural: pluralH });
       } else {
-        return "il y a " + minutes + " minute" + (minutes > 1 ? "s" : "");
+        var pluralM = currentLang === 'it' ? (minutes > 1 ? 'i' : 'o') : (minutes > 1 ? 's' : '');
+        return t("time.ago.minutes", { count: minutes, plural: pluralM });
       }
     }
 
@@ -4608,16 +4976,16 @@
 
       switch (difference) {
         case 0:
-          date_texte = "aujourd'hui";
+          date_texte = t("time.today");
           break;
         case 1:
-          date_texte = "hier";
+          date_texte = t("time.yesterday");
           break;
         case 2:
-          date_texte = "avant-hier";
+          date_texte = t("time.dayBeforeYesterday");
           break;
         default:
-          date_texte += "le ";
+          date_texte += t("time.on") + " ";
           if (timestamp_UTC.getDate() < 10) {
             date_texte += "0";
             date_texte += timestamp_UTC.getDate();
@@ -4650,7 +5018,7 @@
         horaire_texte += timestamp_UTC.getMinutes();
       }
 
-      return date_texte + " à " + horaire_texte;
+      return date_texte + " " + t("time.at") + " " + horaire_texte;
     }
   </script>
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
