@@ -765,10 +765,238 @@
         grid-template-columns: 1fr;
       }
 
-      #contextModal .modal-dialog {
-        max-width: 95%;
-        margin: 10px auto;
+    }
+
+    /* Inline context panel */
+    .context-panel {
+      overflow: hidden;
+      transition: max-height 0.4s ease, opacity 0.3s ease;
+      max-height: 0;
+      opacity: 0;
+    }
+
+    .context-panel.open {
+      max-height: 300px;
+      opacity: 1;
+    }
+
+    .context-panel-inner {
+      border-top: 2px solid var(--primary-color);
+      background: linear-gradient(to bottom, rgba(37, 99, 235, 0.15), rgba(37, 99, 235, 0.03));
+      padding: 12px 16px;
+      margin-top: 8px;
+      border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+    }
+
+    .context-panel.open .context-panel-inner {
+      animation: panelHighlight 1.2s ease;
+    }
+
+    @keyframes panelHighlight {
+      0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); }
+      40% { box-shadow: 0 0 12px 4px rgba(37, 99, 235, 0.25); }
+      100% { box-shadow: none; }
+    }
+
+    /* Scroll indicator arrow */
+    .scroll-indicator {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1050;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      animation: scrollBounce 1s ease infinite;
+      pointer-events: auto;
+      transition: opacity 0.3s ease;
+    }
+
+    .scroll-indicator .scroll-indicator-label {
+      background: var(--primary-color);
+      color: #fff;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 2px 12px rgba(37, 99, 235, 0.35);
+      white-space: nowrap;
+    }
+
+    .scroll-indicator .scroll-indicator-arrow {
+      font-size: 20px;
+      color: var(--primary-color);
+    }
+
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+
+    /* Context dates row - compact inline badges */
+    .context-dates-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .context-date-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .context-date-badge i {
+      font-size: 7px;
+    }
+
+    .context-date-badge-start {
+      background: rgba(40, 167, 69, 0.1);
+      border: 1px solid rgba(40, 167, 69, 0.4);
+      color: #28a745;
+    }
+
+    .context-date-badge-end {
+      background: rgba(220, 53, 69, 0.1);
+      border: 1px solid rgba(220, 53, 69, 0.4);
+      color: #dc3545;
+    }
+
+    .context-date-inline {
+      border: none;
+      background: transparent;
+      color: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 0;
+      cursor: default;
+      width: auto;
+      pointer-events: none;
+    }
+
+    /* Main row: icons + fields + buttons */
+    .context-main-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .context-type-grid-inline {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .context-type-grid-inline .context-type-option {
+      padding: 6px 8px;
+    }
+
+    .context-type-grid-inline .context-type-option img {
+      width: 26px;
+      height: 26px;
+      margin-bottom: 2px;
+    }
+
+    .context-type-grid-inline .context-type-option span {
+      font-size: 10px;
+    }
+
+    .context-fields-col {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    @media screen and (max-width: 768px) {
+      .context-main-row {
+        flex-wrap: wrap;
       }
+      .context-fields-col {
+        width: 100%;
+        flex-direction: row;
+        gap: 8px;
+      }
+      .context-fields-col input {
+        flex: 1;
+      }
+    }
+
+    @media screen and (max-width: 576px) {
+      .context-fields-col {
+        flex-direction: column;
+      }
+    }
+
+    /* AI Analysis panel */
+    .ai-analysis-result {
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .ai-disclaimer {
+      background: rgba(255, 193, 7, 0.08);
+      border: 1px solid rgba(255, 193, 7, 0.3);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .ai-disclaimer i {
+      color: #ffc107;
+    }
+
+    .ai-analysis-stats {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border-color);
+      font-size: 11px;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .ai-analysis-stats span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .ai-analysis-loading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    .ai-analysis-error {
+      padding: 10px 14px;
+      background: rgba(220, 53, 69, 0.08);
+      border: 1px solid rgba(220, 53, 69, 0.25);
+      border-radius: var(--radius-sm);
+      color: #dc3545;
+      font-size: 13px;
     }
 
     /* Toast personnalisé - style attention */
@@ -1051,11 +1279,104 @@
                 <!-- Unified Chart -->
                 <div id="unifiedChart"></div>
 
+                <!-- Inline context form panel (slides open below chart) -->
+                <div id="contextPanel" class="context-panel" style="display: none;">
+                  <div class="context-panel-inner">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <h6 class="mb-0">
+                        <i class="bi bi-plus-circle"></i> <span data-i18n="modal.context.title">Ajouter une contextualisation</span>
+                      </h6>
+                      <button type="button" class="btn-close btn-close-sm" onclick="closeContextPanel()" aria-label="Close"></button>
+                    </div>
+                    <form id="contextForm">
+                      <!-- Ligne 1 : dates compactes (badges) -->
+                      <div class="context-dates-row">
+                        <span class="context-date-badge context-date-badge-start">
+                          <i class="bi bi-circle-fill"></i>
+                          <input type="datetime-local" class="context-date-inline" id="contextDateStart" readonly required>
+                        </span>
+                        <span class="context-date-badge context-date-badge-end">
+                          <i class="bi bi-circle-fill"></i>
+                          <input type="datetime-local" class="context-date-inline" id="contextDateEnd" readonly required>
+                        </span>
+                      </div>
+                      <!-- Ligne 2 : icônes + commentaire + utilisateur + boutons -->
+                      <div class="context-main-row">
+                        <div class="context-type-grid context-type-grid-inline">
+                          <div class="context-type-option" data-type="fire" onclick="selectContextType('fire')">
+                            <img src="https://api.aircarto.fr/context/logos/fire-flat.svg" alt="Incendie">
+                            <span data-i18n="modal.context.fire">Incendie</span>
+                          </div>
+                          <div class="context-type-option" data-type="industrial" onclick="selectContextType('industrial')">
+                            <img src="https://api.aircarto.fr/context/logos/industrial-flat.svg" alt="Industriel">
+                            <span data-i18n="modal.context.industrial">Industriel</span>
+                          </div>
+                          <div class="context-type-option" data-type="traffic" onclick="selectContextType('traffic')">
+                            <img src="https://api.aircarto.fr/context/logos/traffic-flat.svg" alt="Trafic">
+                            <span data-i18n="modal.context.traffic">Trafic</span>
+                          </div>
+                          <div class="context-type-option" data-type="neighbourhood" onclick="selectContextType('neighbourhood')">
+                            <img src="https://api.aircarto.fr/context/logos/neighbourhood-flat.svg" alt="Voisinage">
+                            <span data-i18n="modal.context.neighbourhood">Voisinage</span>
+                          </div>
+                        </div>
+                        <input type="hidden" id="contextType" value="">
+                        <div class="context-fields-col">
+                          <input type="text" class="form-control form-control-sm" id="contextComments"
+                            placeholder="Décrivez le contexte..." data-i18n-placeholder="modal.context.commentsPlaceholder">
+                          <input type="text" class="form-control form-control-sm" id="contextUser" placeholder="Votre nom" data-i18n-placeholder="modal.context.userPlaceholder">
+                        </div>
+                        <div class="d-flex flex-column gap-1 flex-shrink-0">
+                          <button type="button" class="btn btn-success btn-sm" onclick="submitContextualization()">
+                            <i class="bi bi-check-lg"></i> <span data-i18n="btn.save">Enregistrer</span>
+                          </button>
+                          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="closeContextPanel()" data-i18n="btn.cancel">Annuler</button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+
                 <!-- Hidden old charts for compatibility -->
                 <div id="chartdiv5"></div>
                 <div id="chartdiv6"></div>
                 <div id="chartdiv7"></div>
                 <div id="chartdiv8"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI ANALYSIS -->
+        <div class="row section-gap">
+          <div class="col-sm-12">
+            <div class="card">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5 class="card-title mb-0">
+                    <i class="bi bi-robot"></i> <span data-i18n="ai.title">Analyse des données par IA</span>
+                  </h5>
+                  <button type="button" class="btn btn-primary btn-sm" id="btnAiAnalysis" onclick="requestAiAnalysis()">
+                    <i class="bi bi-stars"></i> <span data-i18n="ai.generate">Générer une analyse</span>
+                  </button>
+                </div>
+                <div class="ai-disclaimer mb-3">
+                  <p class="mb-1" data-i18n="ai.description">
+                    Analyse contextuelle des mesures des 3 derniers jours par intelligence artificielle locale.
+                  </p>
+                  <p class="mb-0">
+                    <i class="bi bi-exclamation-triangle"></i> <strong data-i18n="ai.disclaimerTitle">Phase de test</strong> — <span data-i18n="ai.disclaimerText">Cette analyse est générée par un modèle d'IA local (Qwen 2.5 7B). Les résultats sont fournis à titre indicatif uniquement, doivent être interprétés avec précaution et n'engagent en aucun cas la responsabilité d'AirCarto.</span>
+                  </p>
+                </div>
+                <div id="aiAnalysisResult" class="ai-analysis-result" style="display: none;">
+                  <div id="aiAnalysisContent"></div>
+                  <div id="aiAnalysisStats" class="ai-analysis-stats"></div>
+                </div>
+                <div id="aiAnalysisLoading" class="ai-analysis-loading" style="display: none;">
+                  <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                  <span data-i18n="ai.loading">Analyse en cours, cela peut prendre quelques instants...</span>
+                </div>
+                <div id="aiAnalysisError" class="ai-analysis-error" style="display: none;"></div>
               </div>
             </div>
           </div>
@@ -1157,75 +1478,7 @@
       </div>
 
       <!-- Contextualization Modal -->
-      <div class="modal fade" id="contextModal" tabindex="-1" aria-labelledby="contextModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="contextModalLabel">
-                <i class="bi bi-plus-circle"></i> <span data-i18n="modal.context.title">Ajouter une contextualisation</span>
-              </h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <form id="contextForm">
-                <!-- Dates sur une ligne -->
-                <div class="context-date-row mb-3">
-                  <div>
-                    <label for="contextDateStart" class="form-label" data-i18n="modal.context.dateStart">Date/Heure de début</label>
-                    <input type="datetime-local" class="form-control" id="contextDateStart" required>
-                  </div>
-                  <div>
-                    <label for="contextDateEnd" class="form-label" data-i18n="modal.context.dateEnd">Date/Heure de fin</label>
-                    <input type="datetime-local" class="form-control" id="contextDateEnd" required>
-                  </div>
-                </div>
-                <!-- Type de contexte -->
-                <div class="mb-3">
-                  <label class="form-label" data-i18n="modal.context.type">Type de contexte (optionnel)</label>
-                  <div class="context-type-grid">
-                    <div class="context-type-option" data-type="fire" onclick="selectContextType('fire')">
-                      <img src="https://api.aircarto.fr/context/logos/fire-flat.svg" alt="Incendie">
-                      <span data-i18n="modal.context.fire">Incendie</span>
-                    </div>
-                    <div class="context-type-option" data-type="industrial" onclick="selectContextType('industrial')">
-                      <img src="https://api.aircarto.fr/context/logos/industrial-flat.svg" alt="Industriel">
-                      <span data-i18n="modal.context.industrial">Industriel</span>
-                    </div>
-                    <div class="context-type-option" data-type="traffic" onclick="selectContextType('traffic')">
-                      <img src="https://api.aircarto.fr/context/logos/traffic-flat.svg" alt="Trafic">
-                      <span data-i18n="modal.context.traffic">Trafic</span>
-                    </div>
-                    <div class="context-type-option" data-type="neighbourhood"
-                      onclick="selectContextType('neighbourhood')">
-                      <img src="https://api.aircarto.fr/context/logos/neighbourhood-flat.svg" alt="Voisinage">
-                      <span data-i18n="modal.context.neighbourhood">Voisinage</span>
-                    </div>
-                  </div>
-                  <input type="hidden" id="contextType" value="">
-                </div>
-                <!-- Commentaires et utilisateur sur une ligne -->
-                <div class="context-bottom-row">
-                  <div class="mb-3">
-                    <label for="contextComments" class="form-label" data-i18n="modal.context.comments">Commentaires</label>
-                    <textarea class="form-control" id="contextComments" rows="2"
-                      placeholder="Décrivez le contexte..." data-i18n-placeholder="modal.context.commentsPlaceholder"></textarea>
-                  </div>
-                  <div class="mb-3">
-                    <label for="contextUser" class="form-label" data-i18n="modal.context.user">Utilisateur</label>
-                    <input type="text" class="form-control" id="contextUser" placeholder="Votre nom" data-i18n-placeholder="modal.context.userPlaceholder">
-                  </div>
-                </div>
-              </form>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="btn.cancel">Annuler</button>
-              <button type="button" class="btn btn-success" onclick="submitContextualization()">
-                <i class="bi bi-check-lg"></i> <span data-i18n="btn.save">Enregistrer</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Inline context panel is now inside the chart card -->
 
       <!-- Context Details Modal -->
       <div class="modal fade" id="contextDetailsModal" tabindex="-1" aria-labelledby="contextDetailsModalLabel"
@@ -1241,8 +1494,33 @@
             <div class="modal-body" id="contextDetailsBody">
               <!-- Content will be populated by JavaScript -->
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer d-flex justify-content-between">
+              <button type="button" class="btn btn-outline-danger" id="btnDeleteContext" onclick="deleteContext()">
+                <i class="bi bi-trash"></i> <span data-i18n="btn.delete">Supprimer</span>
+              </button>
               <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="btn.close">Fermer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Beta Warning Modal for Contextualization -->
+      <div class="modal fade" id="betaContextModal" tabindex="-1" aria-labelledby="betaContextModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header bg-warning bg-opacity-25">
+              <h5 class="modal-title" id="betaContextModalLabel">
+                <i class="bi bi-exclamation-triangle"></i> <span data-i18n="modal.beta.title">Fonctionnalité en bêta test</span>
+              </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <p data-i18n="modal.beta.message">La fonctionnalité de contextualisation est actuellement en <strong>bêta test</strong>. Elle n'est pas encore totalement stable et peut présenter des dysfonctionnements.</p>
+              <p data-i18n="modal.beta.feedback">Vos retours sont les bienvenus ! N'hésitez pas à nous contacter à <a href="mailto:contact@aircarto.fr">contact@aircarto.fr</a> pour signaler un problème ou suggérer des améliorations.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-warning" data-bs-dismiss="modal" id="btnBetaUnderstood" data-i18n="modal.beta.understood">J'ai compris, continuer</button>
             </div>
           </div>
         </div>
@@ -1384,6 +1662,25 @@
         "contextDetails.industrial": "Activité industrielle",
         "contextDetails.traffic": "Trafic routier",
         "contextDetails.neighbourhood": "Activité de voisinage",
+        "ai.title": "Analyse des données par IA",
+        "ai.generate": "Générer une analyse",
+        "ai.description": "Analyse contextuelle des mesures des 3 derniers jours par intelligence artificielle locale.",
+        "ai.disclaimerTitle": "Phase de test",
+        "ai.disclaimerText": "Cette analyse est générée par un modèle d'IA local (Qwen 2.5 7B). Les résultats sont fournis à titre indicatif uniquement, doivent être interprétés avec précaution et n'engagent en aucun cas la responsabilité d'AirCarto.",
+        "ai.loading": "Analyse en cours, cela peut prendre quelques instants...",
+        "ai.error": "Erreur lors de la génération de l'analyse. Veuillez réessayer.",
+        "ai.errorNoData": "Aucune donnée disponible pour l'analyse.",
+        "ai.statsTime": "Analyse générée en {seconds}s",
+        "ai.statsTokens": "{total} tokens ({prompt} prompt + {completion} réponse)",
+        "scroll.fillForm": "▼ Remplir le formulaire ci-dessous",
+        "btn.delete": "Supprimer",
+        "modal.deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette contextualisation ?",
+        "toast.contextDeleted": "Contextualisation supprimée avec succès.",
+        "toast.contextDeleteError": "Erreur lors de la suppression de la contextualisation.",
+        "modal.beta.title": "Fonctionnalité en bêta test",
+        "modal.beta.message": "La fonctionnalité de contextualisation est actuellement en <strong>bêta test</strong>. Elle n'est pas encore totalement stable et peut présenter des dysfonctionnements.",
+        "modal.beta.feedback": "Vos retours sont les bienvenus ! N'hésitez pas à nous contacter à <a href=\"mailto:contact@aircarto.fr\">contact@aircarto.fr</a> pour signaler un problème ou suggérer des améliorations.",
+        "modal.beta.understood": "J'ai compris, continuer",
         "marker.start": "DÉBUT",
         "marker.end": "FIN"
       },
@@ -1480,6 +1777,25 @@
         "contextDetails.industrial": "Industrial activity",
         "contextDetails.traffic": "Road traffic",
         "contextDetails.neighbourhood": "Neighbourhood activity",
+        "ai.title": "AI Data Analysis",
+        "ai.generate": "Generate analysis",
+        "ai.description": "Contextual analysis of the last 3 days of measurements using local artificial intelligence.",
+        "ai.disclaimerTitle": "Testing phase",
+        "ai.disclaimerText": "This analysis is generated by a local AI model (Qwen 2.5 7B). Results are provided for informational purposes only, should be interpreted with caution and do not engage AirCarto's responsibility in any way.",
+        "ai.loading": "Analysis in progress, this may take a moment...",
+        "ai.error": "Error generating analysis. Please try again.",
+        "ai.errorNoData": "No data available for analysis.",
+        "ai.statsTime": "Analysis generated in {seconds}s",
+        "ai.statsTokens": "{total} tokens ({prompt} prompt + {completion} response)",
+        "scroll.fillForm": "▼ Fill in the form below",
+        "btn.delete": "Delete",
+        "modal.deleteConfirm": "Are you sure you want to delete this contextualization?",
+        "toast.contextDeleted": "Contextualization deleted successfully.",
+        "toast.contextDeleteError": "Error deleting contextualization.",
+        "modal.beta.title": "Feature in beta testing",
+        "modal.beta.message": "The contextualization feature is currently in <strong>beta testing</strong>. It is not yet fully stable and may have some issues.",
+        "modal.beta.feedback": "Your feedback is welcome! Feel free to contact us at <a href=\"mailto:contact@aircarto.fr\">contact@aircarto.fr</a> to report a problem or suggest improvements.",
+        "modal.beta.understood": "I understand, continue",
         "marker.start": "START",
         "marker.end": "END"
       },
@@ -1576,6 +1892,25 @@
         "contextDetails.industrial": "Attività industriale",
         "contextDetails.traffic": "Traffico stradale",
         "contextDetails.neighbourhood": "Attività di vicinato",
+        "ai.title": "Analisi dei dati con IA",
+        "ai.generate": "Genera analisi",
+        "ai.description": "Analisi contestuale delle misure degli ultimi 3 giorni tramite intelligenza artificiale locale.",
+        "ai.disclaimerTitle": "Fase di test",
+        "ai.disclaimerText": "Questa analisi è generata da un modello di IA locale (Qwen 2.5 7B). I risultati sono forniti solo a titolo informativo, devono essere interpretati con cautela e non impegnano in alcun modo la responsabilità di AirCarto.",
+        "ai.loading": "Analisi in corso, potrebbe richiedere qualche istante...",
+        "ai.error": "Errore durante la generazione dell'analisi. Riprovare.",
+        "ai.errorNoData": "Nessun dato disponibile per l'analisi.",
+        "ai.statsTime": "Analisi generata in {seconds}s",
+        "ai.statsTokens": "{total} token ({prompt} prompt + {completion} risposta)",
+        "scroll.fillForm": "▼ Compila il modulo qui sotto",
+        "btn.delete": "Elimina",
+        "modal.deleteConfirm": "Sei sicuro di voler eliminare questa contestualizzazione?",
+        "toast.contextDeleted": "Contestualizzazione eliminata con successo.",
+        "toast.contextDeleteError": "Errore durante l'eliminazione della contestualizzazione.",
+        "modal.beta.title": "Funzionalità in beta test",
+        "modal.beta.message": "La funzionalità di contestualizzazione è attualmente in <strong>beta test</strong>. Non è ancora completamente stabile e potrebbe presentare dei malfunzionamenti.",
+        "modal.beta.feedback": "I vostri feedback sono benvenuti! Non esitate a contattarci a <a href=\"mailto:contact@aircarto.fr\">contact@aircarto.fr</a> per segnalare un problema o suggerire miglioramenti.",
+        "modal.beta.understood": "Ho capito, continua",
         "marker.start": "INIZIO",
         "marker.end": "FINE"
       }
@@ -1637,6 +1972,7 @@
     var root1, root2, root3, root4, rootUnified;
     var unifiedChart, allSeries = {};
     var allAxes = {}; // Store Y-axes references
+    var contextAxisRanges = []; // Store context axis ranges for toggling
 
     var measureType = "PM";
     var timespanGraph = parseInt(localStorage.getItem("moduleair_timespan")) || 2;   // pas de temps en minutes
@@ -1657,7 +1993,7 @@
     // Contextualization mode variables
     var contextualizationMode = false;
     var selectedTimestamp = null;
-    var contextModalInstance = null;
+    var contextModalInstance = null; // legacy, kept for compatibility
     var contextsData = []; // Store fetched contexts for the sensor
     var contextSelectionStep = 0; // 0 = not selecting, 1 = waiting for start, 2 = waiting for end
     var contextStartTimestamp = null;
@@ -3181,6 +3517,7 @@
 
       // ========== CREATE ALL SERIES ==========
       allSeries = {};
+      contextAxisRanges = [];
 
       // PM series (on yAxisPM) - µg/m³
       allSeries.PM1_int = createSeries("PM1 int.", data_PM1_int, colors.PM1, yAxisPM, false, "µg/m³", "PM1");
@@ -3375,13 +3712,15 @@
           visible: true
         });
 
+        // Store range for toggling visibility
+        contextAxisRanges.push(range);
+
         // Prepare marker data
         const midTime = (startTime + endTime) / 2;
-        const maxValue = yAxis.getPrivate("max") || 100;
 
         contextMarkers.push({
           date: midTime,
-          value: maxValue * 0.95,
+          value: 0,
           contextType: context.context_type,
           logoUrl: "https://api.aircarto.fr/context/logos/" + config.logo,
           color: config.color,
@@ -3391,10 +3730,25 @@
 
       // Create a series for context markers
       if (contextMarkers.length > 0) {
+        // Create a dedicated hidden Y axis so context markers don't affect PM scale
+        const contextYAxis = chart.yAxes.push(
+          am5xy.ValueAxis.new(root, {
+            renderer: am5xy.AxisRendererY.new(root, {}),
+            min: 0,
+            max: 100,
+            strictMinMax: true,
+            visible: false
+          })
+        );
+        contextYAxis.get("renderer").set("visible", false);
+
+        // Set marker values to top of this dedicated axis
+        contextMarkers.forEach(function(m) { m.value = 95; });
+
         const contextSeries = chart.series.push(
           am5xy.LineSeries.new(root, {
             xAxis: xAxis,
-            yAxis: yAxis,
+            yAxis: contextYAxis,
             valueYField: "value",
             valueXField: "date"
           })
@@ -3456,8 +3810,12 @@
       }
     }
 
+    // Currently displayed context (for delete action)
+    let currentContextDetails = null;
+
     // Show context details in a Bootstrap modal
     function showContextDetails(context) {
+      currentContextDetails = context;
       const startDate = new Date(context.datetime_start);
       const endDate = new Date(context.datetime_stop);
 
@@ -3500,9 +3858,53 @@
       // Update modal content
       document.getElementById('contextDetailsBody').innerHTML = modalContent;
 
+      // Apply i18n to delete button
+      document.querySelectorAll('#contextDetailsModal [data-i18n]').forEach(function(el) {
+        const key = el.getAttribute('data-i18n');
+        const translation = t(key);
+        if (translation !== key) el.innerHTML = translation;
+      });
+
       // Show the modal
       const detailsModal = new bootstrap.Modal(document.getElementById('contextDetailsModal'));
       detailsModal.show();
+    }
+
+    // Delete the currently displayed context
+    function deleteContext() {
+      if (!currentContextDetails) return;
+
+      if (!confirm(t('modal.deleteConfirm'))) return;
+
+      const contextId = currentContextDetails._id || currentContextDetails.id;
+      if (!contextId) {
+        console.error('No context ID found for deletion');
+        openToast(t('toast.contextDeleteError'));
+        return;
+      }
+
+      $.ajax({
+        method: 'DELETE',
+        url: 'https://api.aircarto.fr/context/delete_context?id=' + contextId
+      })
+        .done(function (response) {
+          console.log('Context deleted successfully:', response);
+
+          // Close the details modal
+          const modal = bootstrap.Modal.getInstance(document.getElementById('contextDetailsModal'));
+          if (modal) modal.hide();
+
+          openToast(t('toast.contextDeleted'));
+          currentContextDetails = null;
+
+          // Reload chart data to reflect the deletion
+          reloadDataSensor(timeLengthGraph, timespanGraph);
+        })
+        .fail(function (xhr, status, error) {
+          console.error('Error deleting context:', error);
+          console.error('Response:', xhr.responseText);
+          openToast(t('toast.contextDeleteError'));
+        });
     }
 
     // Apply visibility based on toggle states
@@ -3522,6 +3924,11 @@
               allSeries.COMMENTS.hide();
             }
           }
+          // Also toggle context axis ranges (colored bands)
+          contextAxisRanges.forEach(function(range) {
+            range.get("axisFill").set("visible", visible);
+            range.get("grid").set("visible", visible);
+          });
           return;
         }
 
@@ -3647,20 +4054,46 @@
     // ========== CONTEXTUALIZATION FUNCTIONS ==========
 
     // Toggle contextualization mode
-    function toggleContextualizationMode() {
-      contextualizationMode = !contextualizationMode;
+    let betaWarningShown = false;
+
+    function activateContextualizationMode() {
+      contextualizationMode = true;
       const btn = document.getElementById('btnContextualization');
       const chartDiv = document.getElementById('unifiedChart');
+      btn.classList.add('active');
+      chartDiv.classList.add('context-mode');
+      contextSelectionStep = 1;
+      contextStartTimestamp = null;
+      contextEndTimestamp = null;
+      clearContextMarkers();
+      openToast(t('toast.contextSelectStart'), true);
+    }
 
-      if (contextualizationMode) {
-        btn.classList.add('active');
-        chartDiv.classList.add('context-mode');
-        contextSelectionStep = 1;
-        contextStartTimestamp = null;
-        contextEndTimestamp = null;
-        clearContextMarkers();
-        openToast(t('toast.contextSelectStart'), true);
+    function toggleContextualizationMode() {
+      if (!contextualizationMode) {
+        // Activating: show beta warning on first use per session
+        if (!betaWarningShown) {
+          betaWarningShown = true;
+          const betaModal = new bootstrap.Modal(document.getElementById('betaContextModal'));
+          // Apply i18n to modal content
+          document.querySelectorAll('#betaContextModal [data-i18n]').forEach(function(el) {
+            const key = el.getAttribute('data-i18n');
+            const translation = t(key);
+            if (translation !== key) el.innerHTML = translation;
+          });
+          betaModal.show();
+          // Activate contextualization mode when user closes the modal
+          document.getElementById('betaContextModal').addEventListener('hidden.bs.modal', function handler() {
+            document.getElementById('betaContextModal').removeEventListener('hidden.bs.modal', handler);
+            activateContextualizationMode();
+          }, { once: true });
+        } else {
+          activateContextualizationMode();
+        }
       } else {
+        contextualizationMode = false;
+        const btn = document.getElementById('btnContextualization');
+        const chartDiv = document.getElementById('unifiedChart');
         btn.classList.remove('active');
         chartDiv.classList.remove('context-mode');
         contextSelectionStep = 0;
@@ -3708,15 +4141,26 @@
         visible: true
       });
 
-      // Label at top
+      // Label along the vertical line (rotated)
       range.get("label").setAll({
         text: isStart ? t("marker.start") : t("marker.end"),
         fill: color,
-        fontSize: 12,
+        fontSize: 11,
         fontWeight: "bold",
-        paddingBottom: 5,
         inside: true,
-        centerX: am5.p50
+        centerX: am5.p50,
+        centerY: am5.p100,
+        rotation: -90,
+        dy: -10,
+        dx: isStart ? -8 : 8,
+        background: am5.RoundedRectangle.new(rootUnified, {
+          fill: am5.color(0xffffff),
+          fillOpacity: 0.85,
+          cornerRadiusTL: 3,
+          cornerRadiusTR: 3,
+          cornerRadiusBL: 3,
+          cornerRadiusBR: 3
+        })
       });
 
       return range;
@@ -3780,11 +4224,8 @@
         // Close the instruction toast
         closeToast();
 
-        // Open modal
-        if (!contextModalInstance) {
-          contextModalInstance = new bootstrap.Modal(document.getElementById('contextModal'));
-        }
-        contextModalInstance.show();
+        // Open inline panel
+        openContextPanel();
 
         // Deactivate contextualization mode (markers stay visible until modal closes)
         contextualizationMode = false;
@@ -3818,15 +4259,26 @@
         return;
       }
 
-      // Convert datetime-local to ISO format with timezone
+      // Format dates as local time strings for the API
       const startDate = new Date(startInput);
       const endDate = new Date(endInput);
+
+      // Use local time formatting (not UTC) to avoid timezone offset
+      function toLocalISOString(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+        return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+      }
 
       // Prepare data for API
       const data = {
         capteur_id: moduleair,
-        datetime_start: startDate.toISOString().slice(0, 19), // Remove Z suffix
-        datetime_end: endDate.toISOString().slice(0, 19),
+        datetime_start: toLocalISOString(startDate),
+        datetime_end: toLocalISOString(endDate),
         timezone: 'Europe/Paris'
       };
 
@@ -3846,10 +4298,8 @@
           console.log('Context saved successfully:', response);
           openToast(t('toast.contextSaved'));
 
-          // Close modal and reset form
-          if (contextModalInstance) {
-            contextModalInstance.hide();
-          }
+          // Close panel and reset form
+          closeContextPanel();
           resetContextModal();
 
           // Reload chart data to show the new context
@@ -3899,6 +4349,80 @@
           contextsData = [];
           if (callback) callback([]);
         });
+    }
+
+    // Open inline context panel with slide animation + scroll indicator
+    function openContextPanel() {
+      const panel = document.getElementById('contextPanel');
+      panel.style.display = 'block';
+      // Apply i18n
+      panel.querySelectorAll('[data-i18n]').forEach(function(el) {
+        const key = el.getAttribute('data-i18n');
+        const translation = t(key);
+        if (translation !== key) el.innerHTML = translation;
+      });
+      panel.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+        const key = el.getAttribute('data-i18n-placeholder');
+        const translation = t(key);
+        if (translation !== key) el.placeholder = translation;
+      });
+      // Trigger animation on next frame
+      requestAnimationFrame(function() {
+        panel.classList.add('open');
+        // Check if panel is visible in viewport
+        setTimeout(function() {
+          const rect = panel.getBoundingClientRect();
+          const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
+          if (!isVisible || rect.bottom > window.innerHeight) {
+            showScrollIndicator(panel);
+          } else {
+            // Already visible, just focus
+            panel.querySelector('input')?.focus();
+          }
+        }, 100);
+      });
+    }
+
+    // Show a floating scroll indicator that points to the panel
+    function showScrollIndicator(panel) {
+      // Remove any existing indicator
+      removeScrollIndicator();
+
+      const indicator = document.createElement('div');
+      indicator.className = 'scroll-indicator';
+      indicator.id = 'scrollIndicator';
+      indicator.innerHTML = '<span class="scroll-indicator-label">' + t('scroll.fillForm') + '</span>';
+      indicator.onclick = function() {
+        panel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        removeScrollIndicator();
+        setTimeout(function() {
+          panel.querySelector('input')?.focus();
+        }, 400);
+      };
+      document.body.appendChild(indicator);
+
+      // Auto-remove after 4 seconds
+      setTimeout(removeScrollIndicator, 4000);
+    }
+
+    function removeScrollIndicator() {
+      const el = document.getElementById('scrollIndicator');
+      if (el) {
+        el.style.opacity = '0';
+        setTimeout(function() { el.remove(); }, 300);
+      }
+    }
+
+    // Close inline context panel
+    function closeContextPanel() {
+      const panel = document.getElementById('contextPanel');
+      panel.classList.remove('open');
+      removeScrollIndicator();
+      panel.addEventListener('transitionend', function handler() {
+        panel.style.display = 'none';
+        panel.removeEventListener('transitionend', handler);
+      }, { once: true });
+      resetContextModal();
     }
 
     // Reset context modal form
@@ -4344,6 +4868,186 @@
         })
         .fail(function () {
           console.log("Error while geting data from Aircarto API");
+        });
+    }
+
+    // ========== AI ANALYSIS ==========
+
+    function requestAiAnalysis() {
+      const btn = document.getElementById('btnAiAnalysis');
+      const loading = document.getElementById('aiAnalysisLoading');
+      const result = document.getElementById('aiAnalysisResult');
+      const content = document.getElementById('aiAnalysisContent');
+      const errorDiv = document.getElementById('aiAnalysisError');
+
+      // Apply i18n to the card
+      document.querySelectorAll('#aiAnalysisLoading [data-i18n], #aiAnalysisResult [data-i18n]').forEach(function(el) {
+        const key = el.getAttribute('data-i18n');
+        const translation = t(key);
+        if (translation !== key) el.innerHTML = translation;
+      });
+
+      // Show loading, hide others
+      btn.disabled = true;
+      loading.style.display = 'flex';
+      result.style.display = 'none';
+      errorDiv.style.display = 'none';
+
+      // Fetch last 3 days of data (72h) at 1h resolution
+      const end = new Date();
+      const start = new Date(end.getTime() - 72 * 3600 * 1000);
+
+      $.ajax({
+        method: 'GET',
+        url: 'https://api.aircarto.fr/capteurs/dataModuleAir?capteurID=' + moduleair +
+          '&start=' + start.toISOString() +
+          '&end=' + end.toISOString() +
+          '&freq=1h&token=' + token
+      })
+        .done(function(data) {
+          if (!data || data.length === 0) {
+            loading.style.display = 'none';
+            errorDiv.textContent = t('ai.errorNoData');
+            errorDiv.style.display = 'block';
+            btn.disabled = false;
+            return;
+          }
+
+          // Also fetch contexts for this period
+          fetchContexts(function(contexts) {
+            // Build a summary of the data for the LLM
+            var prompt = buildAiPrompt(data, contexts, start, end);
+            callLocalLLM(prompt, btn, loading, result, content, errorDiv);
+          });
+        })
+        .fail(function() {
+          loading.style.display = 'none';
+          errorDiv.textContent = t('ai.error');
+          errorDiv.style.display = 'block';
+          btn.disabled = false;
+        });
+    }
+
+    function buildAiPrompt(data, contexts, startDate, endDate) {
+      // Compute stats per pollutant
+      var pollutants = ['PM1', 'PM25', 'PM10', 'CO2', 'COV', 'TEMP', 'HUM'];
+      var stats = {};
+
+      pollutants.forEach(function(p) {
+        var values = data.map(function(d) { return d[p]; }).filter(function(v) { return v !== undefined && v !== null && v !== -1; });
+        if (values.length > 0) {
+          stats[p] = {
+            min: Math.min.apply(null, values),
+            max: Math.max.apply(null, values),
+            avg: Math.round(values.reduce(function(a, b) { return a + b; }, 0) / values.length * 10) / 10,
+            count: values.length
+          };
+        }
+      });
+
+      // Build a concise time series (sample key moments)
+      var timePoints = [];
+      var step = Math.max(1, Math.floor(data.length / 12)); // ~12 points
+      for (var i = 0; i < data.length; i += step) {
+        var d = data[i];
+        timePoints.push(
+          new Date(d.time).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) +
+          ' → PM2.5:' + d.PM25 + ' PM10:' + d.PM10 + ' CO2:' + d.CO2 + ' T:' + d.TEMP + '°C H:' + d.HUM + '%'
+        );
+      }
+
+      // Context info
+      var contextInfo = '';
+      if (contexts && contexts.length > 0) {
+        var relevantContexts = contexts.filter(function(c) {
+          var cs = new Date(c.datetime_start).getTime();
+          var ce = new Date(c.datetime_stop).getTime();
+          return cs <= endDate.getTime() && ce >= startDate.getTime();
+        });
+        if (relevantContexts.length > 0) {
+          contextInfo = '\n\nContextualisations signalées par l\'utilisateur :\n';
+          relevantContexts.forEach(function(c) {
+            contextInfo += '- ' + (c.context_type || 'inconnu') +
+              ' du ' + new Date(c.datetime_start).toLocaleString('fr-FR') +
+              ' au ' + new Date(c.datetime_stop).toLocaleString('fr-FR') +
+              (c.comments ? ' (' + c.comments + ')' : '') + '\n';
+          });
+        }
+      }
+
+      var prompt = 'Tu es un expert en qualité de l\'air intérieur. Analyse les données suivantes d\'un capteur ModuleAir (capteur ID: ' + moduleair + ') sur les 3 derniers jours.\n\n';
+      prompt += 'Statistiques sur la période (' + startDate.toLocaleDateString('fr-FR') + ' - ' + endDate.toLocaleDateString('fr-FR') + ') :\n';
+
+      var units = { PM1: 'µg/m³', PM25: 'µg/m³', PM10: 'µg/m³', CO2: 'ppm', COV: 'ppb', TEMP: '°C', HUM: '%' };
+      var names = { PM1: 'PM1', PM25: 'PM2.5', PM10: 'PM10', CO2: 'CO2', COV: 'COV', TEMP: 'Température', HUM: 'Humidité' };
+
+      Object.keys(stats).forEach(function(p) {
+        var s = stats[p];
+        prompt += '- ' + names[p] + ' (' + units[p] + ') : min=' + s.min + ', max=' + s.max + ', moy=' + s.avg + '\n';
+      });
+
+      prompt += '\nÉchantillon chronologique :\n' + timePoints.join('\n');
+      prompt += contextInfo;
+
+      prompt += '\n\nDonne une analyse concise en français (max 200 mots) :\n';
+      prompt += '1. Évaluation générale de la qualité de l\'air intérieur\n';
+      prompt += '2. Points d\'attention ou dépassements de seuils (OMS/ANSES)\n';
+      prompt += '3. Tendances observées\n';
+      prompt += '4. Recommandations pratiques pour l\'occupant\n';
+      prompt += 'Si des contextualisations sont présentes, intègre-les dans ton analyse.';
+
+      return prompt;
+    }
+
+    function callLocalLLM(prompt, btn, loading, result, content, errorDiv) {
+      var startTime = Date.now();
+
+      $.ajax({
+        method: 'POST',
+        url: 'ai_analysis.php',
+        contentType: 'application/json',
+        data: JSON.stringify({
+          model: 'qwen2.5-coder:7b',
+          messages: [
+            { role: 'system', content: 'Tu es un expert en qualité de l\'air intérieur. Tu donnes des analyses claires, précises et utiles. Réponds en français.' },
+            { role: 'user', content: prompt }
+          ]
+        }),
+        timeout: 120000 // 2 minutes max
+      })
+        .done(function(response) {
+          loading.style.display = 'none';
+          btn.disabled = false;
+
+          if (response && response.choices && response.choices[0] && response.choices[0].message) {
+            content.textContent = response.choices[0].message.content;
+
+            // Build stats line
+            var statsHtml = '';
+            var elapsed = response.timing ? response.timing.elapsed_seconds : Math.round((Date.now() - startTime) / 1000);
+            statsHtml += '<span><i class="bi bi-clock"></i> ' + t('ai.statsTime', { seconds: elapsed }) + '</span>';
+
+            if (response.usage) {
+              statsHtml += '<span><i class="bi bi-cpu"></i> ' + t('ai.statsTokens', { total: response.usage.total_tokens, prompt: response.usage.prompt_tokens, completion: response.usage.completion_tokens }) + '</span>';
+            }
+            if (response.timing && response.timing.tokens_per_second) {
+              statsHtml += '<span><i class="bi bi-speedometer2"></i> ' + response.timing.tokens_per_second + ' tokens/s</span>';
+            }
+
+            document.getElementById('aiAnalysisStats').innerHTML = statsHtml;
+            result.style.display = 'block';
+            result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          } else {
+            errorDiv.textContent = t('ai.error');
+            errorDiv.style.display = 'block';
+          }
+        })
+        .fail(function(xhr, status, error) {
+          loading.style.display = 'none';
+          btn.disabled = false;
+          console.error('LLM error:', error, xhr.responseText);
+          errorDiv.textContent = t('ai.error');
+          errorDiv.style.display = 'block';
         });
     }
 
