@@ -413,6 +413,36 @@
       background: #e74c3c;
     }
 
+    .toggle-btn[data-series="HCSP"] .color-dot {
+      background: linear-gradient(135deg, #51CCAA, #EDE663, #881B33);
+    }
+
+    .hcsp-info {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 10px 16px;
+      margin-bottom: 12px;
+      background: rgba(81, 204, 170, 0.08);
+      border-left: 3px solid #51CCAA;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .hcsp-info i {
+      color: #51CCAA;
+      font-size: 16px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .hcsp-info a {
+      color: var(--primary-color);
+      text-decoration: underline;
+    }
+
     /* Gauge charts */
     .gauges-container {
       display: flex;
@@ -1274,6 +1304,17 @@
                   <button class="toggle-btn active" data-series="COMMENTS" onclick="toggleSeries('COMMENTS')">
                     <span class="color-dot" style="background-color: #6c757d;"></span> <span data-i18n="btn.comments">Commentaires</span>
                   </button>
+                  <button class="toggle-btn active" data-series="HCSP" onclick="toggleHCSP()">
+                    <span class="color-dot"></span> Seuils CO₂ (HCSP)
+                  </button>
+                </div>
+
+                <div id="hcspInfo" class="hcsp-info">
+                  <i class="bi bi-info-circle"></i>
+                  <span>
+                    <strong>Seuils HCSP :</strong> 800 ppm (renouvellement d'air satisfaisant) et 1500 ppm (confinement inacceptable).
+                    Source : <a href="https://www.hcsp.fr/explore.cgi/avisrapportsdomaine?clefr=1154" target="_blank" rel="noopener">Haut Conseil de la Santé Publique</a>.
+                  </span>
                 </div>
 
                 <!-- Unified Chart -->
@@ -1973,6 +2014,8 @@
     var unifiedChart, allSeries = {};
     var allAxes = {}; // Store Y-axes references
     var contextAxisRanges = []; // Store context axis ranges for toggling
+    var hcspAxisRanges = []; // Store HCSP threshold ranges for toggling
+    var hcspVisible = true; // HCSP thresholds visible by default
 
     var measureType = "PM";
     var timespanGraph = parseInt(localStorage.getItem("moduleair_timespan")) || 2;   // pas de temps en minutes
@@ -3183,9 +3226,50 @@
 
         let yAxis = chart.yAxes.push(
           am5xy.ValueAxis.new(root, {
+            min: 0,
             renderer: am5xy.AxisRendererY.new(root, {}),
           })
         );
+
+        // Seuils HCSP CO2 - bandes de couleur
+        // https://www.hcsp.fr/explore.cgi/avisrapportsdomaine?clefr=1154
+        let thresholds = [
+          { low: 0, high: 800, color: 0x51CCAA, label: null },
+          { low: 800, high: 1500, color: 0xEDE663, label: "800 ppm – Seuil HCSP (renouvellement d'air satisfaisant)" },
+          { low: 1500, high: 5000, color: 0x881B33, label: "1500 ppm – Seuil HCSP (confinement inacceptable)" }
+        ];
+
+        thresholds.forEach(function(t) {
+          let rangeDataItem = yAxis.makeDataItem({ value: t.low, endValue: t.high });
+          let range = yAxis.createAxisRange(rangeDataItem);
+          range.get("axisFill").setAll({
+            fill: am5.color(t.color),
+            fillOpacity: 0.12,
+            visible: true
+          });
+          range.get("grid").set("visible", false);
+
+          if (t.label) {
+            // Ligne de seuil horizontale
+            let lineDataItem = yAxis.makeDataItem({ value: t.low });
+            let lineRange = yAxis.createAxisRange(lineDataItem);
+            lineRange.get("grid").setAll({
+              stroke: am5.color(t.color),
+              strokeOpacity: 0.8,
+              strokeWidth: 2,
+              strokeDasharray: [6, 4],
+              visible: true
+            });
+            lineRange.get("label").setAll({
+              text: t.label,
+              fill: am5.color(t.color),
+              fontSize: 11,
+              inside: true,
+              centerX: 0,
+              location: 0
+            });
+          }
+        });
 
         let series_CO2 = chart.series.push(
           am5xy.LineSeries.new(root, {
@@ -3431,6 +3515,49 @@
         fontWeight: "500"
       }));
       yAxisCO2.get("renderer").grid.template.set("forceHidden", true);
+
+      // Seuils HCSP CO2 - bandes de couleur et lignes de seuil
+      // https://www.hcsp.fr/explore.cgi/avisrapportsdomaine?clefr=1154
+      hcspAxisRanges = [];
+      let co2Thresholds = [
+        { low: 0, high: 800, color: 0x51CCAA, label: null },
+        { low: 800, high: 1500, color: 0xEDE663, label: "800 ppm – HCSP" },
+        { low: 1500, high: 5000, color: 0x881B33, label: "1500 ppm – HCSP" }
+      ];
+
+      co2Thresholds.forEach(function(t) {
+        let rangeDataItem = yAxisCO2.makeDataItem({ value: t.low, endValue: t.high });
+        let range = yAxisCO2.createAxisRange(rangeDataItem);
+        range.get("axisFill").setAll({
+          fill: am5.color(t.color),
+          fillOpacity: 0.10,
+          visible: hcspVisible
+        });
+        range.get("grid").set("visible", false);
+        hcspAxisRanges.push(range);
+
+        if (t.label) {
+          let lineDataItem = yAxisCO2.makeDataItem({ value: t.low });
+          let lineRange = yAxisCO2.createAxisRange(lineDataItem);
+          lineRange.get("grid").setAll({
+            stroke: am5.color(t.color),
+            strokeOpacity: 0.7,
+            strokeWidth: 2,
+            strokeDasharray: [6, 4],
+            visible: hcspVisible
+          });
+          lineRange.get("label").setAll({
+            text: t.label,
+            fill: am5.color(t.color),
+            fontSize: 10,
+            inside: true,
+            centerX: 0,
+            location: 0,
+            visible: hcspVisible
+          });
+          hcspAxisRanges.push(lineRange);
+        }
+      });
 
       // Y-Axis for Humidity (%) - Right, second
       let yAxisHum = unifiedChart.yAxes.push(
@@ -4049,6 +4176,26 @@
 
       // Apply to chart
       applySeriesVisibility();
+    }
+
+    // Toggle HCSP thresholds visibility
+    function toggleHCSP() {
+      hcspVisible = !hcspVisible;
+      const btn = document.querySelector('.toggle-btn[data-series="HCSP"]');
+      if (btn) {
+        btn.classList.toggle('active', hcspVisible);
+      }
+      var infoDiv = document.getElementById('hcspInfo');
+      if (infoDiv) {
+        infoDiv.style.display = hcspVisible ? 'flex' : 'none';
+      }
+      hcspAxisRanges.forEach(function(range) {
+        range.get("axisFill").set("visible", hcspVisible);
+        let grid = range.get("grid");
+        if (grid) grid.set("visible", hcspVisible);
+        let label = range.get("label");
+        if (label) label.set("visible", hcspVisible);
+      });
     }
 
     // ========== CONTEXTUALIZATION FUNCTIONS ==========
