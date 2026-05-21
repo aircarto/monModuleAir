@@ -41,7 +41,7 @@ $llmPayload = json_encode([
 $startTime = microtime(true);
 
 // Call local LLM server
-$ch = curl_init('http://192.168.1.120/v1/chat/completions');
+$ch = curl_init('http://10.0.1.193/v1/chat/completions');
 curl_setopt_array($ch, [
     CURLOPT_POST => true,
     CURLOPT_POSTFIELDS => $llmPayload,
