@@ -397,6 +397,22 @@
       background: #74c69d;
     }
 
+    /* Ext (NebuleAir outdoor) PM toggles — same colors as int, dashed border to mirror chart style */
+    .toggle-btn[data-series="PM1_ext"] .color-dot {
+      border-color: #2d6a4f !important;
+      color: #2d6a4f;
+    }
+
+    .toggle-btn[data-series="PM25_ext"] .color-dot {
+      border-color: #40916c !important;
+      color: #40916c;
+    }
+
+    .toggle-btn[data-series="PM10_ext"] .color-dot {
+      border-color: #74c69d !important;
+      color: #74c69d;
+    }
+
     .toggle-btn[data-series="TEMP"] .color-dot {
       background: #ff6b6b;
     }
@@ -471,6 +487,41 @@
       height: 450px;
       border-radius: var(--radius-md);
       overflow: hidden;
+      transition: filter 0.3s ease;
+    }
+
+    #map.map-blurred {
+      filter: blur(6px);
+      pointer-events: none;
+    }
+
+    .map-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 500;
+      cursor: pointer;
+      border-radius: var(--radius-md);
+      transition: opacity 0.25s ease;
+    }
+
+    .map-overlay.d-none {
+      display: none !important;
+    }
+
+    .map-overlay-message {
+      text-align: center;
+      color: var(--text-primary, #333);
+      max-width: 80%;
+      padding: 1.25rem 1.5rem;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     }
 
     .address {
@@ -1292,6 +1343,15 @@
                   <button class="toggle-btn" data-series="PM10" onclick="toggleSeries('PM10')">
                     <span class="color-dot"></span> PM10 <small>(µg/m³)</small>
                   </button>
+                  <button class="toggle-btn ext-toggle d-none" data-series="PM1_ext" onclick="toggleSeries('PM1_ext')">
+                    <span class="color-dot" style="border: 2px dashed currentColor; background: transparent;"></span> PM1 Ext <small>(µg/m³)</small>
+                  </button>
+                  <button class="toggle-btn ext-toggle d-none" data-series="PM25_ext" onclick="toggleSeries('PM25_ext')">
+                    <span class="color-dot" style="border: 2px dashed currentColor; background: transparent;"></span> PM2.5 Ext <small>(µg/m³)</small>
+                  </button>
+                  <button class="toggle-btn ext-toggle d-none" data-series="PM10_ext" onclick="toggleSeries('PM10_ext')">
+                    <span class="color-dot" style="border: 2px dashed currentColor; background: transparent;"></span> PM10 Ext <small>(µg/m³)</small>
+                  </button>
                   <button class="toggle-btn" data-series="TEMP" onclick="toggleSeries('TEMP')">
                     <span class="color-dot"></span> Temp <small>(°C)</small>
                   </button>
@@ -1429,17 +1489,45 @@
             <div class="card h-100">
               <div class="card-body">
                 <h5 class="card-title">
-                  <i class="bi bi-link-45deg"></i> <span data-i18n="nebuleair.title">Connecter un NebuleAir</span>
+                  <i class="bi bi-link-45deg"></i> <span data-i18n="nebuleair.title">Connecter un NebuleAir — Extérieur</span>
                 </h5>
                 <p class="text-muted mb-3" data-i18n="nebuleair.description">
                   Liez votre ModuleAir à un NebuleAir pour comparer les mesures intérieures et extérieures.
                 </p>
-                <div class="d-flex gap-2 align-items-center">
-                  <input type="text" id="linkNebuleAir" placeholder="ID du NebuleAir" class="form-control"
-                    style="max-width: 200px;" data-i18n-placeholder="nebuleair.placeholder" />
-                  <button type="button" id="updateLink" class="btn btn-success">
-                    <i class="bi bi-check-lg"></i> <span data-i18n="btn.validate">Valider</span>
+
+                <!-- Display mode (read-only, when linked) -->
+                <div id="linkDisplay" class="d-flex align-items-center flex-wrap gap-2 d-none">
+                  <span class="badge bg-light text-dark border" style="font-size: 0.95rem; padding: 0.5rem 0.75rem;">
+                    <i class="bi bi-link-45deg"></i>
+                    nebuleair-<span id="linkDisplayValue">—</span>
+                  </span>
+                  <button type="button" id="btnEditLink" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-pencil"></i> <span data-i18n="nebuleair.changeBtn">Changer de NebuleAir</span>
                   </button>
+                  <button type="button" id="btnUnlinkNebuleAir" class="btn btn-sm btn-outline-danger">
+                    <i class="bi bi-x-circle"></i> <span data-i18n="nebuleair.unlinkBtn">Délier</span>
+                  </button>
+                </div>
+
+                <!-- Edit mode (input + Valider) -->
+                <div id="linkEdit">
+                  <div class="d-flex gap-2 align-items-center flex-wrap">
+                    <div class="input-group" style="width: auto; min-width: 340px;">
+                      <span class="input-group-text">nebuleair-</span>
+                      <input type="text" id="linkNebuleAir" placeholder="ID" class="form-control"
+                        style="min-width: 140px;" data-i18n-placeholder="nebuleair.placeholder" autocomplete="off" />
+                      <span class="input-group-text" id="linkStatusIcon" style="background: transparent; min-width: 2.75rem; justify-content: center;">
+                        <span id="linkStatusIconInner"></span>
+                      </span>
+                    </div>
+                    <button type="button" id="updateLink" class="btn btn-success" disabled>
+                      <i class="bi bi-check-lg"></i> <span data-i18n="btn.validate">Valider</span>
+                    </button>
+                    <button type="button" id="btnCancelLink" class="btn btn-sm btn-outline-secondary d-none">
+                      <i class="bi bi-x-lg"></i> <span data-i18n="btn.cancel">Annuler</span>
+                    </button>
+                  </div>
+                  <div id="linkStatusText" class="small mt-2 text-muted" style="min-height: 1.25rem;"></div>
                 </div>
               </div>
             </div>
@@ -1450,22 +1538,46 @@
             <div class="card h-100">
               <div class="card-body">
                 <h5 class="card-title">
-                  <i class="bi bi-house"></i> <span data-i18n="room.title">Position dans la maison</span>
+                  <i class="bi bi-geo"></i> <span data-i18n="room.title">Position du capteur</span>
                 </h5>
                 <p class="text-muted mb-3" data-i18n="room.description">
-                  Indiquez la pièce dans laquelle se trouve le ModuleAir.
+                  Indiquez la catégorie de lieu, puis la pièce ou l'espace où se trouve le ModuleAir.
                 </p>
-                <select id="room" class="form-select" style="max-width: 250px;">
-                  <option value="null" data-i18n="room.select">Choix de la pièce</option>
-                  <option value="cuisine">Cuisine</option>
-                  <option value="salle_a_manger">Salle à manger</option>
-                  <option value="salon">Salon</option>
-                  <option value="chambre_parents">Chambre parents</option>
-                  <option value="chambre_enfants">Chambre enfants</option>
-                  <option value="toilettes">Toilettes</option>
-                  <option value="salle_de_bain">Salle de bain</option>
-                  <option value="entree">Entrée</option>
-                </select>
+
+                <!-- Display mode (read-only) -->
+                <div id="roomDisplay" class="d-flex align-items-center flex-wrap gap-2">
+                  <span class="badge bg-light text-dark border" style="font-size: 0.95rem; padding: 0.5rem 0.75rem;">
+                    <i class="bi bi-geo-alt"></i>
+                    <span id="roomDisplayValue" data-i18n="room.none">Non renseignée</span>
+                  </span>
+                  <button type="button" id="btnEditRoom" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-pencil"></i> <span data-i18n="room.modify">Modifier</span>
+                  </button>
+                  <button type="button" id="btnRoomHistory" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#roomHistoryModal">
+                    <i class="bi bi-clock-history"></i> <span data-i18n="room.history">Historique</span>
+                  </button>
+                </div>
+
+                <!-- Edit mode (hidden by default) -->
+                <div id="roomEdit" class="d-flex flex-wrap gap-3 align-items-end d-none">
+                  <div>
+                    <label for="roomCategory" class="form-label small mb-1" data-i18n="room.category">Catégorie</label>
+                    <select id="roomCategory" class="form-select" style="width: auto; min-width: 230px;">
+                      <option value="null" data-i18n="room.categorySelect">Choix de la catégorie</option>
+                      <option value="maison" data-i18n="room.cat.maison">Maison</option>
+                      <option value="bureau" data-i18n="room.cat.bureau">Bureau</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="room" class="form-label small mb-1" data-i18n="room.subRoom">Pièce / espace</label>
+                    <select id="room" class="form-select" style="width: auto; min-width: 240px;" disabled>
+                      <option value="null" data-i18n="room.select">Choix de la pièce</option>
+                    </select>
+                  </div>
+                  <button type="button" id="btnCancelRoom" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-x-lg"></i> <span data-i18n="btn.cancel">Annuler</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -1479,6 +1591,9 @@
                 <h5 class="card-title">
                   <i class="bi bi-geo-alt"></i> <span data-i18n="geo.title">Géolocaliser mon capteur</span>
                 </h5>
+                <p class="text-muted small mb-3" data-i18n="geo.disclaimer">
+                  Renseigner la géolocalisation n'est pas indispensable au bon fonctionnement du capteur, mais permettra à terme d'activer des fonctionnalités expérimentales (affichage de données de modélisation, par exemple).
+                </p>
 
                 <div id="search">
                   <div class="d-flex gap-2 mb-3 flex-wrap">
@@ -1507,11 +1622,17 @@
         </div>
 
         <!-- MAP -->
-        <div class="row section-gap">
+        <div class="row section-gap" id="mapContainer">
           <div class="col-sm-12">
             <div class="card">
-              <div class="card-body p-0" style="overflow: hidden; border-radius: var(--radius-md);">
+              <div class="card-body p-0" style="overflow: hidden; border-radius: var(--radius-md); position: relative;">
                 <div id="map"></div>
+                <div id="mapOverlay" class="map-overlay">
+                  <div class="map-overlay-message">
+                    <i class="bi bi-geo-alt-fill" style="font-size: 2rem;"></i>
+                    <p class="mb-0 mt-2" data-i18n="geo.overlayMessage">Géolocalisez votre capteur en saisissant une adresse ou des coordonnées ci-dessus.</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1603,6 +1724,35 @@
         </div>
       </div>
 
+      <!-- Room History Modal -->
+      <div class="modal fade" id="roomHistoryModal" tabindex="-1" aria-labelledby="roomHistoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="roomHistoryModalLabel">
+                <i class="bi bi-clock-history"></i> <span data-i18n="room.historyTitle">Historique des emplacements</span>
+              </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="roomHistoryBody">
+              <div class="text-center text-muted py-4" id="roomHistoryLoading">
+                <div class="spinner-border spinner-border-sm" role="status"></div>
+                <span class="ms-2" data-i18n="room.historyLoading">Chargement...</span>
+              </div>
+              <div id="roomHistoryContent" class="d-none"></div>
+              <div id="roomHistoryEmpty" class="text-center text-muted py-4 d-none" data-i18n="room.historyEmpty">Aucun historique disponible.</div>
+              <div id="roomHistoryError" class="alert alert-warning d-none"></div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" id="btnDownloadRoomHistoryCSV">
+                <i class="bi bi-download"></i> <span data-i18n="room.downloadCsv">Télécharger CSV</span>
+              </button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="btn.close">Fermer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </section>
   </div>
 
@@ -1629,15 +1779,44 @@
         "history.addContext": "Ajouter contextualisation",
         "btn.comments": "Commentaires",
         "btn.humidity": "Humidité",
-        "nebuleair.title": "Connecter un NebuleAir",
+        "nebuleair.title": "Connecter un NebuleAir — Extérieur",
         "nebuleair.description": "Liez votre ModuleAir à un NebuleAir pour comparer les mesures intérieures et extérieures.",
-        "nebuleair.placeholder": "ID du NebuleAir",
+        "nebuleair.placeholder": "ex : 1234",
+        "nebuleair.tooShort": "Saisissez au moins 3 caractères pour vérifier l'ID.",
+        "nebuleair.checking": "Vérification en cours…",
+        "nebuleair.valid": "Capteur NebuleAir trouvé.",
+        "nebuleair.invalid": "Aucun capteur NebuleAir trouvé avec cet ID.",
+        "nebuleair.error": "Impossible de vérifier l'ID pour le moment.",
+        "nebuleair.changeBtn": "Changer de NebuleAir",
+        "nebuleair.unlinkBtn": "Délier",
+        "nebuleair.unlinkConfirm": "Voulez-vous vraiment délier ce NebuleAir ?",
         "btn.validate": "Valider",
-        "room.title": "Position dans la maison",
-        "room.description": "Indiquez la pièce dans laquelle se trouve le ModuleAir.",
+        "room.title": "Position du capteur",
+        "room.description": "Indiquez la catégorie de lieu, puis la pièce ou l'espace où se trouve le ModuleAir.",
+        "room.category": "Catégorie",
+        "room.categorySelect": "Choix de la catégorie",
+        "room.cat.maison": "Maison",
+        "room.cat.bureau": "Bureau",
+        "room.subRoom": "Pièce / espace",
         "room.select": "Choix de la pièce",
+        "room.none": "Non renseignée",
+        "room.modify": "Modifier",
+        "room.history": "Historique",
+        "room.historyTitle": "Historique des emplacements",
+        "room.historyLoading": "Chargement...",
+        "room.historyEmpty": "Aucun historique disponible.",
+        "room.historyError": "Erreur lors du chargement de l'historique.",
+        "room.downloadCsv": "Télécharger CSV",
+        "room.col.room": "Pièce / Espace",
+        "room.col.from": "Depuis le",
+        "room.col.to": "Jusqu'au",
+        "room.col.status": "Statut",
+        "room.col.current": "Actuel",
+        "room.legacySuffix": "(valeur existante)",
         "geo.title": "Géolocaliser mon capteur",
+        "geo.disclaimer": "Renseigner la géolocalisation n'est pas indispensable au bon fonctionnement du capteur, mais permettra à terme d'activer des fonctionnalités expérimentales (affichage de données de modélisation, par exemple).",
         "geo.placeholder": "Entrez l'adresse du ModuleAir...",
+        "geo.overlayMessage": "Géolocalisez votre capteur en saisissant une adresse ou des coordonnées ci-dessus.",
         "btn.search": "Rechercher",
         "modal.context.title": "Ajouter une contextualisation",
         "modal.context.dateStart": "Date/Heure de début",
@@ -1665,6 +1844,9 @@
         "toast.addressError": "Erreur pour le changement de localisation.",
         "toast.roomChanged": "Pièce changée.",
         "toast.roomError": "Erreur pour le changement de la pièce.",
+        "toast.linkChanged": "NebuleAir lié — rafraîchissement…",
+        "toast.linkError": "Erreur lors de la liaison du NebuleAir.",
+        "toast.linkRemoved": "NebuleAir délié — rafraîchissement…",
         "toast.contextSaved": "Contextualisation enregistrée avec succès !",
         "toast.contextError": "Erreur lors de l'enregistrement de la contextualisation.",
         "toast.contextDatesRequired": "Veuillez renseigner les dates de début et de fin.",
@@ -1744,15 +1926,44 @@
         "history.addContext": "Add context",
         "btn.comments": "Comments",
         "btn.humidity": "Humidity",
-        "nebuleair.title": "Connect a NebuleAir",
+        "nebuleair.title": "Connect a NebuleAir — Outdoor",
         "nebuleair.description": "Link your ModuleAir to a NebuleAir to compare indoor and outdoor measurements.",
-        "nebuleair.placeholder": "NebuleAir ID",
+        "nebuleair.placeholder": "e.g. 1234",
+        "nebuleair.tooShort": "Enter at least 3 characters to check the ID.",
+        "nebuleair.checking": "Checking…",
+        "nebuleair.valid": "NebuleAir sensor found.",
+        "nebuleair.invalid": "No NebuleAir sensor found with this ID.",
+        "nebuleair.error": "Unable to verify the ID right now.",
+        "nebuleair.changeBtn": "Change NebuleAir",
+        "nebuleair.unlinkBtn": "Unlink",
+        "nebuleair.unlinkConfirm": "Do you really want to unlink this NebuleAir?",
         "btn.validate": "Validate",
-        "room.title": "Position in the house",
-        "room.description": "Indicate the room where the ModuleAir is located.",
+        "room.title": "Sensor position",
+        "room.description": "Select the place category, then the room or space where the ModuleAir is located.",
+        "room.category": "Category",
+        "room.categorySelect": "Choose category",
+        "room.cat.maison": "Home",
+        "room.cat.bureau": "Office",
+        "room.subRoom": "Room / space",
         "room.select": "Choose room",
+        "room.none": "Not set",
+        "room.modify": "Edit",
+        "room.history": "History",
+        "room.historyTitle": "Location history",
+        "room.historyLoading": "Loading...",
+        "room.historyEmpty": "No history available.",
+        "room.historyError": "Error loading history.",
+        "room.downloadCsv": "Download CSV",
+        "room.col.room": "Room / Space",
+        "room.col.from": "From",
+        "room.col.to": "Until",
+        "room.col.status": "Status",
+        "room.col.current": "Current",
+        "room.legacySuffix": "(existing value)",
         "geo.title": "Geolocate my sensor",
+        "geo.disclaimer": "Geolocating the sensor is not required for it to work properly, but it will eventually enable experimental features (such as displaying modeled data).",
         "geo.placeholder": "Enter the ModuleAir address...",
+        "geo.overlayMessage": "Geolocate your sensor by entering an address or coordinates above.",
         "btn.search": "Search",
         "modal.context.title": "Add a contextualization",
         "modal.context.dateStart": "Start date/time",
@@ -1780,6 +1991,9 @@
         "toast.addressError": "Error changing location.",
         "toast.roomChanged": "Room changed.",
         "toast.roomError": "Error changing room.",
+        "toast.linkChanged": "NebuleAir linked — refreshing…",
+        "toast.linkError": "Error while linking the NebuleAir.",
+        "toast.linkRemoved": "NebuleAir unlinked — refreshing…",
         "toast.contextSaved": "Contextualization saved successfully!",
         "toast.contextError": "Error saving contextualization.",
         "toast.contextDatesRequired": "Please fill in the start and end dates.",
@@ -1859,15 +2073,44 @@
         "history.addContext": "Aggiungi contestualizzazione",
         "btn.comments": "Commenti",
         "btn.humidity": "Umidità",
-        "nebuleair.title": "Collegare un NebuleAir",
+        "nebuleair.title": "Collegare un NebuleAir — Esterno",
         "nebuleair.description": "Collega il tuo ModuleAir a un NebuleAir per confrontare le misure interne ed esterne.",
-        "nebuleair.placeholder": "ID del NebuleAir",
+        "nebuleair.placeholder": "es. 1234",
+        "nebuleair.tooShort": "Inserisci almeno 3 caratteri per verificare l'ID.",
+        "nebuleair.checking": "Verifica in corso…",
+        "nebuleair.valid": "Sensore NebuleAir trovato.",
+        "nebuleair.invalid": "Nessun sensore NebuleAir trovato con questo ID.",
+        "nebuleair.error": "Impossibile verificare l'ID al momento.",
+        "nebuleair.changeBtn": "Cambia NebuleAir",
+        "nebuleair.unlinkBtn": "Scollegare",
+        "nebuleair.unlinkConfirm": "Vuoi davvero scollegare questo NebuleAir?",
         "btn.validate": "Conferma",
-        "room.title": "Posizione nella casa",
-        "room.description": "Indica la stanza in cui si trova il ModuleAir.",
+        "room.title": "Posizione del sensore",
+        "room.description": "Indica la categoria di luogo, poi la stanza o lo spazio in cui si trova il ModuleAir.",
+        "room.category": "Categoria",
+        "room.categorySelect": "Scelta della categoria",
+        "room.cat.maison": "Casa",
+        "room.cat.bureau": "Ufficio",
+        "room.subRoom": "Stanza / spazio",
         "room.select": "Scelta della stanza",
+        "room.none": "Non specificata",
+        "room.modify": "Modifica",
+        "room.history": "Cronologia",
+        "room.historyTitle": "Cronologia delle posizioni",
+        "room.historyLoading": "Caricamento...",
+        "room.historyEmpty": "Nessuna cronologia disponibile.",
+        "room.historyError": "Errore nel caricamento della cronologia.",
+        "room.downloadCsv": "Scarica CSV",
+        "room.col.room": "Stanza / Spazio",
+        "room.col.from": "Dal",
+        "room.col.to": "Fino al",
+        "room.col.status": "Stato",
+        "room.col.current": "Attuale",
+        "room.legacySuffix": "(valore esistente)",
         "geo.title": "Geolocalizza il mio sensore",
+        "geo.disclaimer": "Indicare la geolocalizzazione non è indispensabile per il corretto funzionamento del sensore, ma permetterà in futuro di attivare funzionalità sperimentali (ad esempio la visualizzazione di dati di modellizzazione).",
         "geo.placeholder": "Inserire l'indirizzo del ModuleAir...",
+        "geo.overlayMessage": "Geolocalizza il tuo sensore inserendo un indirizzo o le coordinate sopra.",
         "btn.search": "Cerca",
         "modal.context.title": "Aggiungere una contestualizzazione",
         "modal.context.dateStart": "Data/Ora di inizio",
@@ -1895,6 +2138,9 @@
         "toast.addressError": "Errore nella modifica della posizione.",
         "toast.roomChanged": "Stanza cambiata.",
         "toast.roomError": "Errore nel cambio della stanza.",
+        "toast.linkChanged": "NebuleAir collegato — aggiornamento…",
+        "toast.linkError": "Errore durante il collegamento del NebuleAir.",
+        "toast.linkRemoved": "NebuleAir scollegato — aggiornamento…",
         "toast.contextSaved": "Contestualizzazione salvata con successo!",
         "toast.contextError": "Errore durante il salvataggio della contestualizzazione.",
         "toast.contextDatesRequired": "Inserire le date di inizio e di fine.",
@@ -2028,6 +2274,7 @@
     // Toggle states for series visibility
     var seriesVisibility = {
       PM1: false, PM25: true, PM10: false,
+      PM1_ext: false, PM25_ext: true, PM10_ext: false,
       TEMP: false, HUM: false,
       COV: false, CO2: true,
       COMMENTS: true
@@ -2084,6 +2331,22 @@
       .addEventListener("click", updateLink);
 
     document.querySelector("#room").addEventListener("change", changeRoom);
+    document.querySelector("#roomCategory").addEventListener("change", changeRoomCategory);
+    document.querySelector("#btnEditRoom").addEventListener("click", enterRoomEditMode);
+    document.querySelector("#btnCancelRoom").addEventListener("click", cancelRoomEdit);
+    document.querySelector("#btnDownloadRoomHistoryCSV").addEventListener("click", downloadRoomHistoryCSV);
+    document.querySelector("#roomHistoryModal").addEventListener("show.bs.modal", loadRoomHistory);
+
+    // Unlock the map (remove blur + overlay) when the user shows intent to geolocate
+    ["#addr", "#lat", "#lon"].forEach(function (sel) {
+      document.querySelector(sel).addEventListener("focus", unlockMap);
+    });
+    document.querySelector("#mapOverlay").addEventListener("click", unlockMap);
+
+    document.querySelector("#linkNebuleAir").addEventListener("input", onLinkInput);
+    document.querySelector("#btnEditLink").addEventListener("click", enterLinkEditMode);
+    document.querySelector("#btnCancelLink").addEventListener("click", cancelLinkEdit);
+    document.querySelector("#btnUnlinkNebuleAir").addEventListener("click", unlinkNebuleAir);
 
     pwShowHide.forEach((eyeIcon) => {
       eyeIcon.addEventListener("click", () => {
@@ -2117,6 +2380,33 @@
     ).addTo(map);
 
     var myMarker;
+    var mapHasValidGeo = false;
+
+    function isValidGeo(lat, lon) {
+      const la = parseFloat(lat);
+      const lo = parseFloat(lon);
+      if (isNaN(la) || isNaN(lo)) return false;
+      // Both near (0,0) → sensor never geolocated by the user
+      return !(Math.abs(la) < 1 && Math.abs(lo) < 1);
+    }
+
+    function setMapLockedState(locked) {
+      const mapEl = document.querySelector("#map");
+      const overlay = document.querySelector("#mapOverlay");
+      if (locked) {
+        mapEl.classList.add("map-blurred");
+        overlay.classList.remove("d-none");
+      } else {
+        mapEl.classList.remove("map-blurred");
+        overlay.classList.add("d-none");
+        // Leaflet needs a kick after layout/visibility changes
+        setTimeout(function () { map.invalidateSize(); }, 50);
+      }
+    }
+
+    function unlockMap() {
+      setMapLockedState(false);
+    }
 
     setInterval(() => {
       console.log("***RELOAD****");
@@ -2157,7 +2447,7 @@
             localStorage.setItem("moduleair_id", moduleair);
             localStorage.setItem("moduleair_token", token);
 
-            document.querySelector("#room").value = data[0].room;
+            applyRoomFromStored(data[0].room);
 
             const timestamp_UTC = new Date(data[0].time);
             const timestamp_current = Date.now();
@@ -2194,11 +2484,7 @@
 
             document.querySelector("#lat").value = data[0].latitude;
             document.querySelector("#lon").value = data[0].longitude;
-            if (data[0].link != null) {
-              document.querySelector("#linkNebuleAir").value = data[0].link.split("-")[1];
-            } else {
-              document.querySelector("#linkNebuleAir").value = "";
-            }
+            applyLinkFromStored(data[0].link);
 
             // const offset = -new Date().getTimezoneOffset() / 60;
             //const  timestamp_local = new Date(timestamp_UTC.setHours(timestamp_UTC.getHours() + offset));
@@ -2241,10 +2527,16 @@
               });
             }, 1000);
 
-            let coordsCenter = [data[0].latitude, data[0].longitude]; // Marseille
-            let zoomLevel = 16;
+            const geoValid = isValidGeo(data[0].latitude, data[0].longitude);
+            mapHasValidGeo = geoValid;
 
-            map.setView(coordsCenter, zoomLevel);
+            if (geoValid) {
+              map.setView([data[0].latitude, data[0].longitude], 16);
+            } else {
+              // Sensor never geolocated → show a neutral default view behind the overlay
+              map.setView([46.5, 2.5], 5);
+            }
+            setMapLockedState(!geoValid);
 
             myMarker = new L.marker([data[0].latitude, data[0].longitude], {
               title: "Coordinates",
@@ -2272,6 +2564,8 @@
                 myMarker
                   .bindPopup("Lat " + lat + "<br />Lon " + lon)
                   .openPopup();
+                mapHasValidGeo = true;
+                unlockMap();
               });
 
             console.log(myMarker);
@@ -3665,9 +3959,9 @@
 
       // Exterior series (dashed lines) - only if NebuleAir data exists
       if (data2 != null && data2 != undefined) {
-        allSeries.PM1_ext = createSeries("PM1 ext.", data_PM1_ext, colors.PM1, yAxisPM, true, "µg/m³", "PM1");
-        allSeries.PM25_ext = createSeries("PM2.5 ext.", data_PM25_ext, colors.PM25, yAxisPM, true, "µg/m³", "PM25");
-        allSeries.PM10_ext = createSeries("PM10 ext.", data_PM10_ext, colors.PM10, yAxisPM, true, "µg/m³", "PM10");
+        allSeries.PM1_ext = createSeries("PM1 ext.", data_PM1_ext, colors.PM1, yAxisPM, true, "µg/m³", "PM1_ext");
+        allSeries.PM25_ext = createSeries("PM2.5 ext.", data_PM25_ext, colors.PM25, yAxisPM, true, "µg/m³", "PM25_ext");
+        allSeries.PM10_ext = createSeries("PM10 ext.", data_PM10_ext, colors.PM10, yAxisPM, true, "µg/m³", "PM10_ext");
         allSeries.TEMP_ext = createSeries("Temp. ext.", data_TEMP_ext, colors.TEMP, yAxisTemp, true, "°C", "TEMP");
         allSeries.HUM_ext = createSeries("Hum. ext.", data_HUM_ext, colors.HUM, yAxisHum, true, "%", "HUM");
         allSeries.COV_ext = createSeries("COV ext.", data_COV_ext, colors.COV, yAxisCOV, true, "ppb", "COV");
@@ -4039,11 +4333,11 @@
       if (!allSeries || Object.keys(allSeries).length === 0) return;
 
       // Show/hide series
-      Object.keys(seriesVisibility).forEach(function (pollutant) {
-        const visible = seriesVisibility[pollutant];
+      Object.keys(seriesVisibility).forEach(function (key) {
+        const visible = seriesVisibility[key];
 
         // Handle context comments special case
-        if (pollutant === 'COMMENTS') {
+        if (key === 'COMMENTS') {
           if (allSeries.COMMENTS) {
             if (visible) {
               allSeries.COMMENTS.show();
@@ -4059,9 +4353,18 @@
           return;
         }
 
-        const intKey = pollutant + "_int";
-        const extKey = pollutant + "_ext";
+        // Direct match (e.g. PM1_ext → allSeries.PM1_ext)
+        if (allSeries[key]) {
+          if (visible) {
+            allSeries[key].show();
+          } else {
+            allSeries[key].hide();
+          }
+          return;
+        }
 
+        // Fallback: key controls the _int variant only (e.g. PM1 → allSeries.PM1_int)
+        const intKey = key + "_int";
         if (allSeries[intKey]) {
           if (visible) {
             allSeries[intKey].show();
@@ -4069,19 +4372,13 @@
             allSeries[intKey].hide();
           }
         }
-        if (allSeries[extKey]) {
-          if (visible) {
-            allSeries[extKey].show();
-          } else {
-            allSeries[extKey].hide();
-          }
-        }
       });
 
       // Show/hide axes based on which series are visible
       if (allAxes && Object.keys(allAxes).length > 0) {
-        // PM axis: visible if any PM series is visible
-        const pmVisible = seriesVisibility.PM1 || seriesVisibility.PM25 || seriesVisibility.PM10;
+        // PM axis: visible if any PM series (int or ext) is visible
+        const pmVisible = seriesVisibility.PM1 || seriesVisibility.PM25 || seriesVisibility.PM10
+                          || seriesVisibility.PM1_ext || seriesVisibility.PM25_ext || seriesVisibility.PM10_ext;
         if (allAxes.PM) {
           if (pmVisible) {
             allAxes.PM.show();
@@ -5599,17 +5896,101 @@
       });
     }
 
-    function updateLink() {
-      let nebuleair = "nebuleair-" + document.querySelector("#linkNebuleAir").value;
+    // --- Live validation of the NebuleAir link input ---
+    let linkValidationTimer = null;
+    let linkLastCheckedSuffix = null;
 
-      console.log(
-        "https://api.aircarto.fr/capteurs/link?capteurID_ModuleAir=" +
-        moduleair +
-        "&capteurID_NebuleAir=" +
-        nebuleair +
-        "&token=" +
-        token
-      );
+    function setLinkStatus(state, message) {
+      const iconHost = document.querySelector("#linkStatusIconInner");
+      const text = document.querySelector("#linkStatusText");
+      const btn = document.querySelector("#updateLink");
+      let iconHtml = "";
+      let textClass = "text-muted";
+
+      switch (state) {
+        case "idle":
+        case "too-short":
+          iconHtml = "";
+          btn.disabled = true;
+          break;
+        case "checking":
+          iconHtml = '<span class="spinner-border spinner-border-sm text-muted" role="status" aria-hidden="true"></span>';
+          btn.disabled = true;
+          break;
+        case "valid":
+          iconHtml = '<i class="bi bi-check-circle-fill text-success"></i>';
+          textClass = "text-success";
+          btn.disabled = false;
+          break;
+        case "invalid":
+          iconHtml = '<i class="bi bi-x-circle-fill text-danger"></i>';
+          textClass = "text-danger";
+          btn.disabled = true;
+          break;
+        case "error":
+          iconHtml = '<i class="bi bi-exclamation-triangle-fill text-warning"></i>';
+          textClass = "text-warning";
+          btn.disabled = true;
+          break;
+      }
+
+      iconHost.innerHTML = iconHtml;
+      text.className = "small mt-2 " + textClass;
+      text.style.minHeight = "1.25rem";
+      text.textContent = message || "";
+    }
+
+    function validateNebuleAirSuffix(suffix) {
+      linkLastCheckedSuffix = suffix;
+      setLinkStatus("checking", t("nebuleair.checking"));
+      $.ajax({
+        method: "GET",
+        url: "https://api.aircarto.fr/capteurs/metadata?capteurType=NebuleAir&capteurID=nebuleair-" + encodeURIComponent(suffix),
+      })
+        .done(function (data) {
+          // If the user has typed something else in the meantime, ignore this result
+          const currentSuffix = document.querySelector("#linkNebuleAir").value.trim();
+          if (currentSuffix !== suffix) return;
+          const found = Array.isArray(data) && data.length > 0 && data[0] && !data[0].error;
+          if (found) {
+            setLinkStatus("valid", t("nebuleair.valid"));
+          } else {
+            setLinkStatus("invalid", t("nebuleair.invalid"));
+          }
+        })
+        .fail(function () {
+          const currentSuffix = document.querySelector("#linkNebuleAir").value.trim();
+          if (currentSuffix !== suffix) return;
+          setLinkStatus("error", t("nebuleair.error"));
+        });
+    }
+
+    function onLinkInput() {
+      const value = document.querySelector("#linkNebuleAir").value.trim();
+      if (linkValidationTimer) {
+        clearTimeout(linkValidationTimer);
+        linkValidationTimer = null;
+      }
+      if (value.length === 0) {
+        setLinkStatus("idle", "");
+        return;
+      }
+      if (value.length < 3) {
+        setLinkStatus("too-short", t("nebuleair.tooShort"));
+        return;
+      }
+      setLinkStatus("checking", t("nebuleair.checking"));
+      linkValidationTimer = setTimeout(function () {
+        validateNebuleAirSuffix(value);
+      }, 400);
+    }
+
+    function updateLink() {
+      const suffix = document.querySelector("#linkNebuleAir").value.trim();
+      if (!suffix) return;
+      const nebuleair = "nebuleair-" + suffix;
+      const btn = document.querySelector("#updateLink");
+      btn.disabled = true;
 
       $.ajax({
         method: "GET",
@@ -5617,12 +5998,15 @@
           "https://api.aircarto.fr/capteurs/link?capteurID_ModuleAir=" +
           moduleair +
           "&capteurID_NebuleAir=" +
-          nebuleair +
+          encodeURIComponent(nebuleair) +
           "&token=" +
           token,
       })
         .done(function (data) {
-          console.log(data);
+          console.log("Link API response:", data);
+          openToast(t("toast.linkChanged"));
+          // Refresh the page so the NebuleAir data appears on the charts
+          setTimeout(function () { location.reload(); }, 1200);
           //location.reload(); //RELOAD THE PAGE
           //document.querySelector("#linkNebuleAir").value = 
 
@@ -5696,14 +6080,220 @@
         })
         .fail(function () {
           console.log("Error while posting data to Aircarto API");
+          openToast(t("toast.linkError"));
+          document.querySelector("#updateLink").disabled = false;
         });
     }
 
+    // Track the currently linked NebuleAir (raw suffix, e.g. "1234")
+    let currentLinkedNebuleAirSuffix = null;
+
+    function applyLinkFromStored(linkStored) {
+      // linkStored is like "nebuleair-1234" or null/empty
+      if (linkStored && linkStored.indexOf("nebuleair-") === 0) {
+        const suffix = linkStored.slice("nebuleair-".length);
+        currentLinkedNebuleAirSuffix = suffix;
+        document.querySelector("#linkDisplayValue").textContent = suffix;
+        document.querySelector("#linkNebuleAir").value = suffix;
+        exitLinkEditMode();
+        // Validate silently so the button is enabled if the user clicks "Changer"
+        onLinkInput();
+        setExtTogglesVisible(true);
+      } else {
+        currentLinkedNebuleAirSuffix = null;
+        document.querySelector("#linkNebuleAir").value = "";
+        enterLinkEditMode();
+        setLinkStatus("idle", "");
+        setExtTogglesVisible(false);
+      }
+    }
+
+    function setExtTogglesVisible(visible) {
+      document.querySelectorAll(".ext-toggle").forEach(function (btn) {
+        btn.classList.toggle("d-none", !visible);
+        // Reflect current visibility state on the button
+        const key = btn.dataset.series;
+        if (seriesVisibility[key]) {
+          btn.classList.add("active");
+        } else {
+          btn.classList.remove("active");
+        }
+      });
+    }
+
+    function enterLinkEditMode() {
+      document.querySelector("#linkDisplay").classList.add("d-none");
+      document.querySelector("#linkEdit").classList.remove("d-none");
+      // Show Cancel only if there's already a link to revert to
+      const cancelBtn = document.querySelector("#btnCancelLink");
+      if (currentLinkedNebuleAirSuffix) {
+        cancelBtn.classList.remove("d-none");
+      } else {
+        cancelBtn.classList.add("d-none");
+      }
+    }
+
+    function exitLinkEditMode() {
+      document.querySelector("#linkEdit").classList.add("d-none");
+      document.querySelector("#linkDisplay").classList.remove("d-none");
+    }
+
+    function cancelLinkEdit() {
+      // Revert input to the current linked value
+      document.querySelector("#linkNebuleAir").value = currentLinkedNebuleAirSuffix || "";
+      exitLinkEditMode();
+    }
+
+    function unlinkNebuleAir() {
+      if (!confirm(t("nebuleair.unlinkConfirm"))) return;
+      const btn = document.querySelector("#btnUnlinkNebuleAir");
+      btn.disabled = true;
+      $.ajax({
+        method: "GET",
+        url:
+          "https://api.aircarto.fr/capteurs/link?capteurID_ModuleAir=" +
+          moduleair +
+          "&capteurID_NebuleAir=&token=" +
+          token,
+      })
+        .done(function () {
+          openToast(t("toast.linkRemoved"));
+          setTimeout(function () { location.reload(); }, 1200);
+        })
+        .fail(function () {
+          openToast(t("toast.linkError"));
+          btn.disabled = false;
+        });
+    }
+
+    const ROOM_OPTIONS = {
+      maison: [
+        { value: "cuisine", label: "Cuisine" },
+        { value: "salle_a_manger", label: "Salle à manger" },
+        { value: "salon", label: "Salon" },
+        { value: "chambre_parents", label: "Chambre parents" },
+        { value: "chambre_enfants", label: "Chambre enfants" },
+        { value: "toilettes", label: "Toilettes" },
+        { value: "salle_de_bain", label: "Salle de bain" },
+        { value: "entree", label: "Entrée" },
+      ],
+      bureau: [
+        { value: "open_space", label: "Open space" },
+        { value: "bureau_individuel", label: "Bureau individuel" },
+        { value: "bureau_partage", label: "Bureau partagé" },
+        { value: "salle_reunion", label: "Salle de réunion" },
+        { value: "salle_pause", label: "Salle de pause / cafétéria" },
+        { value: "accueil", label: "Accueil / réception" },
+        { value: "couloir", label: "Couloir / circulation" },
+        { value: "salle_classe", label: "Salle de classe" },
+        { value: "atelier", label: "Atelier / local technique" },
+      ],
+    };
+
+    // Currently-applied stored value (used to revert on Cancel)
+    let currentRoomStored = null;
+
+    function parseRoomStored(stored) {
+      if (!stored || stored === "null") return { category: null, value: null, isLegacy: false };
+      if (stored.indexOf(":") !== -1) {
+        const parts = stored.split(":");
+        return { category: parts[0], value: parts[1], isLegacy: false };
+      }
+      // Legacy values (saved before the category:value format) — assume maison
+      return { category: "maison", value: stored, isLegacy: true };
+    }
+
+    // Turn a raw stored value like "chambre_parents" into "Chambre parents"
+    function humanizeRoom(value) {
+      if (!value) return "—";
+      const spaced = value.replace(/_/g, " ").trim();
+      return spaced.charAt(0).toUpperCase() + spaced.slice(1);
+    }
+
+    function isKnownRoomValue(category, value) {
+      const list = ROOM_OPTIONS[category];
+      if (!list || !value) return false;
+      return list.some(function (o) { return o.value === value; });
+    }
+
+    function formatRoomDisplay(stored) {
+      const parsed = parseRoomStored(stored);
+      if (!parsed.category) return t("room.none");
+      const catKey = "room.cat." + parsed.category;
+      const catLabel = t(catKey) === catKey ? humanizeRoom(parsed.category) : t(catKey);
+      const opts = ROOM_OPTIONS[parsed.category] || [];
+      const opt = opts.find(function (o) { return o.value === parsed.value; });
+      const valLabel = opt ? opt.label : humanizeRoom(parsed.value);
+      return catLabel + " — " + valLabel;
+    }
+
+    function renderRoomOptions(category, selectedValue) {
+      const select = document.querySelector("#room");
+      const placeholder = document.createElement("option");
+      placeholder.value = "null";
+      placeholder.setAttribute("data-i18n", "room.select");
+      placeholder.textContent = t("room.select");
+      select.innerHTML = "";
+      select.appendChild(placeholder);
+
+      const hasCategory = category && category !== "null";
+      const list = ROOM_OPTIONS[category] || [];
+
+      // If the stored value isn't in our standard list (legacy DB value), preserve it
+      // as a fallback option so it still displays correctly in the select.
+      if (hasCategory && selectedValue && !isKnownRoomValue(category, selectedValue)) {
+        const legacy = document.createElement("option");
+        legacy.value = selectedValue;
+        legacy.textContent = humanizeRoom(selectedValue) + " " + t("room.legacySuffix");
+        select.appendChild(legacy);
+      }
+
+      list.forEach(function (opt) {
+        const o = document.createElement("option");
+        o.value = opt.value;
+        o.textContent = opt.label;
+        select.appendChild(o);
+      });
+      select.disabled = !hasCategory;
+      select.value = hasCategory && selectedValue ? selectedValue : "null";
+    }
+
+    function applyRoomFromStored(stored) {
+      currentRoomStored = stored;
+      const parsed = parseRoomStored(stored);
+      document.querySelector("#roomCategory").value = parsed.category || "null";
+      renderRoomOptions(parsed.category, parsed.value);
+      document.querySelector("#roomDisplayValue").textContent = formatRoomDisplay(stored);
+      exitRoomEditMode();
+    }
+
+    function enterRoomEditMode() {
+      document.querySelector("#roomDisplay").classList.add("d-none");
+      document.querySelector("#roomEdit").classList.remove("d-none");
+    }
+
+    function exitRoomEditMode() {
+      document.querySelector("#roomEdit").classList.add("d-none");
+      document.querySelector("#roomDisplay").classList.remove("d-none");
+    }
+
+    function cancelRoomEdit() {
+      // Revert selects to the last applied value
+      const parsed = parseRoomStored(currentRoomStored);
+      document.querySelector("#roomCategory").value = parsed.category || "null";
+      renderRoomOptions(parsed.category, parsed.value);
+      exitRoomEditMode();
+    }
+
+    function changeRoomCategory(event) {
+      renderRoomOptions(event.target.value, null);
+    }
+
     function changeRoom(event) {
-
-      let room;
-
-      console.log(event.target.value);
+      const value = event.target.value;
+      const category = document.querySelector("#roomCategory").value;
+      if (value === "null" || category === "null") return;
+      const combined = category + ":" + value;
 
       $.ajax({
         method: "POST",
@@ -5711,16 +6301,99 @@
           "https://api.aircarto.fr/capteurs/changeRoom?capteurID=" +
           moduleair +
           "&room=" +
-          event.target.value +
+          combined +
           "&token=" +
           token,
-        success: function (result) {
+        success: function () {
+          currentRoomStored = combined;
+          document.querySelector("#roomDisplayValue").textContent = formatRoomDisplay(combined);
+          exitRoomEditMode();
           openToast(t("toast.roomChanged"));
         },
       }).fail(function () {
         console.log("Error while posting data to Aircarto API");
         openToast(t("toast.roomError"));
       });
+    }
+
+    // --- Room history modal ---
+    function formatHistoryDate(iso) {
+      if (!iso) return "—";
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return iso;
+      const locale = currentLang === "fr" ? "fr-FR" : (currentLang === "it" ? "it-IT" : "en-US");
+      return d.toLocaleString(locale, {
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit"
+      });
+    }
+
+    function loadRoomHistory() {
+      const loading = document.querySelector("#roomHistoryLoading");
+      const content = document.querySelector("#roomHistoryContent");
+      const empty = document.querySelector("#roomHistoryEmpty");
+      const errorBox = document.querySelector("#roomHistoryError");
+      loading.classList.remove("d-none");
+      content.classList.add("d-none");
+      empty.classList.add("d-none");
+      errorBox.classList.add("d-none");
+      content.innerHTML = "";
+
+      $.ajax({
+        method: "GET",
+        url: "https://api.aircarto.fr/capteurs/roomHistory?capteurID=" + moduleair + "&token=" + token,
+      })
+        .done(function (data) {
+          loading.classList.add("d-none");
+          if (!Array.isArray(data)) {
+            errorBox.textContent = t("room.historyError");
+            errorBox.classList.remove("d-none");
+            return;
+          }
+          if (data.length === 1 && data[0] && data[0].error) {
+            errorBox.textContent = data[0].message || t("room.historyError");
+            errorBox.classList.remove("d-none");
+            return;
+          }
+          if (data.length === 0) {
+            empty.classList.remove("d-none");
+            return;
+          }
+          let html = '<div class="table-responsive"><table class="table table-sm table-hover align-middle mb-0">';
+          html += '<thead><tr>'
+            + '<th>' + t("room.col.room") + '</th>'
+            + '<th>' + t("room.col.from") + '</th>'
+            + '<th>' + t("room.col.to") + '</th>'
+            + '<th>' + t("room.col.status") + '</th>'
+            + '</tr></thead><tbody>';
+          data.forEach(function (row) {
+            const isCurrent = row.is_current === true || row.is_current === "true" || row.is_current === 1;
+            const rowClass = isCurrent ? ' class="table-success"' : '';
+            const toDisplay = isCurrent ? '—' : formatHistoryDate(row.to_date);
+            const statusBadge = isCurrent
+              ? '<span class="badge bg-success">' + t("room.col.current") + '</span>'
+              : '';
+            html += '<tr' + rowClass + '>'
+              + '<td>' + formatRoomDisplay(row.room) + '</td>'
+              + '<td>' + formatHistoryDate(row.from_date) + '</td>'
+              + '<td>' + toDisplay + '</td>'
+              + '<td>' + statusBadge + '</td>'
+              + '</tr>';
+          });
+          html += '</tbody></table></div>';
+          content.innerHTML = html;
+          content.classList.remove("d-none");
+        })
+        .fail(function () {
+          loading.classList.add("d-none");
+          errorBox.textContent = t("room.historyError");
+          errorBox.classList.remove("d-none");
+        });
+    }
+
+    function downloadRoomHistoryCSV() {
+      const url = "https://api.aircarto.fr/capteurs/roomHistory?capteurID=" + moduleair + "&token=" + token + "&format=CSV";
+      window.open(url, "_blank");
     }
 
     function openToast(message, persistent = false) {
