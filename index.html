@@ -817,6 +817,12 @@
       margin-bottom: 4px;
     }
 
+    .context-type-option .context-emoji {
+      font-size: 26px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
     .context-type-option span {
       font-size: 11px;
       font-weight: 500;
@@ -971,7 +977,8 @@
     }
 
     .context-type-grid-inline {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       gap: 6px;
       flex-shrink: 0;
     }
@@ -983,6 +990,11 @@
     .context-type-grid-inline .context-type-option img {
       width: 26px;
       height: 26px;
+      margin-bottom: 2px;
+    }
+
+    .context-type-grid-inline .context-type-option .context-emoji {
+      font-size: 22px;
       margin-bottom: 2px;
     }
 
@@ -1299,10 +1311,16 @@
               <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                   <h5 class="card-title mb-0" data-i18n="history.title">Historique des mesures</h5>
-                  <button type="button" id="btnContextualization" class="btn btn-outline-secondary"
-                    onclick="toggleContextualizationMode()">
-                    <i class="bi bi-plus-circle"></i> <span data-i18n="history.addContext">Ajouter contextualisation</span>
-                  </button>
+                  <div class="d-flex gap-2 flex-wrap">
+                    <button type="button" id="btnCommentsList" class="btn btn-outline-secondary"
+                      style="display: none;" onclick="openCommentsList()">
+                      <i class="bi bi-chat-left-text"></i> <span data-i18n="history.commentsList">Liste des commentaires</span>
+                    </button>
+                    <button type="button" id="btnContextualization" class="btn btn-outline-secondary"
+                      onclick="toggleContextualizationMode()">
+                      <i class="bi bi-plus-circle"></i> <span data-i18n="history.addContext">Ajouter contextualisation</span>
+                    </button>
+                  </div>
                 </div>
 
                 <div class="time-controls">
@@ -1405,20 +1423,36 @@
                       <div class="context-main-row">
                         <div class="context-type-grid context-type-grid-inline">
                           <div class="context-type-option" data-type="fire" onclick="selectContextType('fire')">
-                            <img src="https://api.aircarto.fr/context/logos/fire-flat.svg" alt="Incendie">
+                            <span class="context-emoji">🔥</span>
                             <span data-i18n="modal.context.fire">Incendie</span>
                           </div>
                           <div class="context-type-option" data-type="industrial" onclick="selectContextType('industrial')">
-                            <img src="https://api.aircarto.fr/context/logos/industrial-flat.svg" alt="Industriel">
+                            <span class="context-emoji">🏭</span>
                             <span data-i18n="modal.context.industrial">Industriel</span>
                           </div>
                           <div class="context-type-option" data-type="traffic" onclick="selectContextType('traffic')">
-                            <img src="https://api.aircarto.fr/context/logos/traffic-flat.svg" alt="Trafic">
+                            <span class="context-emoji">🚗</span>
                             <span data-i18n="modal.context.traffic">Trafic</span>
                           </div>
                           <div class="context-type-option" data-type="neighbourhood" onclick="selectContextType('neighbourhood')">
-                            <img src="https://api.aircarto.fr/context/logos/neighbourhood-flat.svg" alt="Voisinage">
+                            <span class="context-emoji">🏘️</span>
                             <span data-i18n="modal.context.neighbourhood">Voisinage</span>
+                          </div>
+                          <div class="context-type-option" data-type="cleaning" onclick="selectContextType('cleaning')">
+                            <span class="context-emoji">🧹</span>
+                            <span data-i18n="modal.context.cleaning">Ménage</span>
+                          </div>
+                          <div class="context-type-option" data-type="cooking" onclick="selectContextType('cooking')">
+                            <span class="context-emoji">🍳</span>
+                            <span data-i18n="modal.context.cooking">Cuisson</span>
+                          </div>
+                          <div class="context-type-option" data-type="meeting" onclick="selectContextType('meeting')">
+                            <span class="context-emoji">👥</span>
+                            <span data-i18n="modal.context.meeting">Réunion</span>
+                          </div>
+                          <div class="context-type-option" data-type="other" onclick="selectContextType('other')">
+                            <span class="context-emoji">📝</span>
+                            <span data-i18n="modal.context.other">Divers</span>
                           </div>
                         </div>
                         <input type="hidden" id="contextType" value="">
@@ -1666,6 +1700,27 @@
         </div>
       </div>
 
+      <!-- Comments List Modal -->
+      <div class="modal fade" id="commentsListModal" tabindex="-1" aria-labelledby="commentsListModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="commentsListModalLabel">
+                <i class="bi bi-chat-left-text"></i> <span data-i18n="modal.commentsList.title">Liste des commentaires</span>
+              </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="commentsListBody">
+              <!-- Content will be populated by JavaScript -->
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="btn.close">Fermer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Beta Warning Modal for Contextualization -->
       <div class="modal fade" id="betaContextModal" tabindex="-1" aria-labelledby="betaContextModalLabel"
         aria-hidden="true">
@@ -1777,6 +1832,9 @@
         "history.resolution": "Résolution :",
         "history.custom": "Personnalisée",
         "history.addContext": "Ajouter contextualisation",
+        "history.commentsList": "Liste des commentaires",
+        "modal.commentsList.title": "Liste des commentaires",
+        "modal.commentsList.empty": "Aucun commentaire disponible pour ce capteur.",
         "btn.comments": "Commentaires",
         "btn.humidity": "Humidité",
         "nebuleair.title": "Connecter un NebuleAir — Extérieur",
@@ -1826,6 +1884,10 @@
         "modal.context.industrial": "Industriel",
         "modal.context.traffic": "Trafic",
         "modal.context.neighbourhood": "Voisinage",
+        "modal.context.cleaning": "Ménage",
+        "modal.context.cooking": "Cuisson",
+        "modal.context.meeting": "Réunion",
+        "modal.context.other": "Divers",
         "modal.context.comments": "Commentaires",
         "modal.context.commentsPlaceholder": "Décrivez le contexte...",
         "modal.context.user": "Utilisateur",
@@ -1885,6 +1947,10 @@
         "contextDetails.industrial": "Activité industrielle",
         "contextDetails.traffic": "Trafic routier",
         "contextDetails.neighbourhood": "Activité de voisinage",
+        "contextDetails.cleaning": "Ménage",
+        "contextDetails.cooking": "Cuisson",
+        "contextDetails.meeting": "Réunion",
+        "contextDetails.other": "Divers",
         "ai.title": "Analyse des données par IA",
         "ai.generate": "Générer une analyse",
         "ai.description": "Analyse contextuelle des mesures des 3 derniers jours par intelligence artificielle locale.",
@@ -1924,6 +1990,9 @@
         "history.resolution": "Resolution:",
         "history.custom": "Custom",
         "history.addContext": "Add context",
+        "history.commentsList": "Comments list",
+        "modal.commentsList.title": "Comments list",
+        "modal.commentsList.empty": "No comments available for this sensor.",
         "btn.comments": "Comments",
         "btn.humidity": "Humidity",
         "nebuleair.title": "Connect a NebuleAir — Outdoor",
@@ -1973,6 +2042,10 @@
         "modal.context.industrial": "Industrial",
         "modal.context.traffic": "Traffic",
         "modal.context.neighbourhood": "Neighbourhood",
+        "modal.context.cleaning": "Cleaning",
+        "modal.context.cooking": "Cooking",
+        "modal.context.meeting": "Meeting",
+        "modal.context.other": "Other",
         "modal.context.comments": "Comments",
         "modal.context.commentsPlaceholder": "Describe the context...",
         "modal.context.user": "User",
@@ -2032,6 +2105,10 @@
         "contextDetails.industrial": "Industrial activity",
         "contextDetails.traffic": "Road traffic",
         "contextDetails.neighbourhood": "Neighbourhood activity",
+        "contextDetails.cleaning": "Cleaning",
+        "contextDetails.cooking": "Cooking",
+        "contextDetails.meeting": "Meeting",
+        "contextDetails.other": "Other",
         "ai.title": "AI Data Analysis",
         "ai.generate": "Generate analysis",
         "ai.description": "Contextual analysis of the last 3 days of measurements using local artificial intelligence.",
@@ -2071,6 +2148,9 @@
         "history.resolution": "Risoluzione:",
         "history.custom": "Personalizzato",
         "history.addContext": "Aggiungi contestualizzazione",
+        "history.commentsList": "Elenco dei commenti",
+        "modal.commentsList.title": "Elenco dei commenti",
+        "modal.commentsList.empty": "Nessun commento disponibile per questo sensore.",
         "btn.comments": "Commenti",
         "btn.humidity": "Umidità",
         "nebuleair.title": "Collegare un NebuleAir — Esterno",
@@ -2120,6 +2200,10 @@
         "modal.context.industrial": "Industriale",
         "modal.context.traffic": "Traffico",
         "modal.context.neighbourhood": "Vicinato",
+        "modal.context.cleaning": "Pulizie",
+        "modal.context.cooking": "Cottura",
+        "modal.context.meeting": "Riunione",
+        "modal.context.other": "Varie",
         "modal.context.comments": "Commenti",
         "modal.context.commentsPlaceholder": "Descrivi il contesto...",
         "modal.context.user": "Utente",
@@ -2179,6 +2263,10 @@
         "contextDetails.industrial": "Attività industriale",
         "contextDetails.traffic": "Traffico stradale",
         "contextDetails.neighbourhood": "Attività di vicinato",
+        "contextDetails.cleaning": "Pulizie",
+        "contextDetails.cooking": "Cottura",
+        "contextDetails.meeting": "Riunione",
+        "contextDetails.other": "Varie",
         "ai.title": "Analisi dei dati con IA",
         "ai.generate": "Genera analisi",
         "ai.description": "Analisi contestuale delle misure degli ultimi 3 giorni tramite intelligenza artificiale locale.",
@@ -4095,7 +4183,11 @@
         fire: { color: am5.color(0xff6b6b), logo: 'fire-flat.svg' },
         industrial: { color: am5.color(0x95a5a6), logo: 'industrial-flat.svg' },
         traffic: { color: am5.color(0xf39c12), logo: 'traffic-flat.svg' },
-        neighbourhood: { color: am5.color(0x3498db), logo: 'neighbourhood-flat.svg' }
+        neighbourhood: { color: am5.color(0x3498db), logo: 'neighbourhood-flat.svg' },
+        cleaning: { color: am5.color(0x2ecc71), logo: '' },
+        cooking: { color: am5.color(0xe67e22), logo: '' },
+        meeting: { color: am5.color(0x9b59b6), logo: '' },
+        other: { color: am5.color(0x7f8c8d), logo: '' }
       };
 
       // Prepare data for context markers
@@ -4200,23 +4292,39 @@
             })
           );
 
-          // Logo image - try using SVG directly instead of Picture
-          // Debug: log the URL being used
-          console.log('Loading logo from:', dataContext.logoUrl);
+          // Type icon as emoji label (reliable, matches detail modal icons)
+          const typeEmojis = {
+            fire: '🔥',
+            industrial: '🏭',
+            traffic: '🚗',
+            neighbourhood: '🏘️',
+            cleaning: '🧹',
+            cooking: '🍳',
+            meeting: '👥',
+            other: '📝'
+          };
 
           container.children.push(
-            am5.Picture.new(root, {
+            am5.Label.new(root, {
+              text: typeEmojis[dataContext.contextType] || '📍',
               centerX: am5.p50,
               centerY: am5.p50,
-              width: 24,
-              height: 24,
-              src: dataContext.logoUrl,
-              shadowColor: am5.color(0x000000),
-              shadowBlur: 0
+              fontSize: 20,
+              populateText: false
             })
           );
 
-          // Add click event
+          // Prevent the chart cursor from zooming when interacting with the
+          // marker: disable zoom while hovering, restore on leave.
+          const cursor = chart.get("cursor");
+          container.events.on("pointerover", function () {
+            if (cursor) cursor.set("behavior", "none");
+          });
+          container.events.on("pointerout", function () {
+            if (cursor) cursor.set("behavior", "zoomX");
+          });
+
+          // Add click event — show context detail modal only
           container.events.on("click", function () {
             showContextDetails(dataContext.contextData);
           });
@@ -4244,14 +4352,22 @@
         fire: t('contextDetails.fire'),
         industrial: t('contextDetails.industrial'),
         traffic: t('contextDetails.traffic'),
-        neighbourhood: t('contextDetails.neighbourhood')
+        neighbourhood: t('contextDetails.neighbourhood'),
+        cleaning: t('contextDetails.cleaning'),
+        cooking: t('contextDetails.cooking'),
+        meeting: t('contextDetails.meeting'),
+        other: t('contextDetails.other')
       };
 
       const typeIcons = {
         fire: '🔥',
         industrial: '🏭',
         traffic: '🚗',
-        neighbourhood: '🏘️'
+        neighbourhood: '🏘️',
+        cleaning: '🧹',
+        cooking: '🍳',
+        meeting: '👥',
+        other: '📝'
       };
 
       const typeLabel = typeLabels[context.context_type] || context.context_type || t('contextDetails.typeUnknown');
@@ -4297,16 +4413,29 @@
 
       if (!confirm(t('modal.deleteConfirm'))) return;
 
-      const contextId = currentContextDetails._id || currentContextDetails.id;
-      if (!contextId) {
-        console.error('No context ID found for deletion');
+      // The context table has no id column, so identify the row by its fields
+      // (exactly as returned by get_context).
+      const c = currentContextDetails;
+      const payload = {
+        capteur_id: c.capteur_id || moduleair,
+        datetime_start: c.datetime_start,
+        datetime_stop: c.datetime_stop,
+        context_type: (c.context_type !== undefined ? c.context_type : null),
+        user: (c.user !== undefined ? c.user : null),
+        comments: (c.comments !== undefined ? c.comments : null)
+      };
+
+      if (!payload.datetime_start || !payload.datetime_stop) {
+        console.error('Cannot delete context: missing dates', c);
         openToast(t('toast.contextDeleteError'));
         return;
       }
 
       $.ajax({
         method: 'DELETE',
-        url: 'https://api.aircarto.fr/context/delete_context?id=' + contextId
+        url: 'https://api.aircarto.fr/context/delete_context',
+        contentType: 'application/json',
+        data: JSON.stringify(payload)
       })
         .done(function (response) {
           console.log('Context deleted successfully:', response);
@@ -4326,6 +4455,74 @@
           console.error('Response:', xhr.responseText);
           openToast(t('toast.contextDeleteError'));
         });
+    }
+
+    // Escape HTML to safely render user-provided text
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    // Show/hide the "Liste des commentaires" button based on available contexts
+    function updateCommentsButtonVisibility() {
+      const btn = document.getElementById('btnCommentsList');
+      if (!btn) return;
+      btn.style.display = (contextsData && contextsData.length > 0) ? '' : 'none';
+    }
+
+    // Open a modal listing all contexts/comments available for the sensor
+    function openCommentsList() {
+      const body = document.getElementById('commentsListBody');
+      if (!body) return;
+
+      const typeLabels = {
+        fire: t('contextDetails.fire'),
+        industrial: t('contextDetails.industrial'),
+        traffic: t('contextDetails.traffic'),
+        neighbourhood: t('contextDetails.neighbourhood'),
+        cleaning: t('contextDetails.cleaning'),
+        cooking: t('contextDetails.cooking'),
+        meeting: t('contextDetails.meeting'),
+        other: t('contextDetails.other')
+      };
+      const typeIcons = { fire: '🔥', industrial: '🏭', traffic: '🚗', neighbourhood: '🏘️', cleaning: '🧹', cooking: '🍳', meeting: '👥', other: '📝' };
+      const dateLang = currentLang === 'fr' ? 'fr-FR' : (currentLang === 'it' ? 'it-IT' : 'en-GB');
+
+      if (!contextsData || contextsData.length === 0) {
+        body.innerHTML = '<p class="text-muted mb-0">' + t('modal.commentsList.empty') + '</p>';
+      } else {
+        // Most recent first
+        const sorted = contextsData.slice().sort(function (a, b) {
+          return new Date(b.datetime_start).getTime() - new Date(a.datetime_start).getTime();
+        });
+
+        let html = '<div class="list-group">';
+        sorted.forEach(function (c) {
+          const typeLabel = typeLabels[c.context_type] || c.context_type || t('contextDetails.typeUnknown');
+          const typeIcon = typeIcons[c.context_type] || '📍';
+          const startStr = new Date(c.datetime_start).toLocaleString(dateLang, { dateStyle: 'medium', timeStyle: 'short' });
+          const endStr = new Date(c.datetime_stop).toLocaleString(dateLang, { dateStyle: 'medium', timeStyle: 'short' });
+
+          html += '<div class="list-group-item">' +
+            '<div class="d-flex justify-content-between align-items-start">' +
+            '<h6 class="mb-1">' + typeIcon + ' ' + escapeHtml(typeLabel) + '</h6>' +
+            (c.user ? '<small class="text-muted"><i class="bi bi-person"></i> ' + escapeHtml(c.user) + '</small>' : '') +
+            '</div>' +
+            '<div class="small text-muted mb-1"><i class="bi bi-calendar-event"></i> ' + startStr + ' → ' + endStr + '</div>' +
+            (c.comments ? '<div class="small">' + escapeHtml(c.comments) + '</div>' : '') +
+            '</div>';
+        });
+        html += '</div>';
+        body.innerHTML = html;
+      }
+
+      const modal = new bootstrap.Modal(document.getElementById('commentsListModal'));
+      modal.show();
     }
 
     // Apply visibility based on toggle states
@@ -4786,11 +4983,13 @@
         .done(function (data) {
           console.log('Contexts fetched successfully:', data);
           contextsData = data || [];
+          updateCommentsButtonVisibility();
           if (callback) callback(contextsData);
         })
         .fail(function (xhr, status, error) {
           console.error('Error fetching contexts:', error);
           contextsData = [];
+          updateCommentsButtonVisibility();
           if (callback) callback([]);
         });
     }
