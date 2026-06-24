@@ -978,7 +978,7 @@
 
     .context-type-grid-inline {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 6px;
       flex-shrink: 0;
     }
@@ -1450,6 +1450,10 @@
                             <span class="context-emoji">👥</span>
                             <span data-i18n="modal.context.meeting">Réunion</span>
                           </div>
+                          <div class="context-type-option" data-type="fault" onclick="selectContextType('fault')">
+                            <span class="context-emoji">⚠️</span>
+                            <span data-i18n="modal.context.fault">Défaut capteur</span>
+                          </div>
                           <div class="context-type-option" data-type="other" onclick="selectContextType('other')">
                             <span class="context-emoji">📝</span>
                             <span data-i18n="modal.context.other">Divers</span>
@@ -1887,6 +1891,7 @@
         "modal.context.cleaning": "Ménage",
         "modal.context.cooking": "Cuisson",
         "modal.context.meeting": "Réunion",
+        "modal.context.fault": "Défaut capteur",
         "modal.context.other": "Divers",
         "modal.context.comments": "Commentaires",
         "modal.context.commentsPlaceholder": "Décrivez le contexte...",
@@ -1950,6 +1955,7 @@
         "contextDetails.cleaning": "Ménage",
         "contextDetails.cooking": "Cuisson",
         "contextDetails.meeting": "Réunion",
+        "contextDetails.fault": "Défaut capteur",
         "contextDetails.other": "Divers",
         "ai.title": "Analyse des données par IA",
         "ai.generate": "Générer une analyse",
@@ -2045,6 +2051,7 @@
         "modal.context.cleaning": "Cleaning",
         "modal.context.cooking": "Cooking",
         "modal.context.meeting": "Meeting",
+        "modal.context.fault": "Sensor fault",
         "modal.context.other": "Other",
         "modal.context.comments": "Comments",
         "modal.context.commentsPlaceholder": "Describe the context...",
@@ -2108,6 +2115,7 @@
         "contextDetails.cleaning": "Cleaning",
         "contextDetails.cooking": "Cooking",
         "contextDetails.meeting": "Meeting",
+        "contextDetails.fault": "Sensor fault",
         "contextDetails.other": "Other",
         "ai.title": "AI Data Analysis",
         "ai.generate": "Generate analysis",
@@ -2203,6 +2211,7 @@
         "modal.context.cleaning": "Pulizie",
         "modal.context.cooking": "Cottura",
         "modal.context.meeting": "Riunione",
+        "modal.context.fault": "Guasto sensore",
         "modal.context.other": "Varie",
         "modal.context.comments": "Commenti",
         "modal.context.commentsPlaceholder": "Descrivi il contesto...",
@@ -2266,6 +2275,7 @@
         "contextDetails.cleaning": "Pulizie",
         "contextDetails.cooking": "Cottura",
         "contextDetails.meeting": "Riunione",
+        "contextDetails.fault": "Guasto sensore",
         "contextDetails.other": "Varie",
         "ai.title": "Analisi dei dati con IA",
         "ai.generate": "Genera analisi",
@@ -4187,6 +4197,7 @@
         cleaning: { color: am5.color(0x2ecc71), logo: '' },
         cooking: { color: am5.color(0xe67e22), logo: '' },
         meeting: { color: am5.color(0x9b59b6), logo: '' },
+        fault: { color: am5.color(0xe74c3c), logo: '' },
         other: { color: am5.color(0x7f8c8d), logo: '' }
       };
 
@@ -4301,6 +4312,7 @@
             cleaning: '🧹',
             cooking: '🍳',
             meeting: '👥',
+            fault: '⚠️',
             other: '📝'
           };
 
@@ -4356,6 +4368,7 @@
         cleaning: t('contextDetails.cleaning'),
         cooking: t('contextDetails.cooking'),
         meeting: t('contextDetails.meeting'),
+        fault: t('contextDetails.fault'),
         other: t('contextDetails.other')
       };
 
@@ -4367,6 +4380,7 @@
         cleaning: '🧹',
         cooking: '🍳',
         meeting: '👥',
+        fault: '⚠️',
         other: '📝'
       };
 
@@ -4488,9 +4502,10 @@
         cleaning: t('contextDetails.cleaning'),
         cooking: t('contextDetails.cooking'),
         meeting: t('contextDetails.meeting'),
+        fault: t('contextDetails.fault'),
         other: t('contextDetails.other')
       };
-      const typeIcons = { fire: '🔥', industrial: '🏭', traffic: '🚗', neighbourhood: '🏘️', cleaning: '🧹', cooking: '🍳', meeting: '👥', other: '📝' };
+      const typeIcons = { fire: '🔥', industrial: '🏭', traffic: '🚗', neighbourhood: '🏘️', cleaning: '🧹', cooking: '🍳', meeting: '👥', fault: '⚠️', other: '📝' };
       const dateLang = currentLang === 'fr' ? 'fr-FR' : (currentLang === 'it' ? 'it-IT' : 'en-GB');
 
       if (!contextsData || contextsData.length === 0) {
