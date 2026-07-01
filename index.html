@@ -4372,7 +4372,7 @@
     let currentContextDetails = null;
 
     // Show context details in a Bootstrap modal
-    function showContextDetails(context) {
+    function renderContextDetailsBody(context) {
       currentContextDetails = context;
       const startDate = new Date(context.datetime_start);
       const endDate = new Date(context.datetime_stop);
@@ -4421,10 +4421,7 @@
         '</div>' +
         '<div class="mb-2">' +
         '<strong><i class="bi bi-chat-left-text"></i> ' + t('contextDetails.comments') + '</strong><br>' +
-        '<span class="text-muted" id="ctxCommentDisplay">' + (context.comments ? escapeHtml(context.comments) : '<em>—</em>') + '</span>' +
-        '<div id="ctxCommentEditWrap" class="d-none mt-1">' +
-        '<textarea class="form-control form-control-sm" id="ctxCommentEdit" rows="3"></textarea>' +
-        '</div>' +
+        '<span class="text-muted">' + (context.comments ? escapeHtml(context.comments) : '<em>—</em>') + '</span>' +
         '</div>' +
         (context.user ? '<div class="mb-2"><strong><i class="bi bi-person"></i> ' + t('contextDetails.user') + '</strong><br><span class="text-muted">' + escapeHtml(context.user) + '</span></div>' : '') +
         '</div>';
@@ -4432,14 +4429,13 @@
       // Update modal content
       document.getElementById('contextDetailsBody').innerHTML = modalContent;
 
-      // Prefill the (hidden) edit textarea and reset edit state to read-only
-      document.getElementById('ctxCommentEdit').value = context.comments || '';
-      document.getElementById('ctxCommentEditWrap').classList.add('d-none');
-      document.getElementById('ctxCommentDisplay').classList.remove('d-none');
+      // Réinitialise l'état des boutons de pied de modale (mode lecture)
       var _btnEdit = document.getElementById('btnEditContext');
       var _btnSaveEdit = document.getElementById('btnSaveContextEdit');
+      var _btnDel = document.getElementById('btnDeleteContext');
       if (_btnEdit) _btnEdit.classList.remove('d-none');
       if (_btnSaveEdit) _btnSaveEdit.classList.add('d-none');
+      if (_btnDel) _btnDel.classList.remove('d-none');
 
       // Apply i18n to delete button
       document.querySelectorAll('#contextDetailsModal [data-i18n]').forEach(function(el) {
@@ -4448,67 +4444,36 @@
         if (translation !== key) el.innerHTML = translation;
       });
 
-      // Show the modal
+    }
+
+    // Ouvre la modale détails (rendu + affichage)
+    function showContextDetails(context) {
+      renderContextDetailsBody(context);
       const detailsModal = new bootstrap.Modal(document.getElementById('contextDetailsModal'));
       detailsModal.show();
     }
 
-    // Switch the comment to edit mode in the details modal
+    // Passe la modale détails en édition unifiée (commentaire + auteur + dates)
     function enableContextEdit() {
-      document.getElementById('ctxCommentDisplay').classList.add('d-none');
-      document.getElementById('ctxCommentEditWrap').classList.remove('d-none');
-      document.getElementById('btnEditContext').classList.add('d-none');
-      document.getElementById('btnSaveContextEdit').classList.remove('d-none');
-      document.getElementById('ctxCommentEdit').focus();
+      if (!currentContextDetails) return;
+      const body = document.getElementById('contextDetailsBody');
+      if (!body) return;
+      body.innerHTML = buildContextEditFormHtml(currentContextDetails.id, 'modal');
+      fillContextEditForm(body, currentContextDetails);
+      // Boutons de pied de modale masqués pendant l'édition (Save/Cancel sont dans le formulaire)
+      const bEdit = document.getElementById('btnEditContext');
+      const bDel = document.getElementById('btnDeleteContext');
+      const bSave = document.getElementById('btnSaveContextEdit');
+      if (bEdit) bEdit.classList.add('d-none');
+      if (bDel) bDel.classList.add('d-none');
+      if (bSave) bSave.classList.add('d-none');
+      const cm = body.querySelector('.ctx-edit-comment');
+      if (cm) cm.focus();
     }
 
-    // Save the edited comment for the currently displayed context
+    // Conservé pour le bouton de pied de modale : délègue à l'édition unifiée
     function saveContextEdit() {
-      if (!currentContextDetails) return;
-      const c = currentContextDetails;
-      const newComment = document.getElementById('ctxCommentEdit').value;
-
-      if (!c.datetime_start || !c.datetime_stop) {
-        console.error('Cannot update context: missing dates', c);
-        openToast(t('toast.contextUpdateError'));
-        return;
-      }
-
-      const payload = {
-        capteur_id: c.capteur_id || moduleair,
-        datetime_start: c.datetime_start,
-        datetime_stop: c.datetime_stop,
-        context_type: (c.context_type !== undefined ? c.context_type : null),
-        user: (c.user !== undefined ? c.user : null),
-        comments: (c.comments !== undefined ? c.comments : null),
-        new_comments: newComment
-      };
-
-      $.ajax({
-        method: 'PUT',
-        url: 'https://api.aircarto.fr/context/update_context',
-        contentType: 'application/json',
-        data: JSON.stringify(payload)
-      })
-        .done(function (response) {
-          console.log('Context updated successfully:', response);
-          // Reflect locally so further edits match the new value
-          c.comments = newComment;
-          const disp = document.getElementById('ctxCommentDisplay');
-          if (disp) disp.innerHTML = newComment ? escapeHtml(newComment) : '<em>—</em>';
-          document.getElementById('ctxCommentEditWrap').classList.add('d-none');
-          disp.classList.remove('d-none');
-          document.getElementById('btnEditContext').classList.remove('d-none');
-          document.getElementById('btnSaveContextEdit').classList.add('d-none');
-          openToast(t('toast.contextUpdated'));
-          // Refresh chart so markers/list reflect the change
-          reloadDataSensor(timeLengthGraph, timespanGraph);
-        })
-        .fail(function (xhr, status, error) {
-          console.error('Error updating context:', error);
-          console.error('Response:', xhr.responseText);
-          openToast(t('toast.contextUpdateError'));
-        });
+      if (currentContextDetails) saveUnifiedEdit(currentContextDetails.id, 'modal');
     }
 
     // Delete the currently displayed context
@@ -4579,8 +4544,8 @@
       btn.style.display = (contextsData && contextsData.length > 0) ? '' : 'none';
     }
 
-    // Open a modal listing all contexts/comments available for the sensor
-    function openCommentsList() {
+    // Remplit le corps de la modale liste depuis contextsData (sans l'ouvrir)
+    function renderCommentsListBody() {
       const body = document.getElementById('commentsListBody');
       if (!body) return;
 
@@ -4613,21 +4578,206 @@
           const startStr = new Date(c.datetime_start).toLocaleString(dateLang, { dateStyle: 'medium', timeStyle: 'short' });
           const endStr = new Date(c.datetime_stop).toLocaleString(dateLang, { dateStyle: 'medium', timeStyle: 'short' });
 
-          html += '<div class="list-group-item">' +
+          const hasId = (c.id !== undefined && c.id !== null);
+          html += '<div class="list-group-item" id="comment-item-' + (hasId ? c.id : 'x') + '">' +
             '<div class="d-flex justify-content-between align-items-start">' +
             '<h6 class="mb-1">' + typeIcon + ' ' + escapeHtml(typeLabel) + '</h6>' +
+            '<div class="d-flex align-items-center gap-2">' +
             (c.user ? '<small class="text-muted"><i class="bi bi-person"></i> ' + escapeHtml(c.user) + '</small>' : '') +
+            (hasId ? '<span class="text-muted" style="font-size:0.7rem;" title="ID">#' + c.id + '</span>' : '') +
+            '</div>' +
             '</div>' +
             '<div class="small text-muted mb-1"><i class="bi bi-calendar-event"></i> ' + startStr + ' → ' + endStr + '</div>' +
-            (c.comments ? '<div class="small">' + escapeHtml(c.comments) + '</div>' : '') +
+            '<div class="comment-text small">' + (c.comments ? escapeHtml(c.comments) : '<em>—</em>') + '</div>' +
+            (hasId ?
+            '<div class="comment-actions mt-1 d-flex gap-2">' +
+            '<button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="startEditCommentInList(' + c.id + ')" title="' + t('btn.edit') + '"><i class="bi bi-pencil"></i></button>' +
+            '<button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="deleteCommentFromList(' + c.id + ')" title="' + t('btn.delete') + '"><i class="bi bi-trash"></i></button>' +
+            '</div>' : '') +
             '</div>';
         });
         html += '</div>';
         body.innerHTML = html;
       }
+    }
 
+    // Ouvre la modale liste des commentaires
+    function openCommentsList() {
+      renderCommentsListBody();
       const modal = new bootstrap.Modal(document.getElementById('commentsListModal'));
       modal.show();
+    }
+
+    // Retrouve un contexte chargé par son id unique (renvoyé par get_context)
+    function findContextById(id) {
+      return (contextsData || []).find(function (c) { return String(c.id) === String(id); });
+    }
+
+    // ── Édition unifiée (modale détails + liste) : commentaire, auteur, dates ──
+
+    // ISO UTC ("2026-01-22T13:33:43Z") -> valeur d'un <input datetime-local> (heure locale)
+    function utcIsoToLocalInput(iso) {
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return '';
+      const p = function (n) { return String(n).padStart(2, '0'); };
+      return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) +
+        'T' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+    }
+
+    // Valeur d'un <input datetime-local> (heure locale) -> ISO UTC "…:SSZ" pour l'API
+    function localInputToUtcIso(v) {
+      if (!v) return null;
+      const d = new Date(v);
+      if (isNaN(d.getTime())) return null;
+      return d.toISOString().replace(/\.\d{3}Z$/, 'Z');
+    }
+
+    // Formulaire d'édition partagé (mode = 'modal' | 'list') : commentaire, auteur, dates
+    function buildContextEditFormHtml(id, mode) {
+      return '' +
+        '<div class="ctx-edit-form">' +
+        '<label class="form-label small mb-1">' + t('contextDetails.comments') + '</label>' +
+        '<textarea class="form-control form-control-sm mb-2 ctx-edit-comment" rows="3"></textarea>' +
+        '<label class="form-label small mb-1">' + t('contextDetails.user') + '</label>' +
+        '<input type="text" maxlength="100" class="form-control form-control-sm mb-2 ctx-edit-user">' +
+        '<div class="row g-2 mb-2">' +
+        '<div class="col-6"><label class="form-label small mb-1">' + t('contextDetails.start') + '</label>' +
+        '<input type="datetime-local" step="1" class="form-control form-control-sm ctx-edit-start"></div>' +
+        '<div class="col-6"><label class="form-label small mb-1">' + t('contextDetails.end') + '</label>' +
+        '<input type="datetime-local" step="1" class="form-control form-control-sm ctx-edit-end"></div>' +
+        '</div>' +
+        '<div class="d-flex gap-2">' +
+        '<button type="button" class="btn btn-sm btn-primary py-0 px-2" onclick="saveUnifiedEdit(' + id + ', \'' + mode + '\')"><i class="bi bi-check-lg"></i> ' + t('btn.save') + '</button>' +
+        '<button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="cancelUnifiedEdit(' + id + ', \'' + mode + '\')"><i class="bi bi-x-lg"></i></button>' +
+        '</div>' +
+        '</div>';
+    }
+
+    // Pré-remplit un formulaire d'édition (via .value pour éviter les soucis d'échappement)
+    function fillContextEditForm(container, c) {
+      if (!container) return;
+      const cm = container.querySelector('.ctx-edit-comment');
+      const us = container.querySelector('.ctx-edit-user');
+      const st = container.querySelector('.ctx-edit-start');
+      const en = container.querySelector('.ctx-edit-end');
+      if (cm) cm.value = c.comments || '';
+      if (us) us.value = c.user || '';
+      if (st) st.value = utcIsoToLocalInput(c.datetime_start);
+      if (en) en.value = utcIsoToLocalInput(c.datetime_stop);
+    }
+
+    // Lit les valeurs d'un formulaire (dates converties en UTC pour l'API).
+    // Les dates vides sont omises (on ne les met pas à jour) plutôt qu'envoyées à null.
+    function collectContextEdit(container) {
+      const values = {
+        new_comments: container.querySelector('.ctx-edit-comment').value,
+        user: container.querySelector('.ctx-edit-user').value
+      };
+      const s = localInputToUtcIso(container.querySelector('.ctx-edit-start').value);
+      const e = localInputToUtcIso(container.querySelector('.ctx-edit-end').value);
+      if (s) values.datetime_start = s;
+      if (e) values.datetime_stop = e;
+      return values;
+    }
+
+    function submitContextEdit(id, values) {
+      return $.ajax({
+        method: 'PUT',
+        url: 'https://api.aircarto.fr/context/update_context',
+        contentType: 'application/json',
+        data: JSON.stringify(Object.assign({ id: id }, values))
+      });
+    }
+
+    // Applique localement les valeurs éditées à un objet contexte (champs fournis uniquement)
+    function applyEditValues(c, values) {
+      if (!c) return;
+      if (values.new_comments !== undefined) c.comments = values.new_comments;
+      if (values.user !== undefined) c.user = values.user;
+      if (values.datetime_start !== undefined) c.datetime_start = values.datetime_start;
+      if (values.datetime_stop !== undefined) c.datetime_stop = values.datetime_stop;
+    }
+
+    function reloadCurrentContextChart() {
+      reloadDataSensor(timeLengthGraph, timespanGraph);
+    }
+
+    // Conteneur portant le formulaire selon le contexte d'édition
+    function getEditContainer(id, mode) {
+      return mode === 'modal'
+        ? document.getElementById('contextDetailsBody')
+        : document.getElementById('comment-item-' + id);
+    }
+
+    // Passe un item de la liste en édition unifiée
+    function startEditCommentInList(id) {
+      const item = document.getElementById('comment-item-' + id);
+      const c = findContextById(id);
+      if (!item || !c) return;
+      const textDiv = item.querySelector('.comment-text');
+      const actions = item.querySelector('.comment-actions');
+      if (!textDiv) return;
+      textDiv.innerHTML = buildContextEditFormHtml(id, 'list');
+      fillContextEditForm(textDiv, c);
+      if (actions) actions.classList.add('d-none');
+      const cm = textDiv.querySelector('.ctx-edit-comment');
+      if (cm) cm.focus();
+    }
+
+    // Enregistre l'édition unifiée (commentaire + auteur + dates) en ciblant par id
+    function saveUnifiedEdit(id, mode) {
+      const container = getEditContainer(id, mode);
+      if (!container) return;
+      const values = collectContextEdit(container);
+      submitContextEdit(id, values)
+        .done(function () {
+          applyEditValues(findContextById(id), values);
+          if (currentContextDetails && String(currentContextDetails.id) === String(id)) {
+            applyEditValues(currentContextDetails, values);
+          }
+          openToast(t('toast.contextUpdated'));
+          if (mode === 'modal') {
+            if (currentContextDetails) renderContextDetailsBody(currentContextDetails);
+          } else {
+            renderCommentsListBody();
+          }
+          reloadCurrentContextChart();
+        })
+        .fail(function (xhr, status, error) {
+          console.error('Error updating context:', error, xhr.responseText);
+          openToast(t('toast.contextUpdateError'));
+        });
+    }
+
+    // Annule l'édition unifiée et revient à l'affichage
+    function cancelUnifiedEdit(id, mode) {
+      if (mode === 'modal') {
+        if (currentContextDetails) renderContextDetailsBody(currentContextDetails);
+      } else {
+        renderCommentsListBody();
+      }
+    }
+
+    // Supprime un commentaire directement depuis la liste, ciblé par son id unique
+    function deleteCommentFromList(id) {
+      if (!confirm(t('modal.deleteConfirm'))) return;
+      $.ajax({
+        method: 'DELETE',
+        url: 'https://api.aircarto.fr/context/delete_context',
+        contentType: 'application/json',
+        data: JSON.stringify({ id: id })
+      })
+        .done(function () {
+          contextsData = (contextsData || []).filter(function (c) { return String(c.id) !== String(id); });
+          renderCommentsListBody();
+          updateCommentsButtonVisibility();
+          openToast(t('toast.contextDeleted'));
+          reloadCurrentContextChart();
+        })
+        .fail(function (xhr, status, error) {
+          console.error('Error deleting context:', error, xhr.responseText);
+          openToast(t('toast.contextDeleteError'));
+        });
     }
 
     // Apply visibility based on toggle states
