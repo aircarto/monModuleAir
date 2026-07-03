@@ -723,6 +723,37 @@
       cursor: crosshair;
     }
 
+    /* Mini popup discret : confirmation de mise à jour auto des données */
+    .data-update-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(45, 106, 79, 0.95);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .data-update-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .data-update-toast .bi {
+      font-size: 15px;
+    }
+
     /* Custom period modal */
     #customPeriodModal .modal-dialog {
       max-width: 500px;
@@ -1210,6 +1241,12 @@
         </button>
       </div>
     </div>
+  </div>
+
+  <!-- Mini popup discret : confirmation de mise à jour auto des données (auto-disparition) -->
+  <div id="dataUpdateToast" class="data-update-toast" role="status" aria-live="polite">
+    <i class="bi bi-check-circle-fill"></i>
+    <span id="dataUpdateToastText" data-i18n="toast.dataUpdated">Données mises à jour</span>
   </div>
 
   <div class="container">
@@ -1915,6 +1952,7 @@
         "btn.apply": "Appliquer",
         "toast.noNebuleairData": "Pas de donnée NebuleAir sur cet intervalle.",
         "toast.noData": "Pas de donnée sur cet intervalle. Veuillez choisir une période plus longue.",
+        "toast.dataUpdated": "Données mises à jour",
         "toast.addressChanged": "Adresse modifiée.",
         "toast.addressError": "Erreur pour le changement de localisation.",
         "toast.roomChanged": "Pièce changée.",
@@ -2078,6 +2116,7 @@
         "btn.apply": "Apply",
         "toast.noNebuleairData": "No NebuleAir data for this interval.",
         "toast.noData": "No data for this interval. Please choose a longer period.",
+        "toast.dataUpdated": "Data updated",
         "toast.addressChanged": "Address updated.",
         "toast.addressError": "Error changing location.",
         "toast.roomChanged": "Room changed.",
@@ -2241,6 +2280,7 @@
         "btn.apply": "Applica",
         "toast.noNebuleairData": "Nessun dato NebuleAir per questo intervallo.",
         "toast.noData": "Nessun dato per questo intervallo. Scegliere un periodo più lungo.",
+        "toast.dataUpdated": "Dati aggiornati",
         "toast.addressChanged": "Indirizzo modificato.",
         "toast.addressError": "Errore nella modifica della posizione.",
         "toast.roomChanged": "Stanza cambiata.",
@@ -2523,11 +2563,28 @@
       setMapLockedState(false);
     }
 
-    setInterval(() => {
-      console.log("***RELOAD****");
-      //submit();
-      reloadDataSensor(timeLengthGraph, timespanGraph);
-    }, timespanGraph * 60000);
+    // Rafraîchissement automatique de la courbe.
+    // Timer auto-reprogrammé (setTimeout récursif) plutôt qu'un setInterval figé :
+    //  - la cadence suit le pas de temps COURANT (timespanGraph, en minutes) et non
+    //    la valeur capturée au chargement de la page -> fini le refresh toutes les
+    //    2 min quel que soit le pas de temps sélectionné.
+    //  - en période personnalisée, on saute le rechargement : la fenêtre est un
+    //    intervalle historique figé (aucune donnée nouvelle à afficher) et recharger
+    //    via reloadDataSensor réinitialiserait la période choisie par l'utilisateur.
+    var autoReloadTimer = null;
+    function scheduleAutoReload() {
+      if (autoReloadTimer) clearTimeout(autoReloadTimer);
+      autoReloadTimer = setTimeout(function () {
+        if (!isCustomPeriod) {
+          console.log("***RELOAD****");
+          // Mise à jour "en place" des données (préserve le zoom/déplacement) au lieu
+          // de reconstruire tout le graphique.
+          refreshUnifiedChartData();
+        }
+        scheduleAutoReload(); // reprogramme avec le pas de temps courant
+      }, Math.max(timespanGraph, 2) * 60000);
+    }
+    scheduleAutoReload();
 
     // Vérification du statut du capteur toutes les 2 minutes
     setInterval(() => {
@@ -5767,6 +5824,122 @@
         .fail(function () {
           console.log("Error while geting data from Aircarto API");
         });
+    }
+
+    // ========== AUTO-REFRESH (mise à jour des données sans reconstruire le graphique) ==========
+
+    // Met à jour les données des séries existantes "en place" (series.data.setAll)
+    // au lieu de recréer tout le graphique -> le zoom/déplacement de l'utilisateur est
+    // préservé. Retourne false si le graphique n'est pas prêt ou si la structure des
+    // séries ne correspond pas aux nouvelles données (ex : lien NebuleAir modifié) :
+    // l'appelant doit alors faire une reconstruction complète.
+    function updateUnifiedChartData(data1, data2) {
+      if (!allSeries || !allSeries.PM1_int) return false;
+
+      var hasExt = (data2 != null && data2 != undefined);
+      var seriesHasExt = !!allSeries.PM1_ext;
+      if (hasExt !== seriesHasExt) return false;
+
+      var mk = function (arr, key) {
+        return arr.map(function (e) {
+          return { value: e[key], date: new Date(e.time).getTime() };
+        });
+      };
+
+      allSeries.PM1_int.data.setAll(mk(data1, "PM1"));
+      allSeries.PM25_int.data.setAll(mk(data1, "PM25"));
+      allSeries.PM10_int.data.setAll(mk(data1, "PM10"));
+      allSeries.TEMP_int.data.setAll(mk(data1, "TEMP"));
+      allSeries.HUM_int.data.setAll(mk(data1, "HUM"));
+      allSeries.COV_int.data.setAll(mk(data1, "COV"));
+      allSeries.CO2_int.data.setAll(mk(data1, "CO2"));
+
+      if (hasExt) {
+        allSeries.PM1_ext.data.setAll(mk(data2, "PM1"));
+        allSeries.PM25_ext.data.setAll(mk(data2, "PM25"));
+        allSeries.PM10_ext.data.setAll(mk(data2, "PM10"));
+        allSeries.TEMP_ext.data.setAll(mk(data2, "TEMP"));
+        allSeries.HUM_ext.data.setAll(mk(data2, "HUM"));
+        allSeries.COV_ext.data.setAll(mk(data2, "COV"));
+      }
+
+      // Le capteur a pu (re)devenir disponible : garder l'état des boutons à jour
+      updatePollutantButtonsAvailability(data1);
+      return true;
+    }
+
+    // Rafraîchissement périodique : récupère les données du ModuleAir (+ NebuleAir si lié)
+    // et les injecte dans le graphique existant sans le reconstruire. En l'absence de
+    // graphique (ou si la structure a changé), retombe sur un chargement complet.
+    function refreshUnifiedChartData() {
+      if (!moduleair || !token) return;
+      if (rootUnified == undefined) {
+        reloadDataSensor(timeLengthGraph, timespanGraph);
+        return;
+      }
+
+      var end = new Date();
+      var end_string = end.toISOString();
+      var start = new Date(end.getTime() - timeLengthGraph * 3600 * 1000);
+      var start_string = start.toISOString();
+
+      var freq;
+      switch (timespanGraph) {
+        case 2: freq = "2m"; break;
+        case 15: freq = "15m"; break;
+        case 60: freq = "1h"; break;
+        case 1440: freq = "1d"; break;
+        default: freq = "2m";
+      }
+
+      var moduleReq = $.ajax({
+        method: "GET",
+        url: "https://api.aircarto.fr/capteurs/dataModuleAir?capteurID=" + moduleair +
+          "&start=" + start_string + "&end=" + end_string + "&freq=" + freq + "&token=" + token,
+      });
+
+      var nebuleReq = (nebuleair != null) ? $.ajax({
+        method: "GET",
+        url: "https://api.aircarto.fr/capteurs/dataNebuleAir?capteurID=" + nebuleair +
+          "&start=" + start_string + "&end=" + end_string + "&freq=" + freq,
+      }) : null;
+
+      $.when(moduleReq, nebuleReq).done(function (moduleRes, nebuleRes) {
+        // $.when passe [data, status, xhr] pour chaque requête ajax ; null pour une
+        // requête NebuleAir absente.
+        var moduleData = Array.isArray(moduleRes) ? moduleRes[0] : moduleRes;
+        var nebuleData = null;
+        if (nebuleair != null && nebuleRes) {
+          nebuleData = Array.isArray(nebuleRes) ? nebuleRes[0] : nebuleRes;
+          dataNebuleAir = nebuleData;
+        }
+
+        if (moduleData == null) return; // rien de neuf : on garde le graphique en place
+
+        var ok = updateUnifiedChartData(moduleData, nebuleData);
+        if (!ok) {
+          // Structure des séries modifiée -> reconstruction complète
+          reloadDataSensor(timeLengthGraph, timespanGraph);
+          return;
+        }
+        showDataUpdatedToast();
+      }).fail(function () {
+        console.log("Auto-refresh: error while getting data from Aircarto API");
+      });
+    }
+
+    // Mini popup discret qui apparaît puis disparaît tout seul (~2 s)
+    var dataUpdatedToastTimer = null;
+    function showDataUpdatedToast() {
+      var el = document.getElementById("dataUpdateToast");
+      if (!el) return;
+      var textEl = document.getElementById("dataUpdateToastText");
+      if (textEl) textEl.innerText = t("toast.dataUpdated");
+      el.classList.add("show");
+      if (dataUpdatedToastTimer) clearTimeout(dataUpdatedToastTimer);
+      dataUpdatedToastTimer = setTimeout(function () {
+        el.classList.remove("show");
+      }, 2000);
     }
 
     // ========== AI ANALYSIS ==========
