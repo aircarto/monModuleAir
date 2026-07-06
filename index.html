@@ -1123,6 +1123,46 @@
       font-size: 13px;
     }
 
+    .ai-prompt-details {
+      margin-top: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--card-background);
+    }
+
+    .ai-prompt-details > summary {
+      cursor: pointer;
+      padding: 8px 14px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      user-select: none;
+      list-style: none;
+    }
+
+    .ai-prompt-details > summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .ai-prompt-details > summary i {
+      margin-right: 4px;
+    }
+
+    .ai-prompt-details[open] > summary {
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .ai-prompt-content {
+      margin: 0;
+      padding: 12px 14px;
+      font-size: 11px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 400px;
+      overflow-y: auto;
+      color: var(--text-secondary);
+    }
+
     /* Toast personnalisé - style attention */
     #messageToast {
       background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
@@ -1553,6 +1593,12 @@
                   <span data-i18n="ai.loading">Analyse en cours, cela peut prendre quelques instants...</span>
                 </div>
                 <div id="aiAnalysisError" class="ai-analysis-error" style="display: none;"></div>
+                <details id="aiPromptDetails" class="ai-prompt-details" style="display: none;">
+                  <summary>
+                    <i class="bi bi-code-square"></i> <span data-i18n="ai.showPrompt">Voir les données envoyées à l'IA</span>
+                  </summary>
+                  <pre id="aiPromptContent" class="ai-prompt-content"></pre>
+                </details>
               </div>
             </div>
           </div>
@@ -2013,6 +2059,7 @@
         "ai.errorNoData": "Aucune donnée disponible pour l'analyse.",
         "ai.statsTime": "Analyse générée en {seconds}s",
         "ai.statsTokens": "{total} tokens ({prompt} prompt + {completion} réponse)",
+        "ai.showPrompt": "Voir les données envoyées à l'IA",
         "scroll.fillForm": "▼ Remplir le formulaire ci-dessous",
         "btn.delete": "Supprimer",
         "btn.edit": "Modifier",
@@ -2177,6 +2224,7 @@
         "ai.errorNoData": "No data available for analysis.",
         "ai.statsTime": "Analysis generated in {seconds}s",
         "ai.statsTokens": "{total} tokens ({prompt} prompt + {completion} response)",
+        "ai.showPrompt": "View the data sent to the AI",
         "scroll.fillForm": "▼ Fill in the form below",
         "btn.delete": "Delete",
         "btn.edit": "Edit",
@@ -2341,6 +2389,7 @@
         "ai.errorNoData": "Nessun dato disponibile per l'analisi.",
         "ai.statsTime": "Analisi generata in {seconds}s",
         "ai.statsTokens": "{total} token ({prompt} prompt + {completion} risposta)",
+        "ai.showPrompt": "Visualizza i dati inviati all'IA",
         "scroll.fillForm": "▼ Compila il modulo qui sotto",
         "btn.delete": "Elimina",
         "btn.edit": "Modifica",
@@ -5952,7 +6001,7 @@
       const errorDiv = document.getElementById('aiAnalysisError');
 
       // Apply i18n to the card
-      document.querySelectorAll('#aiAnalysisLoading [data-i18n], #aiAnalysisResult [data-i18n]').forEach(function(el) {
+      document.querySelectorAll('#aiAnalysisLoading [data-i18n], #aiAnalysisResult [data-i18n], #aiPromptDetails [data-i18n]').forEach(function(el) {
         const key = el.getAttribute('data-i18n');
         const translation = t(key);
         if (translation !== key) el.innerHTML = translation;
@@ -5963,6 +6012,8 @@
       loading.style.display = 'flex';
       result.style.display = 'none';
       errorDiv.style.display = 'none';
+      var promptDetails = document.getElementById('aiPromptDetails');
+      if (promptDetails) { promptDetails.style.display = 'none'; promptDetails.open = false; }
 
       // Fetch last 3 days of data (72h) at 1h resolution
       const end = new Date();
@@ -6004,26 +6055,37 @@
       var pollutants = ['PM1', 'PM25', 'PM10', 'CO2', 'COV', 'TEMP', 'HUM'];
       var stats = {};
 
+      // Décimales envoyées à l'IA par polluant : les décimales sur les PM/CO2
+      // n'apportent aucune information utile pour l'analyse -> arrondi à l'unité.
+      var decimals = { PM1: 0, PM25: 0, PM10: 0, CO2: 0, COV: 0, TEMP: 1, HUM: 0 };
+      function fmt(p, v) {
+        if (v === undefined || v === null) return v;
+        var d = decimals[p] != null ? decimals[p] : 1;
+        var f = Math.pow(10, d);
+        return Math.round(v * f) / f;
+      }
+
       pollutants.forEach(function(p) {
         var values = data.map(function(d) { return d[p]; }).filter(function(v) { return v !== undefined && v !== null && v !== -1; });
         if (values.length > 0) {
           stats[p] = {
-            min: Math.min.apply(null, values),
-            max: Math.max.apply(null, values),
-            avg: Math.round(values.reduce(function(a, b) { return a + b; }, 0) / values.length * 10) / 10,
+            min: fmt(p, Math.min.apply(null, values)),
+            max: fmt(p, Math.max.apply(null, values)),
+            avg: fmt(p, values.reduce(function(a, b) { return a + b; }, 0) / values.length),
             count: values.length
           };
         }
       });
 
-      // Build a concise time series (sample key moments)
+      // Série temporelle complète : on envoie toutes les moyennes horaires
+      // (données déjà récupérées en freq=1h sur 72h ≈ 72 points, ~1500 tokens,
+      // négligeable pour le modèle). Pas de sous-échantillonnage.
       var timePoints = [];
-      var step = Math.max(1, Math.floor(data.length / 12)); // ~12 points
-      for (var i = 0; i < data.length; i += step) {
+      for (var i = 0; i < data.length; i++) {
         var d = data[i];
         timePoints.push(
           new Date(d.time).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) +
-          ' → PM2.5:' + d.PM25 + ' PM10:' + d.PM10 + ' CO2:' + d.CO2 + ' T:' + d.TEMP + '°C H:' + d.HUM + '%'
+          ' → PM2.5:' + fmt('PM25', d.PM25) + ' PM10:' + fmt('PM10', d.PM10) + ' CO2:' + fmt('CO2', d.CO2) + ' T:' + d.TEMP + '°C H:' + d.HUM + '%'
         );
       }
 
@@ -6057,7 +6119,7 @@
         prompt += '- ' + names[p] + ' (' + units[p] + ') : min=' + s.min + ', max=' + s.max + ', moy=' + s.avg + '\n';
       });
 
-      prompt += '\nÉchantillon chronologique :\n' + timePoints.join('\n');
+      prompt += '\nMoyennes horaires :\n' + timePoints.join('\n');
       prompt += contextInfo;
 
       prompt += '\n\nDonne une analyse concise en français (max 200 mots) :\n';
@@ -6073,16 +6135,32 @@
     function callLocalLLM(prompt, btn, loading, result, content, errorDiv) {
       var startTime = Date.now();
 
+      var model = 'mistral-nemo:12b';
+      var systemContent = 'Tu es un expert en qualité de l\'air intérieur. Tu donnes des analyses claires, précises et utiles. Réponds en français.';
+      var messages = [
+        { role: 'system', content: systemContent },
+        { role: 'user', content: prompt }
+      ];
+
+      // Transparence : afficher le prompt exact envoyé à l'IA dans l'accordéon
+      var promptDetails = document.getElementById('aiPromptDetails');
+      var promptContent = document.getElementById('aiPromptContent');
+      if (promptContent) {
+        var preview = '[model] ' + model + '\n\n';
+        messages.forEach(function(m) {
+          preview += '[' + m.role + ']\n' + m.content + '\n\n';
+        });
+        promptContent.textContent = preview.trim();
+        promptDetails.style.display = 'block';
+      }
+
       $.ajax({
         method: 'POST',
         url: 'ai_analysis.php',
         contentType: 'application/json',
         data: JSON.stringify({
-          model: 'mistral-nemo:12b',
-          messages: [
-            { role: 'system', content: 'Tu es un expert en qualité de l\'air intérieur. Tu donnes des analyses claires, précises et utiles. Réponds en français.' },
-            { role: 'user', content: prompt }
-          ]
+          model: model,
+          messages: messages
         }),
         timeout: 120000 // 2 minutes max
       })

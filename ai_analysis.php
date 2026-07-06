@@ -40,8 +40,11 @@ $llmPayload = json_encode([
 // Measure time
 $startTime = microtime(true);
 
-// Call local LLM server
-$ch = curl_init('http://10.0.1.193/v1/chat/completions');
+// Call local LLM server.
+// On tape Ollama en DIRECT (et non http://nginx/v1/ qui est l'agent avec
+// tool-calling web_search forcé : pour une simple synthèse de données, ça fait
+// dérailler le modèle et renvoie une réponse vide/hors-sujet).
+$ch = curl_init('http://ollama:11434/v1/chat/completions');
 curl_setopt_array($ch, [
     CURLOPT_POST => true,
     CURLOPT_POSTFIELDS => $llmPayload,
