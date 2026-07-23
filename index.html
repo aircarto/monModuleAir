@@ -6434,11 +6434,16 @@
       // (données déjà récupérées en freq=1h sur 72h ≈ 72 points, ~1500 tokens,
       // négligeable pour le modèle). Pas de sous-échantillonnage.
       var timePoints = [];
+      // -1 = mesure absente : ne pas l'envoyer au modèle (il la prend pour une valeur)
+      function fmtOrNA(p, v, suffix) {
+        if (v === undefined || v === null || v === -1) return 'n/a';
+        return fmt(p, v) + (suffix || '');
+      }
       for (var i = 0; i < data.length; i++) {
         var d = data[i];
         timePoints.push(
           new Date(d.time).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }) +
-          ' → PM2.5:' + fmt('PM25', d.PM25) + ' PM10:' + fmt('PM10', d.PM10) + ' CO2:' + fmt('CO2', d.CO2) + ' T:' + d.TEMP + '°C H:' + d.HUM + '%'
+          ' → PM2.5:' + fmtOrNA('PM25', d.PM25) + ' PM10:' + fmtOrNA('PM10', d.PM10) + ' CO2:' + fmtOrNA('CO2', d.CO2) + ' T:' + fmtOrNA('TEMP', d.TEMP, '°C') + ' H:' + fmtOrNA('HUM', d.HUM, '%')
         );
       }
 
@@ -6475,12 +6480,13 @@
       prompt += '\nMoyennes horaires :\n' + timePoints.join('\n');
       prompt += contextInfo;
 
-      prompt += '\n\nDonne une analyse concise en français (max 200 mots) :\n';
+      prompt += '\n\nDonne une analyse concise en français (max 200 mots), en 4 points :\n';
       prompt += '1. Évaluation générale de la qualité de l\'air intérieur\n';
-      prompt += '2. Points d\'attention ou dépassements de seuils (OMS/ANSES)\n';
-      prompt += '3. Tendances observées\n';
-      prompt += '4. Recommandations pratiques pour l\'occupant\n';
-      prompt += 'Si des contextualisations sont présentes, intègre-les dans ton analyse.';
+      prompt += '2. Points d\'attention : compare chaque polluant mesuré aux seuils AirCarto fournis dans tes instructions et signale tout dépassement (valeur, moment, durée)\n';
+      prompt += '3. Tendances observées (cycles journaliers, pics récurrents)\n';
+      prompt += '4. Recommandations pratiques pour l\'occupant, tirées des règles fournies dans tes instructions\n';
+      prompt += 'Ne mentionne que les polluants réellement mesurés ci-dessus. ';
+      prompt += 'Si des contextualisations sont présentes, mets-les en relation avec les mesures correspondantes.';
 
       return prompt;
     }
@@ -6499,6 +6505,17 @@
           if (textStatus !== 'success' || typeof expertise !== 'string') {
             expertise = '';
           }
+
+          // Retirer ce qui s'adresse à l'éditeur humain du fichier, pas au
+          // modèle : note éditoriale (lignes ">"), commentaires HTML,
+          // marqueurs "(à valider)"
+          expertise = expertise
+            .replace(/<!--[\s\S]*?-->/g, '')
+            .split('\n')
+            .filter(function (line) { return !/^\s*>/.test(line); })
+            .join('\n')
+            .replace(/ *\(à valider\)/g, '')
+            .replace(/\n{3,}/g, '\n\n');
 
           var systemContent = 'Tu es un expert en qualité de l\'air intérieur. Tu donnes des analyses claires, précises et utiles. Réponds en français.';
           if (expertise.trim()) {
