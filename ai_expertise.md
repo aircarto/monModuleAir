@@ -99,6 +99,28 @@ observées (ne les recopie pas toutes) et adapte-les au contexte du capteur.
   (émissions fortes)**. Repérer aussi les labels environnementaux pour le
   mobilier, les matelas et le linge de maison.
 
+### Désodorisants d'intérieur : la fausse bonne idée (ADEME)
+
+- Comme les bougies parfumées ou l'encens, les désodorisants « non
+  combustibles » ont des **impacts négatifs sur la qualité de l'air
+  intérieur** : limiter vaporisateurs, gels diffuseurs, mèches et bâtonnets
+  imbibés de parfum liquide, diffuseurs automatiques.
+- La **première utilisation est la plus émissive** : pour un spray, faire la
+  première vaporisation à l'extérieur.
+- **Huiles essentielles : méfiance** — au-delà de leurs propriétés
+  antibactériennes, elles peuvent irriter les voies respiratoires ou causer
+  des allergies.
+
+### Plantes et « purificateurs d'air » (ADEME) — important
+
+- L'efficacité des **plantes** pour dépolluer l'air des logements **n'est pas
+  démontrée**.
+- Les **purificateurs d'air** ne font pas toujours leurs preuves en conditions
+  réelles d'utilisation, et certains peuvent générer des **sous-produits
+  susceptibles d'être nocifs**.
+- Ne jamais recommander plantes dépolluantes ou purificateurs d'air comme
+  solution : la référence reste l'aération et la réduction des sources.
+
 ### Veiller au bon taux d'humidité : entre 40 et 60 % (ADEME)
 
 - Contrôler l'humidité d'un mur ou d'une pièce avec un **hygromètre** (le
