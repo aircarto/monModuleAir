@@ -234,6 +234,42 @@
       color: var(--primary-color);
     }
 
+    /* Live device status: icon inside the input, fixed-height text line below */
+    #moduleair {
+      padding-right: 42px;
+    }
+
+    .device-status-icon {
+      position: absolute;
+      top: 50%;
+      right: 14px;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      pointer-events: none;
+    }
+
+    .device-status-text {
+      min-height: 18px;
+      line-height: 1.4;
+      margin-top: 6px;
+      padding: 0 4px;
+      font-size: 12.5px;
+    }
+
+    .field input.status-online {
+      border-color: var(--success-color);
+    }
+
+    .field input.status-offline {
+      border-color: var(--warning-color);
+    }
+
+    .field input.status-not-found {
+      border-color: var(--danger-color);
+    }
+
     .field button {
       color: #fff;
       background: linear-gradient(135deg, var(--primary-color) 0%, #4f46e5 100%);
@@ -1123,6 +1159,18 @@
       font-size: 13px;
     }
 
+    .login-error {
+      display: none;
+      margin: 4px 0 12px;
+      padding: 10px 14px;
+      background: rgba(220, 53, 69, 0.08);
+      border: 1px solid rgba(220, 53, 69, 0.25);
+      border-radius: var(--radius-sm);
+      color: #dc3545;
+      font-size: 13px;
+      text-align: center;
+    }
+
     .ai-prompt-details {
       margin-top: 12px;
       border: 1px solid var(--border-color);
@@ -1310,12 +1358,16 @@
           </p>
           <div class="field input-field">
             <input type="text" placeholder="Nom (device ID)" class="input" id="moduleair" data-i18n-placeholder="login.placeholder.device" />
+            <span id="deviceStatusIcon" class="device-status-icon"></span>
           </div>
+          <div id="deviceStatusText" class="device-status-text text-muted"></div>
 
           <div class="field input-field">
             <input type="password" placeholder="Token" class="password" id="token" data-i18n-placeholder="login.placeholder.token" />
             <i class="bi bi-eye-slash eye-icon"></i>
           </div>
+
+          <div id="loginError" class="login-error" role="alert"></div>
 
           <div class="field button-field">
             <button id="submit" data-i18n="login.submit">Se connecter</button>
@@ -1514,6 +1566,10 @@
                           <div class="context-type-option" data-type="neighbourhood" onclick="selectContextType('neighbourhood')">
                             <span class="context-emoji">🏘️</span>
                             <span data-i18n="modal.context.neighbourhood">Voisinage</span>
+                          </div>
+                          <div class="context-type-option" data-type="works" onclick="selectContextType('works')">
+                            <span class="context-emoji">🚧</span>
+                            <span data-i18n="modal.context.works">Travaux</span>
                           </div>
                           <div class="context-type-option" data-type="cleaning" onclick="selectContextType('cleaning')">
                             <span class="context-emoji">🧹</span>
@@ -1917,6 +1973,14 @@
         "login.placeholder.device": "Nom (device ID)",
         "login.placeholder.token": "Token",
         "login.submit": "Se connecter",
+        "login.errorNotFound": "Ce capteur n'existe pas. Vérifiez le nom du ModuleAir (device ID).",
+        "login.deviceChecking": "Vérification du capteur…",
+        "login.deviceOnline": "Capteur trouvé — connecté",
+        "login.deviceOffline": "Capteur hors ligne — dernière mesure {ago}",
+        "login.deviceNotFound": "Aucun capteur trouvé avec ce nom.",
+        "login.deviceCheckError": "Impossible de vérifier le capteur pour le moment.",
+        "login.errorToken": "Token incorrect. Vérifiez le token indiqué au dos de l'appareil.",
+        "login.errorGeneric": "Connexion impossible pour le moment. Veuillez réessayer.",
         "nav.logout": "Déconnexion",
         "sensor.online": "Capteur connecté",
         "sensor.offline": "Capteur déconnecté",
@@ -1979,6 +2043,7 @@
         "modal.context.industrial": "Industriel",
         "modal.context.traffic": "Trafic",
         "modal.context.neighbourhood": "Voisinage",
+        "modal.context.works": "Travaux",
         "modal.context.cleaning": "Ménage",
         "modal.context.cooking": "Cuisson",
         "modal.context.meeting": "Réunion",
@@ -2044,6 +2109,7 @@
         "contextDetails.industrial": "Activité industrielle",
         "contextDetails.traffic": "Trafic routier",
         "contextDetails.neighbourhood": "Activité de voisinage",
+        "contextDetails.works": "Travaux",
         "contextDetails.cleaning": "Ménage",
         "contextDetails.cooking": "Cuisson",
         "contextDetails.meeting": "Réunion",
@@ -2082,6 +2148,14 @@
         "login.placeholder.device": "Name (device ID)",
         "login.placeholder.token": "Token",
         "login.submit": "Log in",
+        "login.errorNotFound": "This sensor does not exist. Check the ModuleAir name (device ID).",
+        "login.deviceChecking": "Checking sensor…",
+        "login.deviceOnline": "Sensor found — connected",
+        "login.deviceOffline": "Sensor offline — last measurement {ago}",
+        "login.deviceNotFound": "No sensor found with this name.",
+        "login.deviceCheckError": "Unable to check the sensor right now.",
+        "login.errorToken": "Wrong token. Check the token indicated on the back of the device.",
+        "login.errorGeneric": "Unable to log in right now. Please try again.",
         "nav.logout": "Log out",
         "sensor.online": "Sensor connected",
         "sensor.offline": "Sensor disconnected",
@@ -2144,6 +2218,7 @@
         "modal.context.industrial": "Industrial",
         "modal.context.traffic": "Traffic",
         "modal.context.neighbourhood": "Neighbourhood",
+        "modal.context.works": "Construction work",
         "modal.context.cleaning": "Cleaning",
         "modal.context.cooking": "Cooking",
         "modal.context.meeting": "Meeting",
@@ -2209,6 +2284,7 @@
         "contextDetails.industrial": "Industrial activity",
         "contextDetails.traffic": "Road traffic",
         "contextDetails.neighbourhood": "Neighbourhood activity",
+        "contextDetails.works": "Construction work",
         "contextDetails.cleaning": "Cleaning",
         "contextDetails.cooking": "Cooking",
         "contextDetails.meeting": "Meeting",
@@ -2247,6 +2323,14 @@
         "login.placeholder.device": "Nome (device ID)",
         "login.placeholder.token": "Token",
         "login.submit": "Accedi",
+        "login.errorNotFound": "Questo sensore non esiste. Verificare il nome del ModuleAir (device ID).",
+        "login.deviceChecking": "Verifica del sensore…",
+        "login.deviceOnline": "Sensore trovato — connesso",
+        "login.deviceOffline": "Sensore offline — ultima misura {ago}",
+        "login.deviceNotFound": "Nessun sensore trovato con questo nome.",
+        "login.deviceCheckError": "Impossibile verificare il sensore al momento.",
+        "login.errorToken": "Token errato. Verificare il token indicato sul retro del dispositivo.",
+        "login.errorGeneric": "Impossibile accedere al momento. Riprovare.",
         "nav.logout": "Disconnetti",
         "sensor.online": "Sensore connesso",
         "sensor.offline": "Sensore disconnesso",
@@ -2309,6 +2393,7 @@
         "modal.context.industrial": "Industriale",
         "modal.context.traffic": "Traffico",
         "modal.context.neighbourhood": "Vicinato",
+        "modal.context.works": "Lavori",
         "modal.context.cleaning": "Pulizie",
         "modal.context.cooking": "Cottura",
         "modal.context.meeting": "Riunione",
@@ -2374,6 +2459,7 @@
         "contextDetails.industrial": "Attività industriale",
         "contextDetails.traffic": "Traffico stradale",
         "contextDetails.neighbourhood": "Attività di vicinato",
+        "contextDetails.works": "Lavori",
         "contextDetails.cleaning": "Pulizie",
         "contextDetails.cooking": "Cottura",
         "contextDetails.meeting": "Riunione",
@@ -2504,6 +2590,7 @@
       pwShowHide = document.querySelectorAll(".eye-icon");
 
     document.querySelector("#submit").addEventListener("click", submit);
+    document.querySelector("#moduleair").addEventListener("input", onDeviceInput);
     document.querySelector("#logout").addEventListener("click", logout);
 
     // Auto-login from localStorage
@@ -2521,6 +2608,7 @@
       if (savedModuleair && savedToken) {
         document.querySelector("#moduleair").value = savedModuleair;
         document.querySelector("#token").value = savedToken;
+        onDeviceInput();
         // Auto-submit after a short delay
         setTimeout(function () {
           submit();
@@ -2642,10 +2730,119 @@
       }
     }, 120000);
 
+    function showLoginError(messageKey) {
+      const errorBox = document.querySelector("#loginError");
+      errorBox.setAttribute("data-i18n", messageKey);
+      errorBox.textContent = t(messageKey);
+      errorBox.style.display = "block";
+    }
+
+    function hideLoginError() {
+      document.querySelector("#loginError").style.display = "none";
+    }
+
+    // --- Live status check of the device ID input (no token needed) ---
+    let deviceCheckTimer = null;
+    let deviceLastCheckedId = null;
+
+    function setDeviceStatus(state, message) {
+      const input = document.querySelector("#moduleair");
+      const iconHost = document.querySelector("#deviceStatusIcon");
+      const text = document.querySelector("#deviceStatusText");
+      let iconHtml = "";
+      let textClass = "text-muted";
+      let inputClass = "";
+
+      switch (state) {
+        case "idle":
+          break;
+        case "checking":
+          iconHtml = '<span class="spinner-border spinner-border-sm text-muted" role="status" aria-hidden="true"></span>';
+          break;
+        case "online":
+          iconHtml = '<i class="bi bi-check-circle-fill text-success"></i>';
+          textClass = "text-success";
+          inputClass = "status-online";
+          break;
+        case "offline":
+          iconHtml = '<i class="bi bi-exclamation-circle-fill text-warning"></i>';
+          textClass = "text-warning";
+          inputClass = "status-offline";
+          break;
+        case "not-found":
+          iconHtml = '<i class="bi bi-x-circle-fill text-danger"></i>';
+          textClass = "text-danger";
+          inputClass = "status-not-found";
+          break;
+        case "error":
+          iconHtml = '<i class="bi bi-exclamation-triangle-fill text-warning"></i>';
+          textClass = "text-warning";
+          break;
+      }
+
+      input.classList.remove("status-online", "status-offline", "status-not-found");
+      if (inputClass) {
+        input.classList.add(inputClass);
+      }
+      iconHost.innerHTML = iconHtml;
+      text.className = "device-status-text " + textClass;
+      text.textContent = message || "";
+    }
+
+    function checkDeviceStatus(deviceId) {
+      deviceLastCheckedId = deviceId;
+      $.ajax({
+        method: "GET",
+        url: "https://api.aircarto.fr/capteurs/metadata?capteurType=ModuleAir&capteurID=" + encodeURIComponent(deviceId),
+      })
+        .done(function (data) {
+          // Ignore the result if the user has typed something else in the meantime
+          if (document.querySelector("#moduleair").value.trim() !== deviceId) return;
+
+          if (!Array.isArray(data) || data.length === 0 || !data[0]) {
+            setDeviceStatus("error", t("login.deviceCheckError"));
+            return;
+          }
+          if (data[0].error === "device_not_found") {
+            setDeviceStatus("not-found", t("login.deviceNotFound"));
+            return;
+          }
+          // Device exists ("wrong_token" is expected since no token was sent)
+          const seenSec = data[0].last_seen_sec;
+          if (seenSec != null && seenSec > 300) {
+            setDeviceStatus("offline", t("login.deviceOffline", { ago: timeAgoText(seenSec * 1000) }));
+          } else {
+            setDeviceStatus("online", t("login.deviceOnline"));
+          }
+        })
+        .fail(function () {
+          if (document.querySelector("#moduleair").value.trim() !== deviceId) return;
+          setDeviceStatus("error", t("login.deviceCheckError"));
+        });
+    }
+
+    function onDeviceInput() {
+      const value = document.querySelector("#moduleair").value.trim();
+      if (deviceCheckTimer) {
+        clearTimeout(deviceCheckTimer);
+        deviceCheckTimer = null;
+      }
+      if (value.length < 3) {
+        setDeviceStatus("idle", "");
+        return;
+      }
+      setDeviceStatus("checking", t("login.deviceChecking"));
+      deviceCheckTimer = setTimeout(function () {
+        checkDeviceStatus(value);
+      }, 400);
+    }
+
     function submit() {
       console.log("---------");
       console.log("---------");
       console.log("SUBMIT");
+
+      hideLoginError();
 
       moduleair = document.querySelector("#moduleair").value;
       token = document.querySelector("#token").value;
@@ -2663,6 +2860,16 @@
           console.log("Getting data from aircarto API (metadata)");
 
           console.log(data);
+          if (Array.isArray(data) && data.length > 0 && data[0] && data[0].error) {
+            if (data[0].error === "device_not_found") {
+              showLoginError("login.errorNotFound");
+            } else if (data[0].error === "wrong_token" || (data[0].message || "").toLowerCase().includes("token")) {
+              showLoginError("login.errorToken");
+            } else {
+              showLoginError("login.errorGeneric");
+            }
+            return;
+          }
           if (data != null) {
             // Save credentials to localStorage on successful login
             localStorage.setItem("moduleair_id", moduleair);
@@ -2897,14 +3104,12 @@
                 console.log("Error while geting data from Aircarto API");
               });
           } else {
-            document.querySelector("#moduleair").value = "";
-            document.querySelector("#token").value = "";
+            showLoginError("login.errorGeneric");
           }
         })
         .fail(function () {
           console.log("Error while geting data from Aircarto API");
-          document.querySelector("#moduleair").value = "";
-          document.querySelector("#token").value = "";
+          showLoginError("login.errorGeneric");
         });
     }
 
@@ -4317,6 +4522,7 @@
         industrial: { color: am5.color(0x95a5a6), logo: 'industrial-flat.svg' },
         traffic: { color: am5.color(0xf39c12), logo: 'traffic-flat.svg' },
         neighbourhood: { color: am5.color(0x3498db), logo: 'neighbourhood-flat.svg' },
+        works: { color: am5.color(0xd4a017), logo: '' },
         cleaning: { color: am5.color(0x2ecc71), logo: '' },
         cooking: { color: am5.color(0xe67e22), logo: '' },
         meeting: { color: am5.color(0x9b59b6), logo: '' },
@@ -4432,6 +4638,7 @@
             industrial: '🏭',
             traffic: '🚗',
             neighbourhood: '🏘️',
+            works: '🚧',
             cleaning: '🧹',
             cooking: '🍳',
             meeting: '👥',
@@ -4488,6 +4695,7 @@
         industrial: t('contextDetails.industrial'),
         traffic: t('contextDetails.traffic'),
         neighbourhood: t('contextDetails.neighbourhood'),
+        works: t('contextDetails.works'),
         cleaning: t('contextDetails.cleaning'),
         cooking: t('contextDetails.cooking'),
         meeting: t('contextDetails.meeting'),
@@ -4500,6 +4708,7 @@
         industrial: '🏭',
         traffic: '🚗',
         neighbourhood: '🏘️',
+        works: '🚧',
         cleaning: '🧹',
         cooking: '🍳',
         meeting: '👥',
@@ -4660,13 +4869,14 @@
         industrial: t('contextDetails.industrial'),
         traffic: t('contextDetails.traffic'),
         neighbourhood: t('contextDetails.neighbourhood'),
+        works: t('contextDetails.works'),
         cleaning: t('contextDetails.cleaning'),
         cooking: t('contextDetails.cooking'),
         meeting: t('contextDetails.meeting'),
         fault: t('contextDetails.fault'),
         other: t('contextDetails.other')
       };
-      const typeIcons = { fire: '🔥', industrial: '🏭', traffic: '🚗', neighbourhood: '🏘️', cleaning: '🧹', cooking: '🍳', meeting: '👥', fault: '⚠️', other: '📝' };
+      const typeIcons = { fire: '🔥', industrial: '🏭', traffic: '🚗', neighbourhood: '🏘️', works: '🚧', cleaning: '🧹', cooking: '🍳', meeting: '👥', fault: '⚠️', other: '📝' };
       const dateLang = currentLang === 'fr' ? 'fr-FR' : (currentLang === 'it' ? 'it-IT' : 'en-GB');
 
       if (!contextsData || contextsData.length === 0) {
