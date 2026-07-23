@@ -6489,24 +6489,43 @@
       var startTime = Date.now();
 
       var model = 'mistral-nemo:12b';
-      var systemContent = 'Tu es un expert en qualité de l\'air intérieur. Tu donnes des analyses claires, précises et utiles. Réponds en français.';
-      var messages = [
-        { role: 'system', content: systemContent },
-        { role: 'user', content: prompt }
-      ];
 
-      // Transparence : afficher le prompt exact envoyé à l'IA dans l'accordéon
-      var promptDetails = document.getElementById('aiPromptDetails');
-      var promptContent = document.getElementById('aiPromptContent');
-      if (promptContent) {
-        var preview = '[model] ' + model + '\n\n';
-        messages.forEach(function(m) {
-          preview += '[' + m.role + ']\n' + m.content + '\n\n';
+      // Référentiel d'expertise AirCarto (seuils maison + recommandations
+      // AtmoSud) : fichier markdown éditable, rechargé à chaque analyse et
+      // injecté dans le message system. Si absent/inaccessible, l'analyse
+      // fonctionne avec le system de base.
+      $.ajax({ url: 'ai_expertise.md', dataType: 'text', cache: false })
+        .always(function (expertise, textStatus) {
+          if (textStatus !== 'success' || typeof expertise !== 'string') {
+            expertise = '';
+          }
+
+          var systemContent = 'Tu es un expert en qualité de l\'air intérieur. Tu donnes des analyses claires, précises et utiles. Réponds en français.';
+          if (expertise.trim()) {
+            systemContent += '\n\n' + expertise.trim();
+          }
+          var messages = [
+            { role: 'system', content: systemContent },
+            { role: 'user', content: prompt }
+          ];
+
+          // Transparence : afficher le prompt exact envoyé à l'IA dans l'accordéon
+          var promptDetails = document.getElementById('aiPromptDetails');
+          var promptContent = document.getElementById('aiPromptContent');
+          if (promptContent) {
+            var preview = '[model] ' + model + '\n\n';
+            messages.forEach(function(m) {
+              preview += '[' + m.role + ']\n' + m.content + '\n\n';
+            });
+            promptContent.textContent = preview.trim();
+            promptDetails.style.display = 'block';
+          }
+
+          sendLLMRequest(model, messages, startTime, btn, loading, result, content, errorDiv);
         });
-        promptContent.textContent = preview.trim();
-        promptDetails.style.display = 'block';
-      }
+    }
 
+    function sendLLMRequest(model, messages, startTime, btn, loading, result, content, errorDiv) {
       $.ajax({
         method: 'POST',
         url: 'ai_analysis.php',
