@@ -72,18 +72,51 @@ Repères de confort (à valider) :
 - Humidité relative : 40–60 %. En dessous de 30 % : air trop sec ; au-dessus
   de 65 % : risque de condensation et de moisissures.
 
-## Recommandations (à compléter depuis les rapports AtmoSud)
+## Recommandations
 
-<!-- Formulez ici, en règles courtes, les recommandations issues de votre
-     expertise et des rapports AtmoSud. Le modèle les recombine selon les
-     données. Exemples de forme (à remplacer par le contenu réel) : -->
+Source principale : guide ADEME « Comment améliorer la qualité de l'air chez
+soi ? » (2025). Choisis les recommandations pertinentes selon les données
+observées (ne les recopie pas toutes) et adapte-les au contexte du capteur.
 
-- Si le CO2 dépasse régulièrement le seuil « moyen » aux mêmes heures,
-  recommander une aération de 5 à 10 minutes à ces moments-là (occupation).
-- Si des pics de PM apparaissent aux heures des repas, évoquer la cuisson et
-  recommander l'usage de la hotte ou l'aération pendant/après la cuisson.
+### Aérer et laisser l'air circuler (ADEME)
+
+- Même avec une ventilation mécanique contrôlée (VMC), ouvrir grand les
+  fenêtres **5 à 10 minutes le matin et le soir**, même en hiver.
+- Aérer **pendant et après** les activités émettrices de polluants (aspirateur,
+  produits d'entretien, bricolage…) ou de vapeur d'eau (douche, bain, lessive,
+  cuisson…).
+- Ne **jamais obstruer** une bouche d'extraction de ventilation mécanique ou
+  une grille d'aération, et les **dépoussiérer régulièrement**.
+
+### Limiter les sources intérieures de polluants (ADEME)
+
+- Ménage : privilégier les produits de nettoyage porteurs d'un **label
+  environnemental**, ou le **nettoyage à la vapeur** et les **chiffons humides
+  ou microfibres**, souvent suffisants pour les vitres et le sol.
+- Déco et aménagement : choisir des produits **peu émissifs** — l'étiquette
+  « émissions dans l'air intérieur » des peintures, papiers peints, vernis,
+  colles… indique le niveau d'émission en COV de **A+ (émissions faibles) à C
+  (émissions fortes)**. Repérer aussi les labels environnementaux pour le
+  mobilier, les matelas et le linge de maison.
+
+### Veiller au bon taux d'humidité : entre 40 et 60 % (ADEME)
+
+- Contrôler l'humidité d'un mur ou d'une pièce avec un **hygromètre** (le
+  ModuleAir mesure déjà l'humidité relative de la pièce).
+- Si des **moisissures** apparaissent sur murs ou plafonds : les nettoyer sans
+  tarder et **rechercher la cause** — fuite d'eau, capillarité, infiltration ou
+  renouvellement d'air insuffisant.
+- Éviter l'excès d'humidité, source indirecte de polluants : **couvrir les
+  casseroles** et **activer la hotte** en cuisine, **faire sécher le linge à
+  l'extérieur** ou dans une pièce bien ventilée.
+
+### Lien intérieur/extérieur
+
 - Si un NebuleAir extérieur est lié et que les PM intérieures suivent les
   extérieures, orienter vers une aération aux heures où l'air extérieur est le
   moins chargé.
+
+### À compléter (rapports AtmoSud)
+
 - [Règle AtmoSud : …]
 - [Règle AtmoSud : …]
