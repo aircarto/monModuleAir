@@ -17,6 +17,9 @@
   les recopier toutes.
 - Utilise les qualificatifs du tableau (bon, moyen, dégradé, mauvais, très
   mauvais) pour qualifier les niveaux mesurés.
+- INTERDIT : ne recommande JAMAIS de plantes dépolluantes ni de purificateurs
+  d'air (efficacité non démontrée, voir section dédiée). La solution de
+  référence est toujours l'aération et la réduction des sources.
 
 ## Seuils de référence Atmo
 
