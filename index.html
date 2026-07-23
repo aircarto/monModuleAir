@@ -12,6 +12,14 @@
 
   <link rel="icon" type="image/x-icon" href="https://moduleair.fr/img/favicon.png" />
 
+  <script>
+    // Before first paint: if credentials are stored, hide the login form and
+    // show a neutral loading screen while the auto-login runs
+    if (localStorage.getItem("moduleair_id") && localStorage.getItem("moduleair_token")) {
+      document.documentElement.classList.add("auto-login");
+    }
+  </script>
+
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
@@ -106,6 +114,32 @@
       background-color: var(--background-color);
       display: none;
       padding-bottom: 40px;
+    }
+
+    /* Auto-login: loading screen instead of a login-form flash */
+    #autoLoginLoading {
+      position: fixed;
+      inset: 0;
+      z-index: 2000;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      background: #f0f4f8;
+    }
+
+    #autoLoginLoading img {
+      height: 55px;
+      max-width: 80vw;
+    }
+
+    html.auto-login #autoLoginLoading {
+      display: flex;
+    }
+
+    html.auto-login #container_form {
+      display: none !important;
     }
 
     /* Header sticky - card style */
@@ -1386,6 +1420,11 @@
 </head>
 
 <body>
+  <div id="autoLoginLoading">
+    <img src="/img/logoModuleAirColor_long.png" alt="ModuleAir" />
+    <div class="spinner-border text-primary" role="status" aria-hidden="true"></div>
+  </div>
+
   <div class="toast-container position-fixed end-0 p-3" style="bottom: 20px; z-index: 9999;">
     <div class="toast align-items-center" id="messageToast" role="alert" aria-live="assertive" aria-atomic="true"
       data-bs-delay="5000">
@@ -2688,10 +2727,12 @@
         document.querySelector("#moduleair").value = savedModuleair;
         document.querySelector("#token").value = savedToken;
         onDeviceInput();
-        // Auto-submit after a short delay
-        setTimeout(function () {
-          submit();
-        }, 300);
+        submit();
+        // Safety net: never leave the loading screen up if nothing resolved
+        setTimeout(endAutoLoginScreen, 10000);
+      } else {
+        // No stored credentials but the loader may be up (e.g. cleared mid-session)
+        endAutoLoginScreen();
       }
     });
     document
@@ -2809,7 +2850,15 @@
       }
     }, 120000);
 
+    // Remove the auto-login loading screen (shown before first paint by the
+    // inline <head> script) and reveal whatever the current state is
+    function endAutoLoginScreen() {
+      document.documentElement.classList.remove("auto-login");
+      document.querySelector("#autoLoginLoading").style.display = "none";
+    }
+
     function showLoginError(messageKey) {
+      endAutoLoginScreen();
       const errorBox = document.querySelector("#loginError");
       errorBox.setAttribute("data-i18n", messageKey);
       errorBox.textContent = t(messageKey);
@@ -3004,6 +3053,7 @@
 
             document.querySelector("#container_form").style.display = "none";
             document.querySelector("#container_graphs").style.display = "block";
+            endAutoLoginScreen();
 
 
             if (
