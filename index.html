@@ -450,10 +450,14 @@
     }
 
     /* Grouped sub-section for the linked NebuleAir (outdoor) PM toggles,
-       on its own row below the main toggles */
-    .ext-toggle-group {
+       on its own row below the main toggles, sized to its content */
+    .ext-toggle-break {
       flex-basis: 100%;
-      display: flex;
+      height: 0;
+    }
+
+    .ext-toggle-group {
+      display: inline-flex;
       align-items: center;
       flex-wrap: wrap;
       gap: 8px;
@@ -1549,9 +1553,10 @@
                   <button class="toggle-btn" data-series="PM10" onclick="toggleSeries('PM10')">
                     <span class="color-dot"></span> PM10 <small>(µg/m³)</small>
                   </button>
-                  <div class="ext-toggle-group d-none" id="extToggleGroup">
+                  <div class="ext-toggle-break d-none ext-toggle-group-part"></div>
+                  <div class="ext-toggle-group d-none ext-toggle-group-part" id="extToggleGroup">
                     <span class="ext-group-label">
-                      <i class="bi bi-wind"></i> <span id="extGroupName">NebuleAir</span> <small data-i18n="nebuleair.groupLabel">(extérieur)</small>
+                      <i class="bi bi-wind"></i> <span id="extGroupName">NebuleAir</span> <small>(µg/m³)</small>
                     </span>
                     <div class="ext-btn-group">
                       <button class="toggle-btn ext-toggle" data-series="PM1_ext" onclick="toggleSeries('PM1_ext')">
@@ -1564,7 +1569,6 @@
                         <span class="color-dot" style="border: 2px dashed currentColor; background: transparent;"></span> PM10
                       </button>
                     </div>
-                    <small class="text-muted">(µg/m³)</small>
                   </div>
                   <button class="toggle-btn" data-series="TEMP" onclick="toggleSeries('TEMP')">
                     <span class="color-dot"></span> Temp <small>(°C)</small>
@@ -2064,7 +2068,6 @@
         "btn.comments": "Commentaires",
         "btn.humidity": "Humidité",
         "nebuleair.title": "Comparer avec la mesure PM extérieure — NebuleAir",
-        "nebuleair.groupLabel": "(extérieur)",
         "nebuleair.description": "Si un capteur NebuleAir est installé en extérieur, vous pouvez le lier à votre ModuleAir pour comparer les mesures extérieures et intérieures — uniquement pour les particules (PM).",
         "nebuleair.placeholder": "ex : 1234",
         "nebuleair.tooShort": "Saisissez au moins 3 caractères pour vérifier l'ID.",
@@ -2240,7 +2243,6 @@
         "btn.comments": "Comments",
         "btn.humidity": "Humidity",
         "nebuleair.title": "Compare with outdoor PM measurements — NebuleAir",
-        "nebuleair.groupLabel": "(outdoor)",
         "nebuleair.description": "If a NebuleAir sensor is installed outdoors, you can link it to your ModuleAir to compare outdoor and indoor measurements — for particulate matter (PM) only.",
         "nebuleair.placeholder": "e.g. 1234",
         "nebuleair.tooShort": "Enter at least 3 characters to check the ID.",
@@ -2416,7 +2418,6 @@
         "btn.comments": "Commenti",
         "btn.humidity": "Umidità",
         "nebuleair.title": "Confrontare con la misura PM esterna — NebuleAir",
-        "nebuleair.groupLabel": "(esterno)",
         "nebuleair.description": "Se un sensore NebuleAir è installato all'esterno, è possibile collegarlo al ModuleAir per confrontare le misure esterne e interne — solo per il particolato (PM).",
         "nebuleair.placeholder": "es. 1234",
         "nebuleair.tooShort": "Inserisci almeno 3 caratteri per verificare l'ID.",
@@ -7094,8 +7095,9 @@
     }
 
     function setExtTogglesVisible(visible) {
-      const group = document.querySelector("#extToggleGroup");
-      group.classList.toggle("d-none", !visible);
+      document.querySelectorAll(".ext-toggle-group-part").forEach(function (el) {
+        el.classList.toggle("d-none", !visible);
+      });
       if (visible && currentLinkedNebuleAirSuffix) {
         document.querySelector("#extGroupName").textContent = "nebuleair-" + currentLinkedNebuleAirSuffix;
       }
