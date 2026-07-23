@@ -449,6 +449,38 @@
       color: #74c69d;
     }
 
+    /* Grouped sub-section for the linked NebuleAir (outdoor) PM toggles */
+    .ext-toggle-group {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 6px 10px;
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--card-background);
+    }
+
+    .ext-toggle-group .toggle-btn {
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+
+    .ext-group-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      padding-right: 2px;
+    }
+
+    .ext-group-label small {
+      font-weight: 400;
+    }
+
     .toggle-btn[data-series="TEMP"] .color-dot {
       background: #ff6b6b;
     }
@@ -1490,15 +1522,20 @@
                   <button class="toggle-btn" data-series="PM10" onclick="toggleSeries('PM10')">
                     <span class="color-dot"></span> PM10 <small>(µg/m³)</small>
                   </button>
-                  <button class="toggle-btn ext-toggle d-none" data-series="PM1_ext" onclick="toggleSeries('PM1_ext')">
-                    <span class="color-dot" style="border: 2px dashed currentColor; background: transparent;"></span> PM1 Ext <small>(µg/m³)</small>
-                  </button>
-                  <button class="toggle-btn ext-toggle d-none" data-series="PM25_ext" onclick="toggleSeries('PM25_ext')">
-                    <span class="color-dot" style="border: 2px dashed currentColor; background: transparent;"></span> PM2.5 Ext <small>(µg/m³)</small>
-                  </button>
-                  <button class="toggle-btn ext-toggle d-none" data-series="PM10_ext" onclick="toggleSeries('PM10_ext')">
-                    <span class="color-dot" style="border: 2px dashed currentColor; background: transparent;"></span> PM10 Ext <small>(µg/m³)</small>
-                  </button>
+                  <div class="ext-toggle-group d-none" id="extToggleGroup">
+                    <span class="ext-group-label">
+                      <i class="bi bi-wind"></i> <span id="extGroupName">NebuleAir</span> <small data-i18n="nebuleair.groupLabel">(extérieur)</small>
+                    </span>
+                    <button class="toggle-btn ext-toggle" data-series="PM1_ext" onclick="toggleSeries('PM1_ext')">
+                      <span class="color-dot" style="border: 2px dashed currentColor; background: transparent;"></span> PM1 <small>(µg/m³)</small>
+                    </button>
+                    <button class="toggle-btn ext-toggle" data-series="PM25_ext" onclick="toggleSeries('PM25_ext')">
+                      <span class="color-dot" style="border: 2px dashed currentColor; background: transparent;"></span> PM2.5 <small>(µg/m³)</small>
+                    </button>
+                    <button class="toggle-btn ext-toggle" data-series="PM10_ext" onclick="toggleSeries('PM10_ext')">
+                      <span class="color-dot" style="border: 2px dashed currentColor; background: transparent;"></span> PM10 <small>(µg/m³)</small>
+                    </button>
+                  </div>
                   <button class="toggle-btn" data-series="TEMP" onclick="toggleSeries('TEMP')">
                     <span class="color-dot"></span> Temp <small>(°C)</small>
                   </button>
@@ -1997,6 +2034,7 @@
         "btn.comments": "Commentaires",
         "btn.humidity": "Humidité",
         "nebuleair.title": "Comparer avec la mesure PM extérieure — NebuleAir",
+        "nebuleair.groupLabel": "(extérieur)",
         "nebuleair.description": "Si un capteur NebuleAir est installé en extérieur, vous pouvez le lier à votre ModuleAir pour comparer les mesures extérieures et intérieures — uniquement pour les particules (PM).",
         "nebuleair.placeholder": "ex : 1234",
         "nebuleair.tooShort": "Saisissez au moins 3 caractères pour vérifier l'ID.",
@@ -2172,6 +2210,7 @@
         "btn.comments": "Comments",
         "btn.humidity": "Humidity",
         "nebuleair.title": "Compare with outdoor PM measurements — NebuleAir",
+        "nebuleair.groupLabel": "(outdoor)",
         "nebuleair.description": "If a NebuleAir sensor is installed outdoors, you can link it to your ModuleAir to compare outdoor and indoor measurements — for particulate matter (PM) only.",
         "nebuleair.placeholder": "e.g. 1234",
         "nebuleair.tooShort": "Enter at least 3 characters to check the ID.",
@@ -2347,6 +2386,7 @@
         "btn.comments": "Commenti",
         "btn.humidity": "Umidità",
         "nebuleair.title": "Confrontare con la misura PM esterna — NebuleAir",
+        "nebuleair.groupLabel": "(esterno)",
         "nebuleair.description": "Se un sensore NebuleAir è installato all'esterno, è possibile collegarlo al ModuleAir per confrontare le misure esterne e interne — solo per il particolato (PM).",
         "nebuleair.placeholder": "es. 1234",
         "nebuleair.tooShort": "Inserisci almeno 3 caratteri per verificare l'ID.",
@@ -7024,8 +7064,12 @@
     }
 
     function setExtTogglesVisible(visible) {
+      const group = document.querySelector("#extToggleGroup");
+      group.classList.toggle("d-none", !visible);
+      if (visible && currentLinkedNebuleAirSuffix) {
+        document.querySelector("#extGroupName").textContent = "nebuleair-" + currentLinkedNebuleAirSuffix;
+      }
       document.querySelectorAll(".ext-toggle").forEach(function (btn) {
-        btn.classList.toggle("d-none", !visible);
         // Reflect current visibility state on the button
         const key = btn.dataset.series;
         if (seriesVisibility[key]) {
