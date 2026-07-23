@@ -449,9 +449,11 @@
       color: #74c69d;
     }
 
-    /* Grouped sub-section for the linked NebuleAir (outdoor) PM toggles */
+    /* Grouped sub-section for the linked NebuleAir (outdoor) PM toggles,
+       on its own row below the main toggles */
     .ext-toggle-group {
-      display: inline-flex;
+      flex-basis: 100%;
+      display: flex;
       align-items: center;
       flex-wrap: wrap;
       gap: 8px;
@@ -464,6 +466,31 @@
     .ext-toggle-group .toggle-btn {
       padding: 6px 12px;
       font-size: 13px;
+    }
+
+    /* Segmented button group: same pollutant family, joined buttons */
+    .ext-btn-group {
+      display: inline-flex;
+    }
+
+    .ext-btn-group .toggle-btn {
+      border-radius: 0;
+      margin-left: -2px;
+      position: relative;
+    }
+
+    .ext-btn-group .toggle-btn:first-child {
+      border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+      margin-left: 0;
+    }
+
+    .ext-btn-group .toggle-btn:last-child {
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    .ext-btn-group .toggle-btn:hover,
+    .ext-btn-group .toggle-btn.active {
+      z-index: 1;
     }
 
     .ext-group-label {
@@ -1526,15 +1553,18 @@
                     <span class="ext-group-label">
                       <i class="bi bi-wind"></i> <span id="extGroupName">NebuleAir</span> <small data-i18n="nebuleair.groupLabel">(extérieur)</small>
                     </span>
-                    <button class="toggle-btn ext-toggle" data-series="PM1_ext" onclick="toggleSeries('PM1_ext')">
-                      <span class="color-dot" style="border: 2px dashed currentColor; background: transparent;"></span> PM1 <small>(µg/m³)</small>
-                    </button>
-                    <button class="toggle-btn ext-toggle" data-series="PM25_ext" onclick="toggleSeries('PM25_ext')">
-                      <span class="color-dot" style="border: 2px dashed currentColor; background: transparent;"></span> PM2.5 <small>(µg/m³)</small>
-                    </button>
-                    <button class="toggle-btn ext-toggle" data-series="PM10_ext" onclick="toggleSeries('PM10_ext')">
-                      <span class="color-dot" style="border: 2px dashed currentColor; background: transparent;"></span> PM10 <small>(µg/m³)</small>
-                    </button>
+                    <div class="ext-btn-group">
+                      <button class="toggle-btn ext-toggle" data-series="PM1_ext" onclick="toggleSeries('PM1_ext')">
+                        <span class="color-dot" style="border: 2px dashed currentColor; background: transparent;"></span> PM1
+                      </button>
+                      <button class="toggle-btn ext-toggle" data-series="PM25_ext" onclick="toggleSeries('PM25_ext')">
+                        <span class="color-dot" style="border: 2px dashed currentColor; background: transparent;"></span> PM2.5
+                      </button>
+                      <button class="toggle-btn ext-toggle" data-series="PM10_ext" onclick="toggleSeries('PM10_ext')">
+                        <span class="color-dot" style="border: 2px dashed currentColor; background: transparent;"></span> PM10
+                      </button>
+                    </div>
+                    <small class="text-muted">(µg/m³)</small>
                   </div>
                   <button class="toggle-btn" data-series="TEMP" onclick="toggleSeries('TEMP')">
                     <span class="color-dot"></span> Temp <small>(°C)</small>
