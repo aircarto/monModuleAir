@@ -4,12 +4,12 @@
 > d'IA à chaque analyse. Éditez-le librement (les modifications sont prises en
 > compte à la prochaine analyse, sans toucher au code). Les valeurs marquées
 > « à valider » sont des valeurs par défaut reprises de l'interface (bandes des
-> jauges, seuils HCSP) : remplacez-les par les seuils AirCarto définitifs.
+> jauges, seuils HCSP) : remplacez-les par les seuils Atmo définitifs.
 
 ## Consignes impératives
 
 - Base ton analyse EXCLUSIVEMENT sur les seuils du tableau « Seuils de
-  référence AirCarto » ci-dessous.
+  référence Atmo » ci-dessous.
 - Ne cite PAS d'autres référentiels (OMS, ANSES, valeurs guides européennes…),
   sauf si l'utilisateur le demande explicitement.
 - Pour les recommandations, appuie-toi en priorité sur les règles de la
@@ -18,7 +18,7 @@
 - Utilise les qualificatifs du tableau (bon, moyen, dégradé, mauvais, très
   mauvais) pour qualifier les niveaux mesurés.
 
-## Seuils de référence AirCarto
+## Seuils de référence Atmo
 
 | Polluant | Bon | Moyen | Dégradé | Mauvais | Très mauvais | Unité |
 |----------|-----|-------|---------|---------|--------------|-------|

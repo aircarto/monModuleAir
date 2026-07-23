@@ -6418,7 +6418,7 @@
         if (diff > 0) stepMs = diff;
       }
 
-      // --- 1. Épisodes de dépassement des seuils AirCarto ---
+      // --- 1. Épisodes de dépassement des seuils Atmo ---
       var thresholds = {
         CO2: [
           { limit: 1500, label: 'CO2 > 1500 ppm (valeur d\'action rapide HCSP)', unit: 'ppm' },
@@ -6627,7 +6627,7 @@
 
       prompt += '\n\nDonne une analyse concise en français (max 200 mots), en 4 points :\n';
       prompt += '1. Évaluation générale de la qualité de l\'air intérieur\n';
-      prompt += '2. Points d\'attention : appuie-toi sur les dépassements précalculés ci-dessus (valeur, moment, durée) et qualifie-les avec les seuils AirCarto fournis dans tes instructions\n';
+      prompt += '2. Points d\'attention : appuie-toi sur les dépassements précalculés ci-dessus (valeur, moment, durée) et qualifie-les avec les seuils Atmo fournis dans tes instructions\n';
       prompt += '3. Tendances observées (cycles journaliers, pics récurrents)\n';
       prompt += '4. Recommandations pratiques pour l\'occupant, tirées des règles fournies dans tes instructions\n';
       prompt += 'Ne mentionne que les polluants réellement mesurés ci-dessus. ';
