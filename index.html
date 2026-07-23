@@ -6403,6 +6403,146 @@
         });
     }
 
+    // Analyses précalculées en JS (déterministes) pour prémâcher le travail du
+    // LLM : épisodes de dépassement, indice ICONE, stats par contextualisation,
+    // complétude des mesures. Le modèle interprète, il ne calcule plus.
+    function buildPrecomputedAnalyses(data, contexts, startDate, endDate) {
+      function valid(v) { return v !== undefined && v !== null && v !== -1; }
+      function fmtDT(t) { return new Date(t).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' }); }
+      var sections = [];
+
+      // Pas de temps entre deux points (défaut 1 h)
+      var stepMs = 3600000;
+      if (data.length >= 2) {
+        var diff = new Date(data[1].time) - new Date(data[0].time);
+        if (diff > 0) stepMs = diff;
+      }
+
+      // --- 1. Épisodes de dépassement des seuils AirCarto ---
+      var thresholds = {
+        CO2: [
+          { limit: 1500, label: 'CO2 > 1500 ppm (valeur d\'action rapide HCSP)', unit: 'ppm' },
+          { limit: 800, label: 'CO2 > 800 ppm (valeur repère HCSP)', unit: 'ppm' }
+        ],
+        PM25: [
+          { limit: 25, label: 'PM2.5 > 25 µg/m³ (niveau mauvais)', unit: 'µg/m³' },
+          { limit: 10, label: 'PM2.5 > 10 µg/m³ (niveau moyen ou plus)', unit: 'µg/m³' }
+        ],
+        PM10: [
+          { limit: 50, label: 'PM10 > 50 µg/m³ (niveau mauvais)', unit: 'µg/m³' },
+          { limit: 20, label: 'PM10 > 20 µg/m³ (niveau moyen ou plus)', unit: 'µg/m³' }
+        ],
+        COV: [
+          { limit: 1000, label: 'COV > 1000 ppb (niveau mauvais)', unit: 'ppb' },
+          { limit: 250, label: 'COV > 250 ppb (niveau moyen ou plus)', unit: 'ppb' }
+        ]
+      };
+      var epLines = [];
+      Object.keys(thresholds).forEach(function (p) {
+        var measured = data.some(function (d) { return valid(d[p]); });
+        if (!measured) return;
+        thresholds[p].forEach(function (th) {
+          var episodes = [];
+          var cur = null;
+          data.forEach(function (d) {
+            var v = d[p];
+            if (valid(v) && v > th.limit) {
+              if (!cur) {
+                cur = { start: d.time, end: d.time, max: v, maxTime: d.time };
+              } else {
+                cur.end = d.time;
+                if (v > cur.max) { cur.max = v; cur.maxTime = d.time; }
+              }
+            } else if (cur) {
+              // valeur redescendue ou mesure absente : fin de l'épisode
+              if (!valid(v)) cur.interrupted = true;
+              episodes.push(cur);
+              cur = null;
+            }
+          });
+          if (cur) { cur.ongoing = true; episodes.push(cur); }
+          if (episodes.length) {
+            epLines.push('- ' + th.label + ' : ' + episodes.map(function (e) {
+              var durH = Math.round(((new Date(e.end) - new Date(e.start)) + stepMs) / 3600000 * 10) / 10;
+              return 'du ' + fmtDT(e.start) + ' au ' + fmtDT(e.end) +
+                ' (' + durH + ' h, max ' + Math.round(e.max) + ' ' + th.unit + ' à ' + fmtDT(e.maxTime) + ')' +
+                (e.ongoing ? ' — en cours en fin de période' : '');
+            }).join(' ; '));
+          } else {
+            epLines.push('- ' + th.label + ' : aucun dépassement');
+          }
+        });
+      });
+      if (epLines.length) {
+        sections.push('Dépassements de seuils détectés :\n' + epLines.join('\n'));
+      }
+
+      // --- 2. Indice de confinement ICONE (approximation) ---
+      var co2vals = data.map(function (d) { return d.CO2; }).filter(valid);
+      if (co2vals.length >= 10) {
+        var f1 = co2vals.filter(function (v) { return v > 1000 && v <= 1700; }).length / co2vals.length;
+        var f2 = co2vals.filter(function (v) { return v > 1700; }).length / co2vals.length;
+        var icone = Math.min(5, Math.round((2.5 / Math.log10(2)) * Math.log10(1 + f1 + 3 * f2)));
+        var iconeLabels = ['confinement nul', 'confinement faible', 'confinement moyen', 'confinement élevé', 'confinement très élevé', 'confinement extrême'];
+        sections.push('Indice de confinement ICONE ≈ ' + icone + '/5 (' + iconeLabels[icone] + '). ' +
+          'Approximation calculée sur les ' + co2vals.length + ' mesures CO2 disponibles ; ' +
+          'l\'indice officiel se calcule sur les seules périodes d\'occupation.');
+      }
+
+      // --- 3. Statistiques pendant les contextualisations ---
+      if (contexts && contexts.length > 0) {
+        var ctxLines = [];
+        contexts.forEach(function (c) {
+          var cs = new Date(c.datetime_start).getTime();
+          var ce = new Date(c.datetime_stop).getTime();
+          if (cs > endDate.getTime() || ce < startDate.getTime()) return;
+          var during = data.filter(function (d) {
+            var t = new Date(d.time).getTime();
+            return t >= cs && t <= ce;
+          });
+          var before = data.filter(function (d) {
+            var t = new Date(d.time).getTime();
+            return t >= cs - 3 * 3600000 && t < cs;
+          });
+          var parts = [];
+          ['CO2', 'PM25', 'PM10', 'COV'].forEach(function (p) {
+            var dv = during.map(function (d) { return d[p]; }).filter(valid);
+            if (!dv.length) return;
+            var avg = Math.round(dv.reduce(function (a, b) { return a + b; }, 0) / dv.length);
+            var max = Math.round(Math.max.apply(null, dv));
+            var txt = p.replace('PM25', 'PM2.5') + ' moy=' + avg + ' max=' + max;
+            var bv = before.map(function (d) { return d[p]; }).filter(valid);
+            if (bv.length) {
+              txt += ' (moy avant : ' + Math.round(bv.reduce(function (a, b) { return a + b; }, 0) / bv.length) + ')';
+            }
+            parts.push(txt);
+          });
+          if (parts.length) {
+            ctxLines.push('- pendant « ' + (c.context_type || 'inconnu') + ' » (' + fmtDT(c.datetime_start) + ' → ' + fmtDT(c.datetime_stop) + ') : ' + parts.join(', '));
+          }
+        });
+        if (ctxLines.length) {
+          sections.push('Mesures pendant les contextualisations (vs moyenne des 3 h précédentes) :\n' + ctxLines.join('\n'));
+        }
+      }
+
+      // --- 4. Complétude des mesures ---
+      var completeness = [];
+      [['PM25', 'PM2.5'], ['PM10', 'PM10'], ['CO2', 'CO2'], ['COV', 'COV'], ['TEMP', 'Température'], ['HUM', 'Humidité']].forEach(function (p) {
+        var nValid = data.filter(function (d) { return valid(d[p[0]]); }).length;
+        if (nValid === 0) {
+          completeness.push(p[1] + ' : non mesuré sur la période');
+        } else if (nValid < data.length * 0.9) {
+          completeness.push(p[1] + ' : mesuré sur ' + Math.round(100 * nValid / data.length) + ' % des points');
+        }
+      });
+      if (completeness.length) {
+        sections.push('Complétude des données : ' + completeness.join(' ; ') + '. Ne commente pas les grandeurs non mesurées.');
+      }
+
+      return sections.join('\n\n');
+    }
+
     function buildAiPrompt(data, contexts, startDate, endDate) {
       // Compute stats per pollutant
       var pollutants = ['PM1', 'PM25', 'PM10', 'CO2', 'COV', 'TEMP', 'HUM'];
@@ -6480,13 +6620,18 @@
       prompt += '\nMoyennes horaires :\n' + timePoints.join('\n');
       prompt += contextInfo;
 
+      var precomputed = buildPrecomputedAnalyses(data, contexts, startDate, endDate);
+      if (precomputed) {
+        prompt += '\n\nAnalyses précalculées par le logiciel (valeurs exactes et fiables — reprends-les telles quelles, ne recalcule rien depuis les moyennes horaires) :\n\n' + precomputed;
+      }
+
       prompt += '\n\nDonne une analyse concise en français (max 200 mots), en 4 points :\n';
       prompt += '1. Évaluation générale de la qualité de l\'air intérieur\n';
-      prompt += '2. Points d\'attention : compare chaque polluant mesuré aux seuils AirCarto fournis dans tes instructions et signale tout dépassement (valeur, moment, durée)\n';
+      prompt += '2. Points d\'attention : appuie-toi sur les dépassements précalculés ci-dessus (valeur, moment, durée) et qualifie-les avec les seuils AirCarto fournis dans tes instructions\n';
       prompt += '3. Tendances observées (cycles journaliers, pics récurrents)\n';
       prompt += '4. Recommandations pratiques pour l\'occupant, tirées des règles fournies dans tes instructions\n';
       prompt += 'Ne mentionne que les polluants réellement mesurés ci-dessus. ';
-      prompt += 'Si des contextualisations sont présentes, mets-les en relation avec les mesures correspondantes.';
+      prompt += 'Si des contextualisations sont présentes, mets-les en relation avec les mesures correspondantes en t\'appuyant sur les statistiques précalculées.';
 
       return prompt;
     }
