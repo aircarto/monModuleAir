@@ -2843,12 +2843,12 @@
     }
     scheduleAutoReload();
 
-    // Vérification du statut du capteur toutes les 2 minutes
+    // Statut du capteur + valeurs des jauges rafraîchis toutes les minutes
     setInterval(() => {
       if (moduleair && token) {
         checkSensorStatus();
       }
-    }, 120000);
+    }, 60000);
 
     // Remove the auto-login loading screen (shown before first paint by the
     // inline <head> script) and reveal whatever the current state is
@@ -5792,6 +5792,10 @@
       }
     });
 
+    // Update hooks registered by each gauge so the periodic status check can
+    // refresh the displayed values in place
+    var gaugeUpdaters = {};
+
     function gaugeCreator(root, measure, type) {
       //console.log(measure);
 
@@ -5916,6 +5920,16 @@
           easing: am5.ease.out(am5.ease.cubic),
         });
       }, 1000);
+
+      gaugeUpdaters[type] = function (newValue) {
+        if (newValue == null || isNaN(newValue)) return;
+        axisDataItem.animate({
+          key: "value",
+          to: Math.round(newValue),
+          duration: 500,
+          easing: am5.ease.out(am5.ease.cubic),
+        });
+      };
 
       chart.bulletsContainer.set("mask", undefined);
 
@@ -7532,8 +7546,11 @@
           "&token=" +
           token,
       }).done(function (data) {
-        if (data != null && data.length > 0) {
+        if (data != null && data.length > 0 && data[0] && !data[0].error) {
           updateSensorStatus(data[0].time);
+          ["PM1", "PM25", "PM10", "CO2"].forEach(function (t) {
+            if (gaugeUpdaters[t]) gaugeUpdaters[t](data[0][t]);
+          });
         }
       });
     }
