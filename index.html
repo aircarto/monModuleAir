@@ -6461,7 +6461,7 @@
         }
       }
 
-      var prompt = 'Tu es un expert en qualité de l\'air intérieur. Analyse les données suivantes d\'un capteur ModuleAir (capteur ID: ' + moduleair + ') sur les 3 derniers jours.\n\n';
+      var prompt = 'Analyse les données suivantes d\'un capteur ModuleAir (capteur ID: ' + moduleair + ') sur les 3 derniers jours.\n\n';
       prompt += 'Statistiques sur la période (' + startDate.toLocaleDateString('fr-FR') + ' - ' + endDate.toLocaleDateString('fr-FR') + ') :\n';
 
       var units = { PM1: 'µg/m³', PM25: 'µg/m³', PM10: 'µg/m³', CO2: 'ppm', COV: 'ppb', TEMP: '°C', HUM: '%' };
