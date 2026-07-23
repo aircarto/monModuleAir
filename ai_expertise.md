@@ -25,8 +25,45 @@
 | PM1 (à valider) | < 10 | 10–20 | 20–25 | 25–50 | > 50 | µg/m³ |
 | PM2.5 (à valider) | < 10 | 10–20 | 20–25 | 25–50 | > 50 | µg/m³ |
 | PM10 (à valider) | < 20 | 20–40 | 40–50 | 50–100 | > 100 | µg/m³ |
-| CO2 (HCSP, à valider) | < 800 | 800–1500 | — | > 1500 | — | ppm |
+| CO2 (HCSP) | < 800 | 800–1500 | — | > 1500 | — | ppm |
 | COV (à valider) | < 250 | 250–500 | 500–1000 | > 1000 | — | ppb |
+
+### CO2 — référentiel HCSP (avis relatif à la mesure du CO2)
+
+Contexte : cet avis s'inscrit dans l'évolution du cadre réglementaire de la
+surveillance obligatoire de la qualité de l'air intérieur dans certains
+établissements recevant du public (ERP), à des moments clés de la vie des
+bâtiments (action n°14 du Plan national santé-environnement 2021-2025, PNSE4).
+
+Pourquoi le CO2 : produit par la respiration humaine, son élévation traduit un
+confinement de l'air des locaux, associé à une diminution des performances
+cognitives et, en présence de personnes sources, à une augmentation de la
+concentration d'agents infectieux aéroportés.
+
+Les deux valeurs définies par le HCSP pour les ERP :
+
+- **800 ppm — valeur repère d'aide à la gestion** : objectif d'un
+  renouvellement de l'air satisfaisant des locaux occupés, par apport d'air
+  neuf.
+- **1500 ppm — valeur d'action rapide** : confinement de l'air non acceptable
+  au regard de la littérature scientifique, nécessitant des actions
+  correctives.
+
+Recommandations HCSP associées :
+
+- Dimensionner les stratégies d'aération/ventilation et la jauge d'occupation
+  des espaces clos par un **enregistrement en continu du CO2 sur une semaine
+  d'occupation**, permettant de calculer un **indice de confinement ICONE**,
+  notamment lors de travaux du bâtiment (dont rénovation énergétique).
+- Utiliser des **détecteurs de CO2 en période d'occupation** pour s'assurer en
+  temps réel des conditions de renouvellement de l'air lors de changements de
+  jauge d'occupation et/ou d'activité.
+
+Important pour ton analyse : ces valeurs et recommandations visent les **ERP**
+(écoles, bibliothèques, musées, magasins, salles de spectacle, etc.). Si le
+capteur est installé dans un logement, tu peux t'appuyer sur les mêmes valeurs
+comme repères de confinement, mais précise qu'il s'agit de recommandations
+conçues pour les ERP, transposées au cadre domestique.
 
 Repères de confort (à valider) :
 
